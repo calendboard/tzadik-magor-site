@@ -1,0 +1,123 @@
+/* ============================================================
+   הצדיק מעג׳ור — עיצוב דף התרומה
+   ============================================================ */
+
+.donate-page{ padding-top:64px; }
+
+.donate-hero{
+  position:relative; text-align:center; padding:70px 0 30px; overflow:hidden;
+  background:radial-gradient(900px 460px at 50% -20%, #2a1e10, var(--bg) 70%);
+}
+.donate-hero .orb{ opacity:.4; }
+.donate-hero .container{ position:relative; z-index:2; }
+
+.donate-section{ padding-top:30px; }
+.donate-layout{
+  display:grid; grid-template-columns:1.5fr 1fr; gap:34px; align-items:start;
+}
+
+/* ---------- בלוקים בטופס ---------- */
+.donate-form{ display:grid; gap:8px; }
+.d-block{
+  border:1px solid var(--line); border-radius:var(--radius); padding:24px 22px; margin:0 0 18px;
+  background:linear-gradient(180deg,var(--panel),#100d09);
+}
+.d-legend{
+  font-family:var(--ff-serif); font-weight:700; font-size:1.2rem; color:var(--gold-2);
+  padding:0 8px; margin-inline-start:-8px;
+}
+.optional{ color:var(--muted); font-size:.82rem; font-weight:400; }
+
+/* ---------- טאבים של מטרה ---------- */
+.seg-tabs{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:14px; }
+.seg-tab{
+  padding:14px 8px; border-radius:14px; cursor:pointer; font-family:var(--ff-sans);
+  background:#0f0c08; border:1px solid var(--line-2); color:var(--cream); font-weight:500; font-size:.98rem;
+  transition:.22s; text-align:center;
+}
+.seg-tab:hover{ border-color:var(--gold); }
+.seg-tab.active{ background:rgba(216,179,73,.14); border-color:var(--gold); color:var(--gold-2); box-shadow:0 0 0 3px rgba(216,179,73,.12); }
+
+/* ---------- בחירת סכום ---------- */
+.amount-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:14px; }
+.amount{
+  position:relative; padding:18px 8px; border-radius:14px; cursor:pointer;
+  background:#0f0c08; border:1px solid var(--line-2); color:var(--cream);
+  font-family:var(--ff-serif); font-weight:700; font-size:1.35rem; transition:.22s;
+}
+.amount small{ display:block; font-family:var(--ff-sans); font-weight:400; font-size:.72rem; color:var(--muted); margin-top:3px; }
+.amount:hover{ border-color:var(--gold); transform:translateY(-2px); }
+.amount.active{ background:var(--gold-grad); color:#241803; border-color:transparent; box-shadow:0 10px 26px rgba(216,179,73,.34); }
+.amount.active small{ color:#3a2a08; }
+
+.custom-amount{ margin-top:14px; }
+.custom-amount label{ display:block; font-size:.9rem; color:var(--gold-2); margin-bottom:7px; }
+.custom-amount input{
+  width:100%; padding:13px 14px; border-radius:12px; background:#0f0c08; color:var(--cream);
+  border:1px solid var(--line-2); font-size:1.1rem; font-family:var(--ff-serif);
+}
+.custom-amount input:focus{ outline:none; border-color:var(--gold); box-shadow:0 0 0 3px rgba(216,179,73,.16); }
+
+/* ---------- תדירות ---------- */
+.freq-toggle{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:18px; background:#0f0c08; padding:6px; border-radius:14px; border:1px solid var(--line); }
+.freq{
+  padding:12px; border-radius:10px; cursor:pointer; background:transparent; border:0; color:var(--muted);
+  font-family:var(--ff-sans); font-weight:600; font-size:.98rem; transition:.2s;
+}
+.freq.active{ background:rgba(216,179,73,.16); color:var(--gold-2); }
+
+/* ---------- הקדשה ---------- */
+.ded-row{ display:grid; grid-template-columns:1fr 1.4fr; gap:12px; margin-top:8px; }
+.ded-type, .ded-row input{
+  width:100%; padding:13px 14px; border-radius:12px; background:#0f0c08; color:var(--cream);
+  border:1px solid var(--line-2); font-size:1rem; font-family:var(--ff-sans);
+}
+.ded-type:focus, .ded-row input:focus{ outline:none; border-color:var(--gold); box-shadow:0 0 0 3px rgba(216,179,73,.16); }
+.ded-hint{ color:var(--muted); font-size:.86rem; margin:10px 0 0; }
+
+/* ---------- פרטי תורם ---------- */
+.d-fields{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:8px; }
+.d-fields .field:first-child{ grid-column:1 / -1; }
+
+/* ---------- שליחה ---------- */
+.d-submit{ margin-top:6px; }
+.secure-note{ text-align:center; color:var(--muted); font-size:.86rem; margin:14px 0 0; }
+
+/* ---------- צד: סיכום + אמון ---------- */
+.donate-aside{ display:grid; gap:18px; position:sticky; top:84px; }
+.summary-card{
+  border:1px solid var(--line-2); border-radius:var(--radius); padding:24px;
+  background:
+    radial-gradient(400px 200px at 50% -20%, rgba(216,179,73,.12), transparent 70%),
+    linear-gradient(180deg,var(--panel),#100d09);
+  box-shadow:var(--shadow);
+}
+.summary-card h3{ margin:0 0 16px; color:var(--gold-2); font-size:1.3rem; }
+.summary-list{ list-style:none; padding:0; margin:0; display:grid; gap:12px; }
+.summary-list li{ display:flex; justify-content:space-between; gap:14px; color:var(--muted); }
+.summary-list li b{ color:var(--cream); font-weight:600; text-align:left; }
+.summary-total{ border-top:1px solid var(--line); padding-top:14px; margin-top:4px; }
+.summary-total span{ color:var(--cream); font-size:1.05rem; }
+.summary-total b{ color:var(--gold-2)!important; font-family:var(--ff-serif); font-size:1.7rem; }
+
+.trust-card{ border:1px solid var(--line); border-radius:var(--radius); padding:20px 22px; background:var(--panel); display:grid; gap:13px; }
+.trust-item{ display:flex; align-items:center; gap:12px; color:#ddd2bb; font-size:.96rem; }
+.trust-item span{ font-size:1.2rem; }
+
+.aside-quote{
+  margin:0; padding:22px; border-radius:var(--radius); border:1px dashed var(--line-2);
+  font-family:var(--ff-serif); font-size:1.2rem; color:var(--cream); text-align:center; line-height:1.5;
+}
+.aside-quote cite{ display:block; font-family:var(--ff-sans); font-style:normal; font-size:.9rem; color:var(--muted); margin-top:12px; }
+
+/* ---------- רספונסיב ---------- */
+@media (max-width:920px){
+  .donate-layout{ grid-template-columns:1fr; }
+  .donate-aside{ position:static; }
+  .seg-tabs{ grid-template-columns:1fr 1fr; }
+}
+@media (max-width:520px){
+  .amount-grid{ grid-template-columns:1fr 1fr; }
+  .ded-row, .d-fields{ grid-template-columns:1fr; }
+  .d-fields .field:first-child{ grid-column:auto; }
+}

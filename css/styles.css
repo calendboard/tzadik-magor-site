@@ -1,0 +1,411 @@
+/* ============================================================
+   הצדיק מעג׳ור — עיצוב ראשי
+   צבעים: זהב על רקע כהה ויוקרתי · עברית · מימין לשמאל
+   ============================================================ */
+
+:root{
+  --bg:        #0c0a08;
+  --bg-2:      #14100b;
+  --bg-3:      #1c1610;
+  --panel:     #181310;
+  --gold:      #d8b349;
+  --gold-2:    #f7e7a3;
+  --gold-3:    #c9a23a;
+  --cream:     #f4ecd8;
+  --muted:     #b6a98c;
+  --line:      rgba(216,179,73,.18);
+  --line-2:    rgba(216,179,73,.32);
+  --shadow:    0 24px 60px rgba(0,0,0,.45);
+  --radius:    18px;
+  --maxw:      1180px;
+  --gold-grad: linear-gradient(135deg,#f7e7a3 0%,#d8b349 45%,#b4842a 100%);
+  --ff-serif:  "Frank Ruhl Libre", Georgia, serif;
+  --ff-sans:   "Heebo", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+}
+
+*,*::before,*::after{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+body{
+  margin:0;
+  font-family:var(--ff-sans);
+  background:var(--bg);
+  color:var(--cream);
+  line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+img{ max-width:100%; display:block; }
+a{ color:inherit; text-decoration:none; }
+h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
+
+.container{ width:100%; max-width:var(--maxw); margin-inline:auto; padding-inline:22px; }
+.center{ text-align:center; }
+
+.skip-link{
+  position:absolute; right:-9999px; top:0; background:var(--gold); color:#1a1206;
+  padding:10px 18px; border-radius:0 0 10px 0; z-index:2000; font-weight:700;
+}
+.skip-link:focus{ right:0; }
+
+/* ============ כפתורים ============ */
+.btn{
+  --pad:13px 26px;
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  padding:var(--pad); border-radius:999px; font-family:var(--ff-sans);
+  font-weight:700; font-size:1rem; cursor:pointer; border:1px solid transparent;
+  transition:transform .25s ease, box-shadow .25s ease, background .25s ease, color .25s ease;
+  white-space:nowrap;
+}
+.btn-lg{ --pad:16px 36px; font-size:1.08rem; }
+.btn-sm{ --pad:9px 18px; font-size:.9rem; }
+.btn-block{ width:100%; }
+.btn-gold{ background:var(--gold-grad); color:#241803; box-shadow:0 10px 28px rgba(216,179,73,.32); }
+.btn-gold:hover{ transform:translateY(-3px); box-shadow:0 16px 38px rgba(216,179,73,.46); }
+.btn-ghost{ background:rgba(255,255,255,.04); color:var(--cream); border-color:var(--line-2); backdrop-filter:blur(6px); }
+.btn-ghost:hover{ background:rgba(216,179,73,.12); border-color:var(--gold); transform:translateY(-3px); }
+.btn-outline{ background:transparent; color:var(--gold-2); border-color:var(--gold-3); }
+.btn-outline:hover{ background:var(--gold); color:#241803; transform:translateY(-3px); }
+.btn-dark{ background:#120d08; color:var(--gold-2); border-color:var(--line-2); }
+.btn-dark:hover{ transform:translateY(-3px); background:#000; }
+
+/* ============ ניווט ============ */
+.site-header{
+  position:fixed; inset:0 0 auto 0; z-index:1000;
+  padding:14px 0; transition:background .35s ease, padding .35s ease, box-shadow .35s ease;
+}
+.site-header.scrolled{
+  background:rgba(12,10,8,.82); backdrop-filter:blur(14px);
+  padding:8px 0; box-shadow:0 8px 30px rgba(0,0,0,.4); border-bottom:1px solid var(--line);
+}
+.nav-wrap{ display:flex; align-items:center; justify-content:space-between; gap:18px; }
+.brand{ display:flex; align-items:center; gap:10px; font-family:var(--ff-serif); font-size:1.35rem; }
+.brand-mark{ display:grid; place-items:center; filter:drop-shadow(0 2px 6px rgba(216,179,73,.45)); }
+.brand-text b{ color:var(--gold-2); }
+.main-nav{ display:flex; gap:6px; }
+.main-nav a{
+  padding:8px 14px; border-radius:999px; color:var(--cream); font-weight:500; font-size:.98rem;
+  position:relative; transition:color .2s ease, background .2s ease;
+}
+.main-nav a:hover{ color:var(--gold-2); background:rgba(216,179,73,.1); }
+.nav-cta{ display:flex; align-items:center; gap:12px; }
+.nav-toggle{ display:none; flex-direction:column; gap:5px; background:none; border:0; cursor:pointer; padding:6px; }
+.nav-toggle span{ width:26px; height:2px; background:var(--gold-2); border-radius:2px; transition:.3s; }
+.nav-toggle.open span:nth-child(1){ transform:translateY(7px) rotate(45deg); }
+.nav-toggle.open span:nth-child(2){ opacity:0; }
+.nav-toggle.open span:nth-child(3){ transform:translateY(-7px) rotate(-45deg); }
+
+/* ============ HERO ============ */
+.hero{
+  position:relative; min-height:100svh; display:flex; align-items:center;
+  text-align:center; padding:120px 0 80px; overflow:hidden;
+  background:radial-gradient(1200px 700px at 50% -10%, #241a0e 0%, var(--bg) 60%);
+}
+.hero-bg{ position:absolute; inset:0; z-index:0; }
+.orb{ position:absolute; border-radius:50%; filter:blur(70px); opacity:.5; animation:float 14s ease-in-out infinite; }
+.orb-1{ width:420px; height:420px; background:radial-gradient(circle,#7a5a1e,transparent 70%); top:-60px; right:-80px; }
+.orb-2{ width:360px; height:360px; background:radial-gradient(circle,#5a3d12,transparent 70%); bottom:-40px; left:-60px; animation-delay:-4s; }
+.orb-3{ width:300px; height:300px; background:radial-gradient(circle,#8a6a24,transparent 70%); top:40%; left:55%; animation-delay:-8s; }
+@keyframes float{ 0%,100%{ transform:translate(0,0) scale(1);} 50%{ transform:translate(0,-30px) scale(1.08);} }
+.hero-particles{ position:absolute; inset:0; }
+.hero-particles i{
+  position:absolute; bottom:-10px; width:4px; height:4px; border-radius:50%;
+  background:var(--gold-2); opacity:.0; box-shadow:0 0 8px var(--gold-2);
+  animation:rise linear infinite;
+}
+@keyframes rise{
+  0%{ transform:translateY(0) scale(.6); opacity:0; }
+  10%{ opacity:.9; }
+  100%{ transform:translateY(-90vh) scale(1); opacity:0; }
+}
+.hero-inner{ position:relative; z-index:2; }
+.eyebrow{
+  color:var(--gold-2); letter-spacing:.22em; font-weight:500; font-size:.86rem;
+  text-transform:uppercase; margin:0 0 18px;
+}
+.hero-title{ font-size:clamp(3rem,9vw,6.2rem); margin:8px 0 14px; font-weight:900; letter-spacing:-.5px; }
+.gold-text{
+  background:var(--gold-grad); -webkit-background-clip:text; background-clip:text; color:transparent;
+  filter:drop-shadow(0 4px 18px rgba(216,179,73,.35));
+}
+.hero-sub{ font-size:clamp(1.05rem,2.4vw,1.4rem); color:var(--muted); max-width:680px; margin:0 auto 34px; }
+.hero-actions{ display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
+.hero-stats{ display:flex; align-items:center; justify-content:center; gap:26px; margin-top:54px; flex-wrap:wrap; }
+.stat{ display:flex; flex-direction:column; align-items:center; }
+.stat-num{ font-family:var(--ff-serif); font-size:2.3rem; font-weight:900; color:var(--gold-2); line-height:1; }
+.stat-plus{ display:none; }
+.stat-label{ font-size:.84rem; color:var(--muted); margin-top:6px; }
+.stat-sep{ width:1px; height:42px; background:var(--line-2); }
+
+.scroll-cue{ position:absolute; bottom:26px; left:50%; transform:translateX(-50%); z-index:3; }
+.scroll-cue span{
+  display:block; width:24px; height:40px; border:2px solid var(--line-2); border-radius:14px; position:relative;
+}
+.scroll-cue span::after{
+  content:""; position:absolute; top:7px; left:50%; transform:translateX(-50%);
+  width:5px; height:8px; background:var(--gold-2); border-radius:3px; animation:scrolldot 1.6s infinite;
+}
+@keyframes scrolldot{ 0%{opacity:0;transform:translate(-50%,0);} 40%{opacity:1;} 100%{opacity:0;transform:translate(-50%,14px);} }
+
+/* ============ נר מונפש ============ */
+.candle{ position:relative; width:80px; height:120px; margin:0 auto 26px; }
+.candle.small{ transform:scale(.85); margin-bottom:10px; }
+.candle-body{
+  position:absolute; bottom:0; left:50%; transform:translateX(-50%);
+  width:34px; height:74px; border-radius:8px 8px 4px 4px;
+  background:linear-gradient(90deg,#e9dcc0,#fff6e2 45%,#cdbf9d);
+  box-shadow:inset 0 0 6px rgba(0,0,0,.15);
+}
+.wick{ position:absolute; bottom:74px; left:50%; transform:translateX(-50%); width:3px; height:10px; background:#3a2a1a; }
+.flame{
+  position:absolute; bottom:82px; left:50%; transform:translateX(-50%);
+  width:18px; height:34px; border-radius:50% 50% 50% 50%/60% 60% 40% 40%;
+  background:linear-gradient(to top,#ffd34d,#ff8a1e 55%,#ff5a1e);
+  transform-origin:50% 100%; animation:flicker 1.4s ease-in-out infinite alternate;
+  box-shadow:0 0 18px 6px rgba(255,160,40,.55);
+}
+.flame-glow{
+  position:absolute; inset:-6px; border-radius:50%;
+  background:radial-gradient(circle,rgba(255,200,90,.5),transparent 70%);
+}
+@keyframes flicker{
+  0%{ transform:translateX(-50%) rotate(-3deg) scaleY(1); }
+  50%{ transform:translateX(-50%) rotate(2deg) scaleY(1.06); }
+  100%{ transform:translateX(-50%) rotate(-1deg) scaleY(.97); }
+}
+.candle-light{
+  position:absolute; bottom:60px; left:50%; transform:translateX(-50%);
+  width:240px; height:240px; border-radius:50%;
+  background:radial-gradient(circle,rgba(255,190,80,.22),transparent 65%);
+  pointer-events:none; animation:lightpulse 3s ease-in-out infinite;
+}
+@keyframes lightpulse{ 0%,100%{opacity:.7;} 50%{opacity:1;} }
+
+/* ============ סקשנים כלליים ============ */
+.section{ padding:96px 0; position:relative; }
+.section-eyebrow{
+  color:var(--gold-2); letter-spacing:.2em; text-transform:uppercase; font-size:.8rem;
+  font-weight:600; margin:0 0 12px;
+}
+.section-title{ font-size:clamp(1.9rem,4.5vw,3rem); margin:0 0 16px; }
+.section-lead{ color:var(--muted); font-size:1.1rem; max-width:640px; margin:0 auto; }
+.section-head{ margin-bottom:54px; }
+.section-head.center{ margin-inline:auto; }
+
+/* ============ פס פסוק ============ */
+.quote-strip{
+  padding:70px 0; text-align:center;
+  background:linear-gradient(180deg,var(--bg-2),var(--bg));
+  border-block:1px solid var(--line);
+}
+.quote-ornament{ display:block; color:var(--gold-3); font-size:1.6rem; margin-bottom:16px; }
+.quote-strip blockquote{
+  margin:0 auto; max-width:820px; font-family:var(--ff-serif); font-size:clamp(1.5rem,3.6vw,2.3rem);
+  color:var(--cream); line-height:1.5;
+}
+.quote-strip cite{ display:block; font-family:var(--ff-sans); font-style:normal; color:var(--muted); font-size:1rem; margin-top:18px; }
+
+/* ============ אודות ============ */
+.about{ background:linear-gradient(180deg,var(--bg),var(--bg-2)); }
+.about-grid{ display:grid; grid-template-columns:0.9fr 1.1fr; gap:60px; align-items:center; }
+.portrait-frame{
+  position:relative; aspect-ratio:4/5; border-radius:var(--radius); overflow:hidden;
+  border:1px solid var(--line-2);
+  background:
+    radial-gradient(circle at 50% 30%, #2a2016, #14100b),
+    repeating-linear-gradient(45deg, rgba(216,179,73,.05) 0 12px, transparent 12px 24px);
+  box-shadow:var(--shadow);
+}
+.portrait-frame::after{
+  content:""; position:absolute; inset:10px; border:1px solid var(--line-2); border-radius:12px; pointer-events:none;
+}
+.portrait-placeholder{
+  position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:14px; color:var(--gold-3); text-align:center; padding:20px;
+}
+.portrait-placeholder span{ color:var(--muted); font-size:.95rem; }
+.portrait-caption{ text-align:center; margin-top:16px; color:var(--gold-2); font-family:var(--ff-serif); font-size:1.15rem; }
+.about-text p{ color:#ddd2bb; margin:0 0 16px; }
+.placeholder-note{
+  background:rgba(216,179,73,.07); border:1px dashed var(--line-2); border-radius:12px;
+  padding:14px 16px; color:var(--muted)!important; font-size:.95rem;
+}
+.about-facts{ list-style:none; padding:0; margin:24px 0; display:grid; gap:10px; }
+.about-facts li{ display:flex; justify-content:space-between; gap:16px; padding:12px 16px; background:var(--panel); border:1px solid var(--line); border-radius:12px; }
+.fact-k{ color:var(--muted); }
+.fact-v{ color:var(--gold-2); font-weight:600; }
+
+/* ============ סגולות / כרטיסים ============ */
+.cards-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+.card{
+  background:linear-gradient(180deg,var(--panel),#12100b);
+  border:1px solid var(--line); border-radius:var(--radius); padding:32px 26px;
+  transition:transform .3s ease, border-color .3s ease, box-shadow .3s ease;
+  position:relative; overflow:hidden;
+}
+.card::before{
+  content:""; position:absolute; inset:0 0 auto 0; height:3px; background:var(--gold-grad);
+  transform:scaleX(0); transform-origin:right; transition:transform .35s ease;
+}
+.card:hover{ transform:translateY(-8px); border-color:var(--line-2); box-shadow:var(--shadow); }
+.card:hover::before{ transform:scaleX(1); }
+.card-icon{
+  width:60px; height:60px; display:grid; place-items:center; border-radius:16px; font-size:1.7rem;
+  background:rgba(216,179,73,.1); color:var(--gold-2); margin-bottom:18px; border:1px solid var(--line);
+}
+.card h3{ font-size:1.35rem; margin:0 0 10px; color:var(--cream); }
+.card p{ color:var(--muted); margin:0; }
+
+/* ============ הילולא ============ */
+.hillula{ text-align:center; overflow:hidden; }
+.hillula-bg{
+  position:absolute; inset:0; z-index:0; opacity:.5;
+  background:radial-gradient(700px 380px at 50% 0%, #3a2a12, transparent 70%);
+}
+.hillula-inner{ position:relative; z-index:1; }
+.countdown{ display:flex; gap:16px; justify-content:center; margin:38px 0; flex-wrap:wrap; }
+.cd-box{
+  min-width:96px; padding:20px 14px; border-radius:16px;
+  background:linear-gradient(180deg,var(--panel),#100d09); border:1px solid var(--line-2);
+  box-shadow:var(--shadow);
+}
+.cd-num{ display:block; font-family:var(--ff-serif); font-size:2.6rem; font-weight:900; color:var(--gold-2); line-height:1; }
+.cd-label{ font-size:.82rem; color:var(--muted); margin-top:8px; display:block; }
+
+/* ============ ישועות ============ */
+.stories{ background:linear-gradient(180deg,var(--bg-2),var(--bg)); }
+.stories-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+.story{
+  position:relative; margin:0; padding:34px 28px 28px; border-radius:var(--radius);
+  background:var(--panel); border:1px solid var(--line);
+}
+.story-quote{ position:absolute; top:8px; right:20px; font-family:var(--ff-serif); font-size:4rem; color:var(--line-2); line-height:1; }
+.story blockquote{ margin:0 0 16px; color:#e4dac3; font-size:1.05rem; position:relative; z-index:1; }
+.story figcaption{ color:var(--gold-2); font-weight:600; }
+.stories-note{ text-align:center; color:var(--muted); font-size:.86rem; margin-top:26px; }
+
+/* ============ גלריה ============ */
+.gallery-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+.gallery-item{
+  aspect-ratio:4/3; border-radius:14px; display:grid; place-items:center;
+  color:var(--muted); border:1px solid var(--line); cursor:pointer; overflow:hidden;
+  background:linear-gradient(135deg,#1d1610,#241b11);
+  transition:transform .3s ease, box-shadow .3s ease;
+}
+.gallery-item span{ background:rgba(0,0,0,.25); padding:6px 12px; border-radius:8px; font-size:.9rem; }
+.gallery-item:hover{ transform:scale(1.03); box-shadow:var(--shadow); }
+.gallery-item:nth-child(odd){ background:linear-gradient(135deg,#241b11,#1a140d); }
+
+/* ============ תפילה ============ */
+.prayer{ background:linear-gradient(180deg,var(--bg),var(--bg-2)); }
+.prayer-card{
+  max-width:760px; margin:0 auto; text-align:center; padding:48px 36px; border-radius:24px;
+  background:
+    radial-gradient(500px 240px at 50% -20%, rgba(216,179,73,.12), transparent 70%),
+    linear-gradient(180deg,var(--panel),#100d09);
+  border:1px solid var(--line-2); box-shadow:var(--shadow);
+}
+.prayer-text{ font-family:var(--ff-serif); font-size:1.3rem; color:var(--cream); line-height:1.7; margin:18px 0 28px; }
+.prayer-actions{ display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
+
+/* ============ CTA נר ============ */
+.candle-cta{ text-align:center; background:radial-gradient(700px 400px at 50% 120%, #2a1e10, var(--bg)); }
+.candle-cta-inner{ max-width:640px; margin:0 auto; }
+
+/* ============ צור קשר ============ */
+.contact{ background:linear-gradient(180deg,var(--bg-2),var(--bg)); }
+.contact-grid{ display:grid; grid-template-columns:1fr 1fr; gap:50px; align-items:start; }
+.contact-info p{ color:var(--muted); }
+.contact-list{ list-style:none; padding:0; margin:24px 0 0; display:grid; gap:14px; }
+.contact-list li{ display:flex; align-items:center; gap:12px; color:#ddd2bb; }
+.contact-list .ci{ width:38px; height:38px; display:grid; place-items:center; border-radius:10px; background:rgba(216,179,73,.1); color:var(--gold-2); border:1px solid var(--line); }
+.contact-form{ background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:28px; box-shadow:var(--shadow); }
+.field{ margin-bottom:16px; }
+.field label{ display:block; margin-bottom:7px; font-size:.92rem; color:var(--gold-2); font-weight:500; }
+.field input,.field select,.field textarea{
+  width:100%; padding:12px 14px; border-radius:11px; background:#0f0c08; color:var(--cream);
+  border:1px solid var(--line-2); font-family:var(--ff-sans); font-size:1rem; transition:border-color .2s ease, box-shadow .2s ease;
+}
+.field input:focus,.field select:focus,.field textarea:focus{
+  outline:none; border-color:var(--gold); box-shadow:0 0 0 3px rgba(216,179,73,.16);
+}
+.field textarea{ resize:vertical; }
+.form-status{ margin:14px 0 0; font-size:.95rem; min-height:1.2em; color:var(--gold-2); text-align:center; }
+
+/* ============ פס תרומה ============ */
+.donate-banner{ background:var(--gold-grad); color:#241803; }
+.donate-banner-inner{ display:flex; align-items:center; justify-content:space-between; gap:30px; padding:48px 22px; flex-wrap:wrap; }
+.donate-banner h2{ margin:0 0 8px; font-size:clamp(1.6rem,3.5vw,2.4rem); color:#1c1304; }
+.donate-banner p{ margin:0; color:#3a2a08; font-weight:500; max-width:560px; }
+
+/* ============ פוטר ============ */
+.site-footer{ background:#08060409; background:#080604; border-top:1px solid var(--line); }
+.footer-grid{ display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr; gap:36px; padding:60px 22px 36px; }
+.footer-col h4{ color:var(--gold-2); margin:0 0 16px; font-size:1.1rem; }
+.footer-col ul{ list-style:none; padding:0; margin:0; display:grid; gap:10px; }
+.footer-col a{ color:var(--muted); transition:color .2s ease; }
+.footer-col a:hover{ color:var(--gold-2); }
+.footer-brand p{ color:var(--muted); margin:16px 0 0; max-width:320px; }
+.socials{ display:flex; gap:10px; }
+.socials a{ width:42px; height:42px; display:grid; place-items:center; border-radius:50%; background:var(--panel); border:1px solid var(--line); color:var(--gold-2); font-weight:700; transition:.25s; }
+.socials a:hover{ background:var(--gold); color:#241803; transform:translateY(-3px); }
+.footer-keywords{ text-align:center; color:#6b6149; font-size:.82rem; padding:22px; border-top:1px solid var(--line); line-height:2; }
+.footer-bottom{ background:#050403; padding:18px 0; }
+.footer-bottom .container{ display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap; color:var(--muted); font-size:.86rem; }
+
+/* ============ כפתור תרומה צף ============ */
+.float-donate{
+  position:fixed; bottom:22px; left:22px; z-index:900;
+  display:flex; align-items:center; gap:8px; padding:12px 20px; border-radius:999px;
+  background:var(--gold-grad); color:#241803; font-weight:700; box-shadow:0 12px 30px rgba(216,179,73,.4);
+  transition:transform .25s ease; animation:floatpulse 2.6s ease-in-out infinite;
+}
+.float-donate:hover{ transform:scale(1.06); }
+.float-flame{ font-size:1.15rem; }
+@keyframes floatpulse{ 0%,100%{ box-shadow:0 12px 30px rgba(216,179,73,.4);} 50%{ box-shadow:0 12px 44px rgba(216,179,73,.7);} }
+
+/* ============ אנימציית כניסה (reveal) ============ */
+.reveal{ opacity:0; transform:translateY(28px); transition:opacity .7s ease, transform .7s ease; }
+.reveal.in{ opacity:1; transform:none; }
+
+/* ============ רספונסיב ============ */
+@media (max-width:980px){
+  .about-grid,.contact-grid{ grid-template-columns:1fr; gap:36px; }
+  .cards-grid,.stories-grid,.gallery-grid{ grid-template-columns:repeat(2,1fr); }
+  .footer-grid{ grid-template-columns:1fr 1fr; }
+}
+@media (max-width:760px){
+  .main-nav{
+    position:fixed; inset:0 0 0 30%; flex-direction:column; gap:6px; padding:90px 22px 22px;
+    background:rgba(10,8,6,.97); backdrop-filter:blur(16px); transform:translateX(100%);
+    transition:transform .35s ease; border-left:1px solid var(--line);
+  }
+  .main-nav.open{ transform:none; }
+  .main-nav a{ font-size:1.15rem; padding:12px 14px; }
+  .nav-toggle{ display:flex; }
+  .nav-cta .btn-gold{ display:none; }
+  .section{ padding:72px 0; }
+  .hero-stats{ gap:16px; }
+  .stat-sep{ display:none; }
+  .donate-banner-inner{ flex-direction:column; text-align:center; }
+  .footer-bottom .container{ justify-content:center; text-align:center; }
+}
+@media (max-width:520px){
+  .cards-grid,.stories-grid,.gallery-grid,.footer-grid{ grid-template-columns:1fr; }
+  .float-text{ display:none; }
+}
+
+/* הדפסה / ייצוא PDF: הצגת כל הסקשנים והסתרת רכיבים צפים */
+@media print{
+  *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .reveal{ opacity:1!important; transform:none!important; }
+  .float-donate, .scroll-cue, .nav-toggle{ display:none!important; }
+  .site-header{ position:static; }
+  .hero{ min-height:auto; }
+  body{ background:#0c0a08; }
+}
+
+/* נגישות: כיבוד העדפת תנועה מופחתת */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{ animation-duration:.001ms!important; animation-iteration-count:1!important; transition-duration:.001ms!important; }
+  .reveal{ opacity:1; transform:none; }
+}

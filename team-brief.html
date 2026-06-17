@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>הצדיק מעג׳ור — מצגת לצוות</title>
+  <link rel="stylesheet" href="css/fonts.css" />
+  <style>
+    *{ box-sizing:border-box; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    @page{ margin:0; }
+    :root{ --ink:#2c2114; --soft:#5c4d36; --gold:#a87f221; --gold:#9c7a1f; --line:#e3d6b8; --paper:#f7f1e3; --paper2:#fbf7ec; }
+    html,body{ margin:0; }
+    body{ font-family:"Heebo",sans-serif; color:var(--ink); background:var(--paper); line-height:1.8; font-size:15px; }
+    .page{ max-width:820px; margin:0 auto; padding:54px 60px; }
+    .page + .page{ page-break-before:always; }
+    h1,h2,h3{ font-family:"Frank Ruhl Libre",serif; color:#1f1810; line-height:1.25; }
+    h1{ font-size:2.7rem; margin:0; font-weight:900; }
+    h2{ font-size:1.7rem; margin:0 0 6px; border-bottom:3px solid #d9b955; padding-bottom:8px; display:inline-block; }
+    h3{ font-size:1.18rem; margin:22px 0 6px; color:#7a5d16; }
+    p{ margin:8px 0; }
+    .gold{ color:#9c7a1f; }
+    .cover{ text-align:center; padding:90px 60px 60px; background:linear-gradient(180deg,#1a140d,#2a2014); color:#f4ecd8; max-width:none; }
+    .cover .mark{ font-size:3rem; }
+    .cover h1{ color:#f7e7a3; margin:14px 0 6px; }
+    .cover .sub{ color:#cdbf9d; font-size:1.15rem; }
+    .cover .meta{ color:#9c8e6e; margin-top:26px; font-size:.95rem; letter-spacing:.04em; }
+    .lead{ font-size:1.08rem; color:var(--soft); }
+    ul{ margin:8px 0; padding-inline-start:0; list-style:none; }
+    li{ margin:7px 0; padding-inline-start:30px; position:relative; }
+    li::before{ content:"◆"; position:absolute; right:0; color:#cdab45; font-size:.8rem; top:.35em; }
+    li.ok::before{ content:"✓"; color:#3f8a3f; font-weight:700; }
+    .box{ background:var(--paper2); border:1px solid var(--line); border-radius:14px; padding:18px 22px; margin:16px 0; }
+    .box.warn{ background:#fbf3e0; border-color:#e6cf93; }
+    .box.note{ background:#eef4ef; border-color:#c9e0cb; }
+    .tag{ display:inline-block; background:#1f1810; color:#f7e7a3; border-radius:999px; padding:4px 14px; font-size:.82rem; font-weight:700; letter-spacing:.08em; }
+    .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+    .shot{ width:100%; border:1px solid var(--line); border-radius:12px; box-shadow:0 6px 22px rgba(0,0,0,.14); }
+    .shot-cap{ text-align:center; color:var(--soft); font-size:.9rem; margin:8px 0 22px; }
+    .steps{ counter-reset:s; list-style:none; padding:0; }
+    .steps li{ padding-inline-start:46px; margin:14px 0; }
+    .steps li::before{ counter-increment:s; content:counter(s); background:#9c7a1f; color:#fff; width:30px; height:30px; border-radius:50%; display:grid; place-items:center; font-weight:700; top:0; font-size:.95rem; }
+    .foot{ text-align:center; color:var(--soft); border-top:1px solid var(--line); margin-top:34px; padding-top:16px; font-size:.9rem; }
+    .filters{ display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+    .filters span{ background:#fff; border:1px solid var(--line); border-radius:999px; padding:5px 14px; font-size:.9rem; }
+  </style>
+</head>
+<body>
+
+  <!-- שער -->
+  <section class="cover">
+    <div class="mark">🕯️</div>
+    <h1>הצדיק מעג׳ור</h1>
+    <div class="sub">אתר תדמית ותרומות · מצגת להתרשמות הצוות</div>
+    <div class="meta">טיוטה ראשונה לבדיקה · כולל תכנית התאמה לאינטרנט מסונן</div>
+  </section>
+
+  <!-- מה נבנה -->
+  <section class="page">
+    <span class="tag">מה נבנה</span>
+    <h2>סקירה כללית</h2>
+    <p class="lead">אתר מלא בעברית (מימין לשמאל), בעיצוב יוקרתי של זהב על רקע כהה, מותאם למחשב ולנייד, ובנוי לקידום בגוגל.</p>
+
+    <h3>דף הבית</h3>
+    <ul>
+      <li>פתיחה מרשימה עם נר מונפש, שם הצדיק וכפתורי פעולה</li>
+      <li>תולדות חייו · סגולות (רפואה, זיווג, פרנסה, פרי בטן, הצלחה, שמירה)</li>
+      <li>ההילולא עם ספירה לאחור · סיפורי ישועות · גלריית תמונות</li>
+      <li>תפילה לזכות הצדיק · הדלקת נר · טופס יצירת קשר</li>
+    </ul>
+
+    <h3>דף תרומה ותשלום</h3>
+    <ul>
+      <li>בחירת מטרה (הדלקת נר / פדיון נפש / תרומה / הילולא)</li>
+      <li>בחירת סכום, חד־פעמי או הוראת קבע חודשית</li>
+      <li>הקדשה ושם לתפילה (לעילוי נשמת / לרפואת...) וסיכום חי</li>
+    </ul>
+
+    <div class="box note">
+      <strong>מצב נוכחי:</strong> המבנה והעיצוב מוכנים. התוכן כרגע לדוגמה — ממתינים לשם הצדיק, סיפור חייו, תמונות, פרטי קשר וסיפורי ישועות אמיתיים.
+    </div>
+  </section>
+
+  <!-- אפיון אינטרנט מסונן -->
+  <section class="page">
+    <span class="tag">אינטרנט מסונן</span>
+    <h2>התאמה לסינון — אפיון</h2>
+    <p class="lead">המטרה: שהאתר יוכל להיפתח גם אצל גולשים בסינון (רימון, נטפרי, נתיב ועוד).</p>
+
+    <h3>איך זה עובד</h3>
+    <p>חברות הסינון חוסמות כברירת מחדל את כל הרשת ומאפשרות גישה רק לאתרים <strong>שאושרו אצלן</strong> ("רשימה לבנה"). אתר חדש לא ייפתח אצל גולש מסונן עד שיאושר — אצל כל חברה בנפרד.</p>
+
+    <h3>מה כבר עשינו כדי שהאתר יהיה "נקי" לאישור</h3>
+    <ul>
+      <li class="ok">הפונטים מאוחסנים <strong>בתוך האתר</strong> — בלי טעינה מ-Google או משרת חיצוני</li>
+      <li class="ok">הוסרו כל הקישורים לרשתות חברתיות (פייסבוק / אינסטגרם / יוטיוב)</li>
+      <li class="ok">אין פרסומות ואין מעקב (טראקינג) של צד שלישי</li>
+      <li class="ok">אין סרטוני וידאו או תוכן שעלול להוביל החוצה לתוכן לא מתאים</li>
+      <li class="ok">הוסר קישור חיצוני לאתר תהילים; נשאר רק וואטסאפ — אופציונלי וניתן להסרה</li>
+      <li class="ok">מבנה עצמאי לחלוטין — כמעט הכל "בתוך" האתר</li>
+    </ul>
+
+    <h3>מה נדרש מצד התוכן (באחריות הצוות)</h3>
+    <ul>
+      <li>תמונות צנועות בלבד, בהתאם לכללי הצניעות</li>
+      <li>בלי קישורים לאתרים שאינם מאושרים</li>
+      <li>טקסט תורני וענייני נקי</li>
+    </ul>
+  </section>
+
+  <!-- תהליך אישור -->
+  <section class="page">
+    <span class="tag">תהליך</span>
+    <h2>איך מאשרים את האתר בסינון</h2>
+    <p class="lead">לאחר שהאתר עולה לאוויר עם כתובת קבועה — מתחילים את תהליך האישור.</p>
+
+    <ol class="steps">
+      <li>מעלים את האתר לכתובת קבועה (דומיין) עם תעודת אבטחה <strong>HTTPS</strong>.</li>
+      <li>מגישים בקשת אישור לכל חברת סינון בנפרד.</li>
+      <li>החברה בודקת את האתר (בדרך כלל ימים עד שבועות) ומאשרת.</li>
+      <li>מרגע האישור — האתר נפתח אצל כל הגולשים של אותה חברה.</li>
+    </ol>
+
+    <p>חברות הסינון העיקריות שאליהן נפנה:</p>
+    <div class="filters">
+      <span>רימון</span><span>נטפרי</span><span>נתיב</span><span>אינטליגייט</span><span>גלאט-נט</span><span>נטו</span><span>ועוד</span>
+    </div>
+
+    <div class="box warn">
+      <strong>נקודה חשובה לגבי "הקישור":</strong> כל עוד האתר לא אושר בסינון, גם קישור תקין <u>לא ייפתח</u> אצל מי שגולש בסינון. לכן —
+      <ul style="margin-top:8px">
+        <li>להתרשמות מהעיצוב <strong>עכשיו</strong>: המסמך הזה (PDF) נפתח בכל מכשיר, גם מסונן.</li>
+        <li>במקביל נעלה לאוויר ונתחיל את תהליך האישור — וברגע שיאושר, נשלח קישור חי שנפתח לכולם.</li>
+      </ul>
+    </div>
+
+    <h3>מה צריך להחליט כדי להמשיך</h3>
+    <ul>
+      <li><strong>חברת סליקה</strong> לתרומות — מומלץ ספק שמוכר ומאושר בציבור החרדי (למשל <span class="gold">נדרים פלוס</span>, שנפוץ בעמותות).</li>
+      <li><strong>כתובת אתר</strong> (דומיין).</li>
+      <li><strong>תוכן אמיתי</strong>: שם הצדיק וסיפורו, מקום הציון, תאריך ההילולא, תמונות, פרטי קשר.</li>
+    </ul>
+  </section>
+
+  <!-- תצוגת עיצוב -->
+  <section class="page">
+    <span class="tag">העיצוב</span>
+    <h2>דף הבית — מבט כללי</h2>
+    <div class="grid2">
+      <div>
+        <img class="shot" src="assets/preview/home-hero.png" alt="דף הבית – פתיחה" />
+        <div class="shot-cap">פתיחת דף הבית (מחשב)</div>
+      </div>
+      <div>
+        <img class="shot" src="assets/preview/home-mobile.png" alt="דף הבית – נייד" />
+        <div class="shot-cap">תצוגת נייד</div>
+      </div>
+    </div>
+    <img class="shot" src="assets/preview/donate.png" alt="דף תרומה" />
+    <div class="shot-cap">דף התרומה והתשלום</div>
+  </section>
+
+  <!-- עמוד מלא -->
+  <section class="page">
+    <span class="tag">גלילה מלאה</span>
+    <h2>דף הבית — כל החלקים</h2>
+    <img class="shot" src="assets/preview/home-full.png" alt="דף הבית מלא" />
+    <div class="foot">זכות הצדיק תגן עלינו ועל כל ישראל 🕯️ · מסמך זה הופק עבור התרשמות הצוות</div>
+  </section>
+
+</body>
+</html>
