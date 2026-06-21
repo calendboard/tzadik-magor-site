@@ -286,14 +286,19 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
 /* ============ גלריה ============ */
 .gallery-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
 .gallery-item{
-  aspect-ratio:4/3; border-radius:14px; display:grid; place-items:center;
-  color:var(--muted); border:1px solid var(--line); cursor:pointer; overflow:hidden;
+  position:relative; aspect-ratio:4/3; border-radius:14px; overflow:hidden;
+  border:1px solid var(--line); cursor:pointer;
   background:linear-gradient(135deg,#1d1610,#241b11);
-  transition:transform .3s ease, box-shadow .3s ease;
+  transition:transform .3s ease, box-shadow .3s ease, border-color .3s ease;
 }
-.gallery-item span{ background:rgba(0,0,0,.25); padding:6px 12px; border-radius:8px; font-size:.9rem; }
-.gallery-item:hover{ transform:scale(1.03); box-shadow:var(--shadow); }
-.gallery-item:nth-child(odd){ background:linear-gradient(135deg,#241b11,#1a140d); }
+.gallery-item img{ width:100%; height:100%; object-fit:cover; display:block; transition:transform .6s ease; }
+.gallery-item:hover{ box-shadow:var(--shadow); border-color:#c7a24e; }
+.gallery-item:hover img{ transform:scale(1.07); }
+.gallery-cap{
+  position:absolute; inset-inline-end:10px; inset-block-end:10px;
+  background:rgba(0,0,0,.5); color:#f3e7c4; padding:5px 12px;
+  border-radius:8px; font-size:.85rem; letter-spacing:.02em;
+}
 
 /* ============ תפילה ============ */
 .prayer{ background:linear-gradient(180deg,var(--bg),var(--bg-2)); }
