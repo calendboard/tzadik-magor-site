@@ -13,6 +13,15 @@
     dedName: ""
   };
 
+  /* ====================================================================
+     הגדרות סליקה — נדרים פלוס
+     --------------------------------------------------------------------
+     לאחר פתיחת חשבון בנדרים פלוס מדביקים כאן את כתובת עמוד הסליקה של המוסד
+     (מתקבלת מנדרים פלוס לפי "מספר מוסד"). כל עוד הערך ריק — הכפתור יציג
+     הודעה ידידותית ולא יפנה לסליקה, כך שהאתר תקין גם לפני החיבור.
+     ==================================================================== */
+  var NEDARIM_PAY_URL = ""; // לדוגמה: "https://www.matara.pro/nedarim/tashlum?mosad=0000000"
+
   function $(s, c) { return (c || document).querySelector(s); }
   function $all(s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); }
   function shekel(n) { return "₪" + Number(n || 0).toLocaleString("he-IL"); }
@@ -95,32 +104,32 @@
         return showStatus("נא למלא שם וטלפון כדי להמשיך 🙏", true);
       }
 
-      /* ====================================================================
-         נקודת חיבור לסליקה אמיתית
-         --------------------------------------------------------------------
-         כאן מחברים את ספק הסליקה (לדוגמה: נדרים פלוס / מסב / טרנזילה / משולם).
-         בונים את כתובת התשלום עם הפרטים שנאספו ומפנים אליה את התורם:
-
-         var params = new URLSearchParams({
-           amount:  state.amount,
-           freq:    state.freq,
-           purpose: state.purpose,
-           ded:     state.dedType + " " + state.dedName,
-           name:    name.value,
-           phone:   phone.value
-         });
-         window.location.href = "https://<עמוד-הסליקה-שלכם>?" + params.toString();
-         ==================================================================== */
-
       var data = {
         purpose: state.purpose, amount: state.amount, freq: state.freq,
         dedication: state.dedType ? state.dedType + " " + state.dedName : "",
         name: name.value.trim(), phone: phone.value.trim(),
         email: ($("#donorEmail") || {}).value || ""
       };
-      console.log("פרטי תרומה (להעברה לסליקה):", data);
 
-      showStatus("מצוין! החיבור לעמוד הסליקה המאובטח יושלם לאחר הגדרת ספק התשלומים. הפרטים מוכנים ✓ 🕯️", false);
+      /* כל עוד לא הוגדרה כתובת הסליקה של נדרים פלוס — הודעה ידידותית (האתר נשאר תקין) */
+      if (!NEDARIM_PAY_URL) {
+        console.log("פרטי תרומה (מוכנים להעברה לנדרים פלוס):", data);
+        return showStatus("הפרטים מוכנים ✓ — חיבור הסליקה המאובטח של נדרים פלוס יופעל מיד עם קבלת פרטי החשבון של העמותה 🕯️", false);
+      }
+
+      /* מעבר לעמוד הסליקה המאובטח של נדרים פלוס, עם הפרטים שנאספו */
+      var sep = NEDARIM_PAY_URL.indexOf("?") > -1 ? "&" : "?";
+      var params = new URLSearchParams({
+        Amount: data.amount,
+        Currency: "1",
+        PaymentType: data.freq === "monthly" ? "HK" : "Ragil",
+        ClientName: data.name,
+        Phone: data.phone,
+        Mail: data.email,
+        Comment: data.purpose + (data.dedication ? " · " + data.dedication : "")
+      });
+      showStatus("מעבירים אותך לעמוד הסליקה המאובטח של נדרים פלוס… 🔒", false);
+      window.location.href = NEDARIM_PAY_URL + sep + params.toString();
     });
   }
 
