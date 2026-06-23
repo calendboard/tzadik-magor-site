@@ -400,6 +400,16 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
   .float-text{ display:none; }
 }
 
+/* ===== שאלות נפוצות (אקורדיון נטיבי, ללא JS) ===== */
+.faq-list{ max-width:780px; margin:30px auto 0; display:grid; gap:12px; }
+.faq-item{ background:linear-gradient(135deg,#1b1510,#140e08); border:1px solid var(--line); border-radius:14px; overflow:hidden; transition:border-color .25s ease; }
+.faq-item[open]{ border-color:#6d5121; }
+.faq-item summary{ cursor:pointer; padding:16px 46px 16px 22px; font-family:var(--ff-serif); font-size:1.1rem; color:#f2db8a; list-style:none; position:relative; }
+.faq-item summary::-webkit-details-marker{ display:none; }
+.faq-item summary::after{ content:"+"; position:absolute; left:20px; top:50%; transform:translateY(-50%); color:#c7a24e; font-size:1.5rem; line-height:1; }
+.faq-item[open] summary::after{ content:"–"; }
+.faq-a{ padding:2px 22px 18px; color:#d6c9af; line-height:1.9; }
+
 /* ===== אמבלם הירו (חותם גדול בראש הדף) ===== */
 .sr-only{ position:absolute!important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
 .hero-emblem{ display:block; width:clamp(210px, 42vw, 330px); height:auto; margin:4px auto 12px; filter:drop-shadow(0 14px 36px rgba(0,0,0,.55)); }
