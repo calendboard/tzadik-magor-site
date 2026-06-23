@@ -20,7 +20,7 @@
      (מתקבלת מנדרים פלוס לפי "מספר מוסד"). כל עוד הערך ריק — הכפתור יציג
      הודעה ידידותית ולא יפנה לסליקה, כך שהאתר תקין גם לפני החיבור.
      ==================================================================== */
-  var NEDARIM_PAY_URL = ""; // לדוגמה: "https://www.matara.pro/nedarim/tashlum?mosad=0000000"
+  var NEDARIM_PAY_URL = "https://nedar.im/cwwQ"; // עמוד הסליקה בנדרים פלוס — מוסדות אור תורת שלום (המאורות)
 
   function $(s, c) { return (c || document).querySelector(s); }
   function $all(s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); }
@@ -117,19 +117,10 @@
         return showStatus("הפרטים מוכנים ✓ — חיבור הסליקה המאובטח של נדרים פלוס יופעל מיד עם קבלת פרטי החשבון של העמותה 🕯️", false);
       }
 
-      /* מעבר לעמוד הסליקה המאובטח של נדרים פלוס, עם הפרטים שנאספו */
-      var sep = NEDARIM_PAY_URL.indexOf("?") > -1 ? "&" : "?";
-      var params = new URLSearchParams({
-        Amount: data.amount,
-        Currency: "1",
-        PaymentType: data.freq === "monthly" ? "HK" : "Ragil",
-        ClientName: data.name,
-        Phone: data.phone,
-        Mail: data.email,
-        Comment: data.purpose + (data.dedication ? " · " + data.dedication : "")
-      });
-      showStatus("מעבירים אותך לעמוד הסליקה המאובטח של נדרים פלוס… 🔒", false);
-      window.location.href = NEDARIM_PAY_URL + sep + params.toString();
+      /* מעבר לעמוד הסליקה המאובטח של נדרים פלוס (קישור המוסד).
+         הסכום והפרטים נבחרים ומשולמים בעמוד המאובטח של נדרים פלוס. */
+      showStatus("הפרטים נשמרו ✓ מעבירים אותך לעמוד הסליקה המאובטח של נדרים פלוס… 🔒", false);
+      setTimeout(function () { window.location.href = NEDARIM_PAY_URL; }, 700);
     });
   }
 
