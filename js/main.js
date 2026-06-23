@@ -93,37 +93,46 @@
     }
   }
 
-  /* ---------- ספירה לאחור להילולא ----------
-     אם לא הוגדר תאריך ב-data-date, נחשב את ה-1 בחודש הבא כברירת מחדל זמנית. */
-  var cd = document.getElementById("countdown");
-  if (cd) {
-    var dateStr = cd.getAttribute("data-date");
-    var target;
-    if (dateStr) {
-      target = new Date(dateStr).getTime();
-    } else {
-      var now = new Date();
-      target = new Date(now.getFullYear(), now.getMonth() + 1, 1, 18, 0, 0).getTime();
-    }
-    var elDays = cd.querySelector('[data-cd="days"]');
-    var elHours = cd.querySelector('[data-cd="hours"]');
-    var elMins = cd.querySelector('[data-cd="mins"]');
-    var elSecs = cd.querySelector('[data-cd="secs"]');
-    function pad(n) { return String(n).padStart(2, "0"); }
+  /* ---------- ספירה לאחור להילולא (סקשן בדף הבית + באנר צף בכל הדפים) ---------- */
+  var HILULA_TARGET = "2026-07-05T19:30:00"; // ליל כ״א בתמוז תשפ״ו
+  function pad2(n) { return String(n).padStart(2, "0"); }
+  function setupCountdown(root) {
+    if (!root) return;
+    var target = new Date(root.getAttribute("data-date") || HILULA_TARGET).getTime();
+    var elD = root.querySelector('[data-cd="days"]'),
+        elH = root.querySelector('[data-cd="hours"]'),
+        elM = root.querySelector('[data-cd="mins"]'),
+        elS = root.querySelector('[data-cd="secs"]');
     function tick() {
       var diff = target - Date.now();
-      if (diff < 0) diff = 0;
-      var d = Math.floor(diff / 86400000);
-      var h = Math.floor((diff % 86400000) / 3600000);
-      var m = Math.floor((diff % 3600000) / 60000);
-      var s = Math.floor((diff % 60000) / 1000);
-      if (elDays) elDays.textContent = pad(d);
-      if (elHours) elHours.textContent = pad(h);
-      if (elMins) elMins.textContent = pad(m);
-      if (elSecs) elSecs.textContent = pad(s);
+      if (diff <= 0) {
+        diff = 0;
+        // לאחר ההילולא — מסתירים את הבאנר הצף כדי לא להציג אפסים
+        var bar = document.getElementById("hilulaBar");
+        if (root.id === "floatCountdown" && bar) bar.classList.add("hidden");
+      }
+      if (elD) elD.textContent = pad2(Math.floor(diff / 86400000));
+      if (elH) elH.textContent = pad2(Math.floor((diff % 86400000) / 3600000));
+      if (elM) elM.textContent = pad2(Math.floor((diff % 3600000) / 60000));
+      if (elS) elS.textContent = pad2(Math.floor((diff % 60000) / 1000));
     }
     tick();
     setInterval(tick, 1000);
+  }
+  setupCountdown(document.getElementById("countdown"));
+  setupCountdown(document.getElementById("floatCountdown"));
+
+  /* ---------- סגירת הבאנר הצף (נשמר לזמן הביקור) ---------- */
+  var hilulaBar = document.getElementById("hilulaBar");
+  var hilulaClose = document.getElementById("hilulaClose");
+  try {
+    if (hilulaBar && sessionStorage.getItem("hilulaBarClosed") === "1") hilulaBar.classList.add("hidden");
+  } catch (e) {}
+  if (hilulaClose) {
+    hilulaClose.addEventListener("click", function () {
+      if (hilulaBar) hilulaBar.classList.add("hidden");
+      try { sessionStorage.setItem("hilulaBarClosed", "1"); } catch (e) {}
+    });
   }
 
   /* ---------- טופס יצירת קשר ---------- */

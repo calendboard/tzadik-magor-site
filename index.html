@@ -470,9 +470,21 @@
   </footer>
 
   <!-- כפתור תרומה צף -->
-  <a class="float-donate" href="donate.html" aria-label="תרומה מהירה">
-    <span class="float-flame">🕯️</span><span class="float-text">תרומה</span>
-  </a>
+  <!-- באנר ספירה צף להילולא -->
+  <div class="hilula-bar" id="hilulaBar" role="region" aria-label="ספירה לאחור להילולא">
+    <span class="hb-flame" aria-hidden="true">🕯️</span>
+    <div class="hb-text">
+      <span class="hb-title">ההילולא הקדושה · כ״א בתמוז</span>
+      <span class="hb-countdown" id="floatCountdown" data-date="2026-07-05T19:30:00">
+        <span class="hb-unit"><b data-cd="days">00</b><i>ימים</i></span>
+        <span class="hb-unit"><b data-cd="hours">00</b><i>שע׳</i></span>
+        <span class="hb-unit"><b data-cd="mins">00</b><i>דק׳</i></span>
+        <span class="hb-unit"><b data-cd="secs">00</b><i>שנ׳</i></span>
+      </span>
+    </div>
+    <a class="hb-cta" href="donate.html">להשתתפות »</a>
+    <button class="hb-close" id="hilulaClose" type="button" aria-label="סגירת הבאנר">×</button>
+  </div>
 
   <script src="js/main.js" defer></script>
 </body>

@@ -400,6 +400,43 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
   .float-text{ display:none; }
 }
 
+/* ===== באנר ספירה צף להילולא (קבוע בתחתית, בכל הדפים) ===== */
+.hilula-bar{
+  position:fixed; z-index:60; left:0; right:0; bottom:14px; margin-inline:auto;
+  width:max-content; max-width:calc(100% - 20px);
+  display:flex; align-items:center; gap:14px;
+  padding:8px 8px 8px 18px;
+  background:linear-gradient(135deg, rgba(36,27,16,.97), rgba(18,13,7,.97));
+  border:1px solid #6d5121; border-radius:999px;
+  box-shadow:0 16px 44px rgba(0,0,0,.55);
+  -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px);
+  animation:hbUp .5s ease both;
+}
+@keyframes hbUp{ from{opacity:0; transform:translateY(24px)} to{opacity:1; transform:none} }
+.hb-flame{ font-size:1.5rem; filter:drop-shadow(0 0 7px rgba(255,180,60,.7)); animation:hbFlicker 2.2s ease-in-out infinite; }
+@keyframes hbFlicker{ 0%,100%{opacity:1} 50%{opacity:.78} }
+.hb-text{ display:flex; flex-direction:column; line-height:1.1; }
+.hb-title{ color:#f3e7c4; font-size:.82rem; font-weight:600; white-space:nowrap; }
+.hb-countdown{ display:flex; gap:10px; align-items:center; margin-top:4px; }
+.hb-unit{ display:flex; flex-direction:column; align-items:center; line-height:1; min-width:30px; }
+.hb-unit b{ font-family:var(--ff-serif,serif); font-weight:900; font-size:1.1rem; color:#f7e7a3; font-variant-numeric:tabular-nums; }
+.hb-unit i{ font-style:normal; font-size:.6rem; color:#caa64a; margin-top:2px; }
+.hb-cta{ background:linear-gradient(135deg,#f6e3a4,#caa247); color:#241704; font-weight:800; padding:9px 16px; border-radius:999px; white-space:nowrap; font-size:.88rem; }
+.hb-cta:hover{ filter:brightness(1.07); }
+.hb-close{ background:transparent; border:0; color:#a8987a; font-size:1.4rem; line-height:1; cursor:pointer; padding:0 6px; }
+.hb-close:hover{ color:#f3e7c4; }
+.hilula-bar.hidden{ display:none !important; }
+@media (max-width:560px){
+  .hilula-bar{ bottom:10px; gap:9px; padding:7px 7px 7px 12px; max-width:calc(100% - 14px); }
+  .hb-title{ font-size:.72rem; }
+  .hb-countdown{ gap:7px; margin-top:3px; }
+  .hb-unit{ min-width:25px; }
+  .hb-unit b{ font-size:.95rem; }
+  .hb-unit i{ font-size:.55rem; }
+  .hb-cta{ padding:7px 11px; font-size:.78rem; }
+}
+@media print{ .hilula-bar{ display:none !important; } }
+
 /* הדפסה / ייצוא PDF: הצגת כל הסקשנים והסתרת רכיבים צפים */
 @media print{
   *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
