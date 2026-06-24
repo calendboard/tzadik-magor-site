@@ -258,12 +258,12 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
 /* רקע תמונה אמיתי הקשור לכל סגולה (מעובד לגוון כהה שמשתלב ברקע האתר) */
 .card > *{ position:relative; z-index:1; }
 .card[class*="s-"]{ background-size:cover; background-position:center; }
-.card.s-refua{ background-image:linear-gradient(180deg,rgba(15,10,6,.6),rgba(10,7,3,.88)),url("../assets/segulot/refua.jpg"); }
-.card.s-zivug{ background-image:linear-gradient(180deg,rgba(15,10,6,.6),rgba(10,7,3,.88)),url("../assets/segulot/zivug.jpg"); }
-.card.s-parnasa{ background-image:linear-gradient(180deg,rgba(15,10,6,.56),rgba(10,7,3,.88)),url("../assets/segulot/parnasa.jpg"); }
-.card.s-pri{ background-image:linear-gradient(180deg,rgba(15,10,6,.6),rgba(10,7,3,.88)),url("../assets/segulot/pri.jpg"); }
-.card.s-hatzlacha{ background-image:linear-gradient(180deg,rgba(15,10,6,.56),rgba(10,7,3,.88)),url("../assets/segulot/hatzlacha.jpg"); }
-.card.s-shmira{ background-image:linear-gradient(180deg,rgba(15,10,6,.6),rgba(10,7,3,.88)),url("../assets/segulot/shmira.jpg"); }
+.card.s-refua{ background-image:linear-gradient(180deg,rgba(16,11,6,.42),rgba(10,7,3,.72)),url("../assets/segulot/refua.jpg?v=627"); }
+.card.s-zivug{ background-image:linear-gradient(180deg,rgba(16,11,6,.42),rgba(10,7,3,.72)),url("../assets/segulot/zivug.jpg?v=627"); }
+.card.s-parnasa{ background-image:linear-gradient(180deg,rgba(16,11,6,.42),rgba(10,7,3,.72)),url("../assets/segulot/parnasa.jpg?v=627"); }
+.card.s-pri{ background-image:linear-gradient(180deg,rgba(16,11,6,.42),rgba(10,7,3,.72)),url("../assets/segulot/pri.jpg?v=627"); }
+.card.s-hatzlacha{ background-image:linear-gradient(180deg,rgba(16,11,6,.42),rgba(10,7,3,.72)),url("../assets/segulot/hatzlacha.jpg?v=627"); }
+.card.s-shmira{ background-image:linear-gradient(180deg,rgba(16,11,6,.42),rgba(10,7,3,.72)),url("../assets/segulot/shmira.jpg?v=627"); }
 
 /* ============ הילולא ============ */
 .hillula{ text-align:center; overflow:hidden; }
