@@ -169,4 +169,45 @@
       }
     });
   });
+
+  /* ---------- לייטבוקס לגלריה ---------- */
+  var galLinks = Array.prototype.slice.call(document.querySelectorAll("a.gallery-item"));
+  if (galLinks.length) {
+    var lbItems = galLinks.map(function (a) {
+      var img = a.querySelector("img"), cap = a.querySelector(".gallery-cap");
+      return { src: a.getAttribute("href"), alt: (img && img.alt) || "", cap: (cap && cap.textContent) || "" };
+    });
+    var lb = document.createElement("div");
+    lb.className = "lightbox";
+    lb.innerHTML =
+      '<button class="lb-close" aria-label="סגירה">×</button>' +
+      '<button class="lb-nav lb-prev" aria-label="הקודם">‹</button>' +
+      '<figure class="lb-fig"><img alt="" /><figcaption></figcaption></figure>' +
+      '<button class="lb-nav lb-next" aria-label="הבא">›</button>';
+    document.body.appendChild(lb);
+    var lbImg = lb.querySelector("img"), lbCap = lb.querySelector("figcaption"), idx = 0;
+    function show(i) { idx = (i + lbItems.length) % lbItems.length; lbImg.src = lbItems[idx].src; lbImg.alt = lbItems[idx].alt; lbCap.textContent = lbItems[idx].cap; }
+    function openLb(i) { show(i); lb.classList.add("open"); document.body.style.overflow = "hidden"; }
+    function closeLb() { lb.classList.remove("open"); document.body.style.overflow = ""; }
+    galLinks.forEach(function (a, i) { a.addEventListener("click", function (e) { e.preventDefault(); openLb(i); }); });
+    lb.querySelector(".lb-close").addEventListener("click", closeLb);
+    lb.querySelector(".lb-next").addEventListener("click", function (e) { e.stopPropagation(); show(idx + 1); });
+    lb.querySelector(".lb-prev").addEventListener("click", function (e) { e.stopPropagation(); show(idx - 1); });
+    lb.addEventListener("click", function (e) { if (e.target === lb || e.target.classList.contains("lb-fig")) closeLb(); });
+    document.addEventListener("keydown", function (e) {
+      if (!lb.classList.contains("open")) return;
+      if (e.key === "Escape") closeLb();
+      else if (e.key === "ArrowRight") show(idx - 1);
+      else if (e.key === "ArrowLeft") show(idx + 1);
+    });
+  }
+
+  /* ---------- שיתוף בוואטסאפ (כתובת חיה לפי הדומיין) ---------- */
+  var waShare = document.querySelectorAll(".wa-share");
+  if (waShare.length) {
+    var base = location.origin + location.pathname.replace(/[^/]*$/, "");
+    var msg = "בזכות הצדיק מעג׳ור — רבי יצחק גברא זצ״ל 🕯️ ישועות, סגולות והדלקת נר נשמה: " + base;
+    var href = "https://wa.me/?text=" + encodeURIComponent(msg);
+    Array.prototype.forEach.call(waShare, function (el) { el.setAttribute("href", href); el.setAttribute("target", "_blank"); el.setAttribute("rel", "noopener"); });
+  }
 })();

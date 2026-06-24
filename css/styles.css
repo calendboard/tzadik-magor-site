@@ -400,6 +400,19 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
   .float-text{ display:none; }
 }
 
+/* ===== לייטבוקס גלריה ===== */
+.lightbox{ position:fixed; inset:0; z-index:200; background:rgba(8,6,3,.94); display:none; align-items:center; justify-content:center; -webkit-backdrop-filter:blur(2px); backdrop-filter:blur(2px); }
+.lightbox.open{ display:flex; animation:lbIn .25s ease; }
+@keyframes lbIn{ from{opacity:0} to{opacity:1} }
+.lb-fig{ margin:0; display:flex; flex-direction:column; align-items:center; gap:12px; }
+.lb-fig img{ max-width:92vw; max-height:80vh; border-radius:10px; border:1px solid #6d5121; box-shadow:0 20px 60px rgba(0,0,0,.6); object-fit:contain; }
+.lb-fig figcaption{ color:#f3e7c4; font-family:var(--ff-serif); font-size:1.1rem; text-align:center; }
+.lb-close{ position:fixed; top:14px; right:20px; background:transparent; border:0; color:#e9dcbd; font-size:2.4rem; line-height:1; cursor:pointer; padding:4px 10px; }
+.lb-nav{ position:fixed; top:50%; transform:translateY(-50%); background:rgba(0,0,0,.45); border:1px solid #6d5121; color:#f3e7c4; width:46px; height:46px; border-radius:50%; font-size:1.7rem; cursor:pointer; display:grid; place-items:center; }
+.lb-prev{ right:16px; } .lb-next{ left:16px; }
+.lb-close:hover,.lb-nav:hover{ color:#fff; border-color:#caa64a; }
+@media (max-width:560px){ .lb-nav{ width:40px; height:40px; } .lb-prev{ right:8px } .lb-next{ left:8px } }
+
 /* ===== שאלות נפוצות (אקורדיון נטיבי, ללא JS) ===== */
 .faq-list{ max-width:780px; margin:30px auto 0; display:grid; gap:12px; }
 .faq-item{ background:linear-gradient(135deg,#1b1510,#140e08); border:1px solid var(--line); border-radius:14px; overflow:hidden; transition:border-color .25s ease; }
