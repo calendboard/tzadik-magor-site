@@ -81,13 +81,13 @@
   /* ---------- חלקיקי אור ב-HERO ---------- */
   var particles = document.getElementById("heroParticles");
   if (particles && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    var count = window.innerWidth < 600 ? 14 : 26;
+    var count = window.innerWidth < 600 ? 24 : 46;
     for (var i = 0; i < count; i++) {
       var p = document.createElement("i");
       p.style.left = Math.random() * 100 + "%";
       p.style.animationDuration = (6 + Math.random() * 8) + "s";
       p.style.animationDelay = (-Math.random() * 10) + "s";
-      var s = 2 + Math.random() * 3;
+      var s = 3 + Math.random() * 5;
       p.style.width = p.style.height = s + "px";
       particles.appendChild(p);
     }
