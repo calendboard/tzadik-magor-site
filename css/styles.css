@@ -148,6 +148,14 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
 .stat-label{ font-size:.84rem; color:var(--muted); margin-top:6px; }
 .stat-sep{ width:1px; height:42px; background:var(--line-2); }
 
+/* ===== סגולות בירו — על מה מבקשים על הציון ===== */
+.hero-segulot{ margin-top:50px; text-align:center; }
+.hs-cap{ color:var(--muted); font-size:.9rem; letter-spacing:1px; margin:0 0 16px; }
+.hs-chips{ display:flex; flex-wrap:wrap; justify-content:center; gap:13px; }
+.hs-chip{ font-family:var(--ff-serif); font-weight:700; font-size:clamp(1.05rem,2.3vw,1.4rem); color:var(--gold-2);
+  padding:9px 26px; border-radius:999px; border:1px solid var(--line-2);
+  background:linear-gradient(180deg,rgba(247,231,163,.07),rgba(247,231,163,.02)); }
+
 /* ===== פסוק רץ דו-שורתי בירו (כותרת מעל תת-כותרת, נע משמאל לימין) ===== */
 .hero-marquee{ margin-top:38px; width:100vw; margin-inline:calc(50% - 50vw); overflow:hidden; direction:ltr; text-align:left;
   -webkit-mask-image:linear-gradient(90deg,transparent,#000 13%,#000 87%,transparent);
