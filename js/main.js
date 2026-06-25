@@ -222,4 +222,106 @@
   toTop.addEventListener("click", function () {
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
+
+  /* ---------- כדורי ישועה צפים + מודאל סיפור מלא ---------- */
+  var yshTrack = document.getElementById("yshTrack");
+  if (yshTrack) {
+    var STORIES = [
+      { tag: "גילוי הציון", img: "assets/hilula/ziyon-night.jpg",
+        title: "החלום שגילה את הציון",
+        sum: "זקנה חלמה — ונתגלה מקום הקבר",
+        full: "במשך שנים לא ידעו היכן טמון הצדיק. אישה זקנה שגרה סמוך לעץ החרוב חלמה חלום, ובו נגלה אליה רבי יצחק גברא ואמר לה: „שמי רבי יצחק גברא, אני קבור תחת עץ החרוב הסמוך לביתך… למה בני אינם באים אליי?”. הוא ביקש ממנה להעביר את הדברים לשלושה רבנים — וכך נתגלה מקום הציון הקדוש, ומאז פוקדים אותו רבים.",
+        source: "מקור: ״שחרית״, עמ׳ 18 · מסורת מקומית" },
+      { tag: "ישועה", img: "assets/hilula/candles.jpg",
+        title: "ארבעה נסעו — וכולם נושעו",
+        sum: "אברך, חולה, מובטל ורווק — כולם נושעו",
+        full: "מסופר על נסיעה משותפת לציון של ארבעה אנשים: אברך שלא נפקד בילדים, נער שחלה במחלה קשה, בחור שחיפש עבודה, ורווק מבוגר. כל אחד מהם פרש את משאלתו על הציון. לפי הסיפור — האברך נפקד בילדים, הנער החלים, מחפש העבודה התקבל לעבודה טובה, והרווק התארס בליל ההילולה עצמו. ארבעתם ראו ישועה.",
+        source: "מקור: ״שחרית״, עמ׳ 18" },
+      { tag: "רפואה", img: "assets/segulot/refua.jpg",
+        title: "המום שבלב — שנעלם",
+        sum: "התפלל על נכדו — והניתוח התבטל",
+        full: "נהג מונית שהסיע נוסעים לציון התפלל שם על נכדו הקטן, שעמד לפני ניתוח לב. בעודו יוצא מן הציון קיבל טלפון מבני המשפחה: הבעיה „נפתרה מאליה”, והרופאים הודיעו שאין עוד צורך בניתוח.",
+        source: "מקור: ״שחרית״, עמ׳ 18" },
+      { tag: "שלום בית", img: "assets/hilula/candle-lighting.jpg",
+        title: "שלום בית אחרי שבע שנים",
+        sum: "התפללה בבכי — ולמחרת צלצלה הבת",
+        full: "אם התפללה בבכי על הציון שיחזור השלום בינה לבין בתה, לאחר נתק של שבע שנים. למחרת בבוקר צלצלה הבת מחוץ לארץ ואמרה: „אמא, התגעגעתי אלייך”. הסכסוך הישן הוסדר, והשלום שב לבית.",
+        source: "מקור: ״שחרית״, עמ׳ 18" },
+      { tag: "זיווג", img: "assets/segulot/zivug.jpg",
+        title: "הזיווג שנפתח",
+        sum: "בחור התקשה בשידוך — וראה ישועה",
+        full: "בחור שהתקשה שנים למצוא את זיווגו השתטח על הציון וביקש ישועה. סמוך לאחר מכן נפתח שידוכו ומצא את בת זוגו. סיפורי זיווג רבים נקשרים סביב הציון, ורבים מבקשים עליו לזיווג הגון.",
+        source: "מקור: ״אביר יעקב״ · מסורת" },
+      { tag: "שמירה", img: "assets/segulot/shmira.jpg",
+        title: "לבדו מול השודדים",
+        sum: "כל הכפר ברח — והוא יצא לבדו",
+        full: "מסופר שכאשר באו שודדים אל כפר עג׳ור, נמלטו כל התושבים והסתתרו. רבי יצחק לבדו יצא כנגדם ועמד מולם, עד שהשודדים נסוגו ונמלטו מן הכפר. כוח קדושתו הגן על כל בני המקום.",
+        source: "מקור: ״שחרית״, עמ׳ 16 · מסורת משפחתית" },
+      { tag: "הצלה", img: "assets/hilula/road.jpg",
+        title: "נפל מהגמל — ונמצא לומד",
+        sum: "הגמל התרסק בוואדי — והוא יושב כרגיל",
+        full: "בעת מסע על גבי גמל נפל הגמל אל תוך ואדי עמוק. כשירדו לחפש, מצאו את חלקי הגמל מפוזרים — ואת רבי יצחק יושב בשלום בתחתית הוואדי ולומד כדרכו, כאילו לא אירע דבר.",
+        source: "מקור: ערוץ 2000, בשם הרב שמעון פוקס" },
+      { tag: "נבואה", img: "assets/hilula/grounds.jpg",
+        title: "גשם בתמוז — כאות",
+        sum: "ניבא שירד גשם בקבורתו — וכך היה",
+        full: "רבי יצחק ביקש להיקבר תחת עץ החרוב שמול ביתו, ואמר שזה יהיה הסימן. עוד הוסיף וניבא שייקבר בערב שבת, ושביום קבורתו — אף שהוא בתקופת תמוז שאין בה גשמים — ירד גשם. וכך אכן היה: בשעת ההלוויה ירדו גשם וזלעפות, וקוימו דבריו.",
+        source: "מקור: ״אביר יעקב״ · JDN · מסורת משפחתית" },
+      { tag: "קדושת המקום", img: "assets/hilula/grounds-2.jpg",
+        title: "הטרקטור שלא הצליח",
+        sum: "ניסו להזיז את הציון — ולא עלתה בידם",
+        full: "לאורך השנים נעשו ניסיונות לפנות או להזיז את הציון. באחד מהם, פועלים שניסו לישר את הקרקע סמוך לציון שמעו קול הקורא בשמם; וכשהמשיכו — הטרקטור התהפך. בניסיון אחר הוסטה ידו של מי שהניף את הכלי והוא נחבל. מאז חדלו, והציון נותר על מקומו.",
+        source: "מקור: ״שחרית״, עמ׳ 17–18 · ״אביר יעקב״" }
+    ];
+
+    function yshBall(s) {
+      var b = document.createElement("button");
+      b.className = "ysh-ball";
+      b.type = "button";
+      b.setAttribute("aria-label", s.title + " — לחצו לקריאת הסיפור");
+      b.innerHTML =
+        '<span class="ysh-bg" style="background-image:url(\'' + s.img + '\')"></span>' +
+        '<span class="ysh-in">' +
+          '<span class="ysh-tag">' + s.tag + '</span>' +
+          '<span class="ysh-t">' + s.title + '</span>' +
+          '<span class="ysh-s">' + s.sum + '</span>' +
+          '<span class="ysh-cta">לחץ כאן ›</span>' +
+        '</span>';
+      b.addEventListener("click", function () { yshOpen(s); });
+      return b;
+    }
+    // שתי חזרות לריצה אינסופית חלקה
+    for (var rep = 0; rep < 2; rep++) {
+      STORIES.forEach(function (s) { yshTrack.appendChild(yshBall(s)); });
+    }
+
+    // מודאל
+    var ym = document.createElement("div");
+    ym.className = "ysh-modal";
+    ym.innerHTML =
+      '<div class="ysh-modal-ov"></div>' +
+      '<div class="ysh-panel" role="dialog" aria-modal="true" aria-label="סיפור ישועה">' +
+        '<button class="ysh-close" type="button" aria-label="סגירה">×</button>' +
+        '<img class="ym-img" alt="" />' +
+        '<span class="ym-tag"></span>' +
+        '<h3 class="ym-t"></h3>' +
+        '<div class="ym-body"></div>' +
+        '<p class="ym-src"></p>' +
+      '</div>';
+    document.body.appendChild(ym);
+    var ymImg = ym.querySelector(".ym-img"),
+        ymTag = ym.querySelector(".ym-tag"),
+        ymT = ym.querySelector(".ym-t"),
+        ymBody = ym.querySelector(".ym-body"),
+        ymSrc = ym.querySelector(".ym-src");
+    function yshOpen(s) {
+      ymImg.src = s.img; ymTag.textContent = s.tag; ymT.textContent = s.title;
+      ymBody.textContent = s.full; ymSrc.textContent = s.source;
+      ym.classList.add("open"); document.body.style.overflow = "hidden";
+    }
+    function yshClose() { ym.classList.remove("open"); document.body.style.overflow = ""; }
+    ym.querySelector(".ysh-close").addEventListener("click", yshClose);
+    ym.querySelector(".ysh-modal-ov").addEventListener("click", yshClose);
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") yshClose(); });
+  }
 })();
