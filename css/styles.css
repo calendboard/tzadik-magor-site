@@ -411,6 +411,15 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
   .float-text{ display:none; }
 }
 
+/* ===== מה מתקיים בהילולא ===== */
+.hp-title{ font-family:var(--ff-serif); font-size:1.35rem; color:var(--gold-2); margin:38px 0 16px; }
+.hillula-program{ display:flex; flex-wrap:wrap; justify-content:center; gap:12px; max-width:780px; margin:0 auto; }
+.hp-item{ display:flex; flex-direction:column; align-items:center; gap:7px; min-width:124px; padding:18px 14px; background:rgba(20,15,9,.5); border:1px solid var(--line); border-radius:14px; transition:transform .3s ease, border-color .3s ease; }
+.hp-item:hover{ transform:translateY(-4px); border-color:var(--line-2); }
+.hp-ic{ font-size:1.8rem; line-height:1; }
+.hp-item b{ color:var(--cream); font-weight:600; font-size:.96rem; }
+.hp-note{ color:var(--muted); max-width:620px; margin:20px auto 26px; font-size:1rem; }
+
 /* ===== לייטבוקס גלריה ===== */
 .lightbox{ position:fixed; inset:0; z-index:200; background:rgba(8,6,3,.94); display:none; align-items:center; justify-content:center; -webkit-backdrop-filter:blur(2px); backdrop-filter:blur(2px); }
 .lightbox.open{ display:flex; animation:lbIn .25s ease; }
