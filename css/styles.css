@@ -108,11 +108,21 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
 @keyframes float{ 0%,100%{ transform:translate(0,0) scale(1);} 50%{ transform:translate(0,-30px) scale(1.08);} }
 .hero-particles{ position:absolute; inset:0; }
 .hero-particles i{
-  position:absolute; bottom:-14px; width:5px; height:5px; border-radius:50%;
-  background:radial-gradient(circle at 50% 35%, #fff6d2, #ffc24d 50%, #e88a1e);
-  opacity:0; box-shadow:0 0 10px 2px rgba(255,184,74,.85), 0 0 26px 4px rgba(255,150,40,.45);
-  animation:rise linear infinite;
+  --c:1; position:absolute; bottom:-26px; left:0;
+  width:calc(4px * var(--c)); height:calc(13px * var(--c)); border-radius:1.5px 1.5px 1px 1px;
+  background:linear-gradient(#fff8ea, #f0dcae 60%, #d6ba82);
+  box-shadow:0 1px 3px rgba(0,0,0,.3);
+  opacity:0; animation:rise linear infinite;
 }
+.hero-particles i::before{   /* להבת הנר */
+  content:""; position:absolute; left:50%; bottom:100%; transform:translateX(-50%);
+  width:calc(4.6px * var(--c)); height:calc(7px * var(--c));
+  border-radius:50% 50% 48% 48% / 62% 62% 38% 38%;
+  background:radial-gradient(45% 55% at 50% 78%, #fff6cf, #ffc154 55%, #ec8f1f);
+  box-shadow:0 0 calc(6px*var(--c)) calc(1px*var(--c)) rgba(255,184,74,.95), 0 0 calc(16px*var(--c)) rgba(255,150,40,.5);
+  animation:flicker 1.9s ease-in-out infinite;
+}
+@keyframes flicker{ 0%,100%{ opacity:1; } 50%{ opacity:.82; transform:translateX(-50%) scaleY(.9); } }
 @keyframes rise{
   0%{ transform:translateY(0) scale(.45); opacity:0; }
   14%{ opacity:1; }
@@ -138,14 +148,10 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
 .stat-label{ font-size:.84rem; color:var(--muted); margin-top:6px; }
 .stat-sep{ width:1px; height:42px; background:var(--line-2); }
 
-/* ===== כיתוב רץ בירו (פסוק) ===== */
-.hero-marquee{ margin-top:42px; width:100vw; margin-inline:calc(50% - 50vw); overflow:hidden;
-  -webkit-mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent);
-  mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent); }
-.hm-track{ direction:ltr; display:inline-flex; white-space:nowrap; will-change:transform; animation:heroMarquee 32s linear infinite; }
-.hm-quote{ direction:rtl; font-family:var(--ff-serif); font-size:clamp(1rem,2.3vw,1.35rem); color:rgba(247,231,163,.6); padding-inline-end:50px; white-space:nowrap; }
-@keyframes heroMarquee{ from{ transform:translateX(-50%); } to{ transform:translateX(0); } }
-@media (prefers-reduced-motion: reduce){ .hm-track{ animation:none; } }
+/* ===== פסוק/כותרת בירו (סטטי) ===== */
+.hero-verse{ margin-top:40px; text-align:center; }
+.hv-title{ font-family:var(--ff-serif); font-size:clamp(1.4rem,3.6vw,2.05rem); color:var(--gold-2); margin:0 0 7px; font-weight:700; }
+.hv-sub{ color:var(--muted); font-size:clamp(.95rem,2vw,1.12rem); margin:0; }
 
 .scroll-cue{ position:absolute; bottom:26px; left:50%; transform:translateX(-50%); z-index:3; }
 .scroll-cue span{
@@ -390,7 +396,7 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
 @keyframes floatpulse{ 0%,100%{ box-shadow:0 12px 30px rgba(216,179,73,.4);} 50%{ box-shadow:0 12px 44px rgba(216,179,73,.7);} }
 
 /* ============ אנימציית כניסה (reveal) ============ */
-.reveal{ opacity:0; transform:translateY(28px); transition:opacity .7s ease, transform .7s ease; }
+.reveal{ opacity:1; transform:none; } /* תמיד מוצג — ללא אנימציית גלילה */
 .reveal.in{ opacity:1; transform:none; }
 
 /* ============ רספונסיב ============ */
