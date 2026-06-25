@@ -148,10 +148,15 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
 .stat-label{ font-size:.84rem; color:var(--muted); margin-top:6px; }
 .stat-sep{ width:1px; height:42px; background:var(--line-2); }
 
-/* ===== פסוק/כותרת בירו (סטטי) ===== */
-.hero-verse{ margin-top:40px; text-align:center; }
-.hv-title{ font-family:var(--ff-serif); font-size:clamp(1.4rem,3.6vw,2.05rem); color:var(--gold-2); margin:0 0 7px; font-weight:700; }
-.hv-sub{ color:var(--muted); font-size:clamp(.95rem,2vw,1.12rem); margin:0; }
+/* ===== פסוק רץ בירו (כיתוב נע משמאל לימין) ===== */
+.hero-marquee{ margin-top:40px; width:100vw; margin-inline:calc(50% - 50vw); overflow:hidden;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent);
+  mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent); }
+.hm-track{ direction:ltr; display:inline-flex; white-space:nowrap; will-change:transform; animation:heroMarquee 34s linear infinite; }
+.hm-quote{ direction:rtl; font-family:var(--ff-serif); font-size:clamp(1.05rem,2.4vw,1.45rem); color:var(--muted); padding-inline-end:46px; white-space:nowrap; }
+.hm-quote b{ color:var(--gold-2); font-weight:800; }
+@keyframes heroMarquee{ from{ transform:translateX(-50%); } to{ transform:translateX(0); } }
+@media (prefers-reduced-motion: reduce){ .hm-track{ animation:none; } }
 
 .scroll-cue{ position:absolute; bottom:26px; left:50%; transform:translateX(-50%); z-index:3; }
 .scroll-cue span{
