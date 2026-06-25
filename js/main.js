@@ -210,4 +210,17 @@
     var href = "https://wa.me/?text=" + encodeURIComponent(msg);
     Array.prototype.forEach.call(waShare, function (el) { el.setAttribute("href", href); el.setAttribute("target", "_blank"); el.setAttribute("rel", "noopener"); });
   }
+
+  /* ---------- כפתור "חזרה למעלה" ---------- */
+  var toTop = document.createElement("button");
+  toTop.className = "to-top"; toTop.id = "toTop"; toTop.type = "button";
+  toTop.setAttribute("aria-label", "חזרה למעלה");
+  toTop.innerHTML = "↑";
+  document.body.appendChild(toTop);
+  window.addEventListener("scroll", function () {
+    toTop.classList.toggle("show", window.scrollY > 560);
+  }, { passive: true });
+  toTop.addEventListener("click", function () {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
 })();

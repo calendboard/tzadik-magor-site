@@ -411,6 +411,19 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
   .float-text{ display:none; }
 }
 
+/* ===== כפתור חזרה למעלה ===== */
+.to-top{
+  position:fixed; z-index:90; bottom:84px; right:18px;
+  width:46px; height:46px; border-radius:50%; border:1px solid #6d5121;
+  background:linear-gradient(135deg,#f7e7a3,#caa247); color:#241803;
+  font-size:1.4rem; font-weight:900; cursor:pointer; display:grid; place-items:center;
+  box-shadow:0 8px 22px rgba(0,0,0,.42); opacity:0; transform:translateY(12px);
+  pointer-events:none; transition:opacity .3s ease, transform .3s ease, filter .2s ease;
+}
+.to-top.show{ opacity:1; transform:translateY(0); pointer-events:auto; }
+.to-top:hover{ filter:brightness(1.08); }
+@media print{ .to-top{ display:none !important; } }
+
 /* ===== עובדות מופלאות ===== */
 .facts-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
 .fact-card{ display:flex; gap:12px; align-items:flex-start; padding:20px 18px; background:linear-gradient(160deg,rgba(29,22,16,.7),rgba(18,13,9,.7)); border:1px solid var(--line); border-radius:14px; transition:transform .3s ease, border-color .3s ease; }
