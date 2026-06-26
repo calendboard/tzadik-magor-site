@@ -225,7 +225,8 @@
 
   /* ---------- כדורי ישועה צפים + מודאל סיפור מלא ---------- */
   var yshTrack = document.getElementById("yshTrack");
-  if (yshTrack) {
+  var storyGrid = document.getElementById("storyGrid");
+  if (yshTrack || storyGrid) {
     var STORIES = [
       { tag: "גילוי הציון", img: "assets/hilula/ziyon-night.jpg",
         title: "החלום שגילה את הציון",
@@ -286,7 +287,37 @@
         title: "הטרקטור שלא הצליח",
         sum: "ניסו להזיז את הציון — ולא עלתה בידם",
         full: "לאורך השנים נעשו ניסיונות לפנות או להזיז את הציון. באחד מהם, פועלים שניסו לישר את הקרקע סמוך לציון שמעו קול הקורא בשמם; וכשהמשיכו — הטרקטור התהפך. בניסיון אחר הוסטה ידו של מי שהניף את הכלי והוא נחבל. מאז חדלו, והציון נותר על מקומו.",
-        source: "מקור: ״שחרית״, עמ׳ 17–18 · ״אביר יעקב״" }
+        source: "מקור: ״שחרית״, עמ׳ 17–18 · ״אביר " },
+      { tag: `פרי בטן`, img: `assets/segulot/pri.jpg`,
+        title: `שתי יולדות — ושני בנים בשם יצחק`,
+        sum: `חלו בקורונה — ונולדו שני בנים בריאים`,
+        full: `בתקופת מגפת הקורונה חלו שתי נשים בהיריון, ומצבן הרפואי הידרדר מאוד. בני המשפחה ארגנו מניין לתפילה על ציון הצדיק בעג׳ור, וקיבלו על עצמם שאם שתי הנשים תבראנה ותלדנה בנים בריאים — ייקראו הילדים על שם הצדיק, "יצחק". כנגד כל הסיכויים שתיהן החלימו ללא כל סימן למחלה, ההיריון נמשך כשורה, ושתיהן ילדו בנים בריאים — וכל אחד נקרא יצחק. בעקבות הנס נפתח כולל אברכים על שם הצדיק.`,
+        source: `מקור: ארכיון המאורות · "פועל הישועות מעגור"` },
+      { tag: `זיווג`, img: `assets/segulot/zivug.jpg`,
+        title: `השידוך שנקשר בערב יום כיפור`,
+        sum: `התחייב לסעודה — והבן התארס`,
+        full: `אב שבנו הבוגר טרם זכה להינשא עלה לציון הצדיק בתשעה באב, וקיבל על עצמו שאם בנו יתארס לפני יום ההילולא של הרבנית — יערוך סעודה לכבוד הצדיק ולעילוי נשמתו. סמוך לאחר מכן, בערב יום הכיפורים, נקשר השידוך והבן התארס בשעה טובה.`,
+        source: `מקור: ארכיון המאורות · "פועל הישועות מעגור"` },
+      { tag: `ישועה`, img: `assets/segulot/hatzlacha.jpg`,
+        title: `החוב שנעלם מהמחשב`,
+        sum: `הניחה מסמכיה על הציון — והחוב נמחק`,
+        full: `אישה שעמדה בפני תביעה מהעירייה בגין חוב גדול שהצטבר הביאה את כל מסמכיה לציון. בתמימות הניחה את הניירות על הציון וביקשה מהצדיק שיהיה לה לפרקליט. כשהגיעה למשרדי העירייה כדי לשלם — בדק הפקיד במחשב ולא מצא כל רישום של חוב על שמה, אף שהמסמכים שבידה הראו אחרת.`,
+        source: `מקור: ארכיון המאורות · "פועל הישועות מעגור"` },
+      { tag: `עדות`, img: `assets/hilula/ziyon-prayer.jpg`,
+        title: `פתח בענני השמים`,
+        sum: `חלון נפתח בעננים — בדיוק בזמן התפילה`,
+        full: `מספר הרב ק׳, מפעילי הקהילה בבית שמש: "חיי השתנו מאז שזכיתי לגלות את המקום הקדוש הזה. בתפילת מנחה ביום מעונן הצטערתי שכאילו ננעלו השמים בפני תפילתנו. אך כשהתחלנו, נשאתי עיניי ולמעלה ראיתי פתח רחב בעננים — כמו חלון ממש מולנו. כולם השתוממו. וברגע שהסתיימה התפילה — נסגר הפתח, והשמים נחתמו שוב." המראה ריגש את כל הנוכחים, מכל החוגים.`,
+        source: `מקור: ארכיון המאורות · "פועל הישועות מעגור"` },
+      { tag: `מעלת הצדיק`, img: `assets/hilula/elder-prayer.jpg`,
+        title: `צדיק ביקש — תזכיר אותי שם`,
+        sum: `רב גדול התחנן שיזכירו אותו על הציון`,
+        full: `אותו מספר נכנס פעם לקבל ברכה מרב גדול. מבין רבים שהמתינו, הצביע עליו הרב לפתע ושאל על מעשיו. כששמע שהוא פוקד את רבי גברא בעג׳ור כמעט מדי יום, התרגש עד עומק נשמתו ואמר: "אילו ידעו האנשים את כוחו ומעלתו של הצדיק מעג׳ור — לא היו עוזבים את המקום לעולם!" ואז ביקש בלב נשבר: "אני מתחנן אליך — הזכר אותי שם, בכל פעם שאתה עולה!" וכתב את שמו ושם משפחתו על פתק.`,
+        source: `מקור: ארכיון המאורות · "פועל הישועות מעגור"` },
+      { tag: `רפואה`, img: `assets/hilula/ziyon-interior.jpg`,
+        title: `המקל שנשאר בציון`,
+        sum: `נכנס על מקל הליכה — ויצא בלעדיו`,
+        full: `בחור צעיר, ספורטאי לשעבר, נכנס לציון כשהוא נשען על מקל הליכה. ליד הציון פרץ בבכי: "רבי יצחק! ראה מה עלה בגורלי — הייתי אלוף בכוחי, ואחרי תאונה וניתוחים אני שבור וצולע!" לאחר כמה דקות של שפיכת הלב קם, השליך את המקל, ויצא בלעדיו. כעבור חודשים שב והעיד: "אחרי התפילה הרגשתי תחושות חדשות ברגל, ניסיתי ללכת בלי המקל — וזה לא כאב! תוך ימים ספורים החלמתי לגמרי. וגם זכיתי להתחיל לחזור בתשובה."`,
+        source: `מקור: ארכיון המאורות · "פועל הישועות מעגור"` }
     ];
 
     function yshBall(s) {
@@ -305,9 +336,13 @@
       b.addEventListener("click", function () { yshOpen(s); });
       return b;
     }
-    // שתי חזרות לריצה אינסופית חלקה
-    for (var rep = 0; rep < 2; rep++) {
-      STORIES.forEach(function (s) { yshTrack.appendChild(yshBall(s)); });
+    if (yshTrack) {
+      for (var rep = 0; rep < 2; rep++) {
+        STORIES.forEach(function (s) { yshTrack.appendChild(yshBall(s)); });
+      }
+    }
+    if (storyGrid) {
+      STORIES.forEach(function (s) { storyGrid.appendChild(yshBall(s)); });
     }
 
     // מודאל
@@ -338,5 +373,80 @@
     ym.querySelector(".ysh-close").addEventListener("click", yshClose);
     ym.querySelector(".ysh-modal-ov").addEventListener("click", yshClose);
     document.addEventListener("keydown", function (e) { if (e.key === "Escape") yshClose(); });
+  }
+
+  /* ---------- חדשות ועדכוני המרכז (כרטיסים + מודאל כתבה) ---------- */
+  var newsGrid = document.getElementById("newsGrid");
+  var newsTeaser = document.getElementById("newsTeaser");
+  if (newsGrid || newsTeaser) {
+    /* === להוספת כתבה: הוסיפו אובייקט בראש הרשימה (החדש ביותר ראשון) === */
+    var NEWS = [
+      { date: "תמוז תשפ״ו", cat: "הילולא", img: "assets/hilula/crowd-night.jpg",
+        title: "לקראת ההילולא הקדושה — כ״א בתמוז",
+        excerpt: "מתקרבים ימי ההילולא של פועל הישועות. הפרטים על המעמד, התפילות וההשתתפות.",
+        body: [
+          "מדי שנה, בכ״א בתמוז, נאספים אלפי יהודים מכל קצוות הארץ אל ציון הצדיק רבי יצחק גברא זצ״ל בעג׳ור — להשתטח, להדליק נרות, לומר תהילים ולבקש ישועה.",
+          "השנה תחול ההילולא ביום שני, כ״א בתמוז תשפ״ו (6 ביולי 2026). במהלך היום יתקיימו הדלקה מרכזית, תפילות, אמירת תהילים וסעודת מצווה.",
+          "מי שאינו יכול להגיע מוזמן למסור שם לתפילה ולהיות שותף בהוצאות ההילולא — וזכות הצדיק תגן עליו ועל בני ביתו."
+        ] },
+      { date: "סיון תשפ״ו", cat: "מהמרכז", img: "assets/hilula/ziyon-prayer.jpg",
+        title: "מסירת שמות לתפילה על הציון",
+        excerpt: "ניתן למסור שם לתפילה ולהדליק נר נשמה על ציון הצדיק — מכל מקום בארץ.",
+        body: [
+          "מרכז ״הצדיק מעג׳ור״ מאפשר לכל יהודי למסור שם לתפילה על הציון הקדוש, גם למי שאינו יכול להגיע בעצמו.",
+          "השמות נמסרים לתפילה על הציון לישועה, רפואה, זיווג, פרנסה ופרי בטן. ניתן גם להדליק נר נשמה ולהקדיש לעילוי נשמת יקיריכם.",
+          "למסירת שם ולפרטים נוספים — צרו קשר, או היכנסו לעמוד התרומה וההקדשה."
+        ] },
+      { date: "אייר תשפ״ו", cat: "עדכון", img: "assets/hilula/ziyon-night.jpg",
+        title: "ברוכים הבאים לאתר הרשמי של המרכז",
+        excerpt: "השקנו את האתר הרשמי — תולדות הצדיק, סגולות, סיפורי ישועה, גלריה ועוד.",
+        body: [
+          "בשעה טובה ומוצלחת אנו שמחים להשיק את האתר הרשמי של מרכז ״הצדיק מעג׳ור״ — רבי יצחק בן יצחק גברא זצ״ל, פועל הישועות.",
+          "באתר תמצאו את תולדות חייו של הצדיק, סגולותיו, סיפורי מופת וישועות, גלריית תמונות מההילולות, תפילות ותהילים — הכל במקום אחד.",
+          "מדור החדשות יתעדכן באופן שוטף בכל הנעשה במרכז ובהכנות לקראת ההילולא. שתזכו לישועות בזכות הצדיק!"
+        ] }
+    ];
+
+    function newsCard(a) {
+      var c = document.createElement("article");
+      c.className = "news-card";
+      c.innerHTML =
+        '<div class="nc-img" style="background-image:url(\'' + a.img + '\')"></div>' +
+        '<div class="nc-body">' +
+          '<div class="nc-meta"><span class="nc-cat">' + a.cat + '</span><span class="nc-date">' + a.date + '</span></div>' +
+          '<h3 class="nc-title">' + a.title + '</h3>' +
+          '<p class="nc-excerpt">' + a.excerpt + '</p>' +
+          '<button class="nc-more" type="button">קרא עוד ›</button>' +
+        '</div>';
+      c.querySelector(".nc-more").addEventListener("click", function () { newsOpen(a); });
+      return c;
+    }
+    if (newsGrid) { NEWS.forEach(function (a) { newsGrid.appendChild(newsCard(a)); }); }
+    if (newsTeaser) { NEWS.slice(0, 3).forEach(function (a) { newsTeaser.appendChild(newsCard(a)); }); }
+
+    var nm = document.createElement("div");
+    nm.className = "ysh-modal";
+    nm.innerHTML =
+      '<div class="ysh-modal-ov"></div>' +
+      '<div class="ysh-panel" role="dialog" aria-modal="true" aria-label="כתבה">' +
+        '<button class="ysh-close" type="button" aria-label="סגירה">×</button>' +
+        '<img class="ym-img nm-img" alt="" />' +
+        '<span class="ym-tag nm-tag"></span>' +
+        '<h3 class="ym-t nm-t"></h3>' +
+        '<div class="ym-body nm-body"></div>' +
+      '</div>';
+    document.body.appendChild(nm);
+    var nmImg = nm.querySelector(".nm-img"), nmTag = nm.querySelector(".nm-tag"),
+        nmT = nm.querySelector(".nm-t"), nmBody = nm.querySelector(".nm-body");
+    function newsOpen(a) {
+      nmImg.src = a.img; nmTag.textContent = a.cat + " · " + a.date; nmT.textContent = a.title;
+      nmBody.innerHTML = "";
+      a.body.forEach(function (p) { var el = document.createElement("p"); el.textContent = p; nmBody.appendChild(el); });
+      nm.classList.add("open"); document.body.style.overflow = "hidden";
+    }
+    function newsClose() { nm.classList.remove("open"); document.body.style.overflow = ""; }
+    nm.querySelector(".ysh-close").addEventListener("click", newsClose);
+    nm.querySelector(".ysh-modal-ov").addEventListener("click", newsClose);
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") newsClose(); });
   }
 })();

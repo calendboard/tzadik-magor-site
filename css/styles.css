@@ -4,17 +4,17 @@
    ============================================================ */
 
 :root{
-  --bg:        #0c0a08;
-  --bg-2:      #14100b;
-  --bg-3:      #1c1610;
-  --panel:     #181310;
+  --bg:        #2b2015;
+  --bg-2:      #352a1a;
+  --bg-3:      #41331f;
+  --panel:     #3a2e1d;
   --gold:      #d8b349;
   --gold-2:    #f7e7a3;
   --gold-3:    #c9a23a;
   --cream:     #f4ecd8;
-  --muted:     #b6a98c;
-  --line:      rgba(216,179,73,.18);
-  --line-2:    rgba(216,179,73,.32);
+  --muted:     #cdbf9e;
+  --line:      rgba(216,179,73,.26);
+  --line-2:    rgba(216,179,73,.44);
   --shadow:    0 24px 60px rgba(0,0,0,.45);
   --radius:    18px;
   --maxw:      1180px;
@@ -59,14 +59,14 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
 .btn-lg{ --pad:16px 36px; font-size:1.08rem; }
 .btn-sm{ --pad:9px 18px; font-size:.9rem; }
 .btn-block{ width:100%; }
-.btn-gold{ background:var(--gold-grad); color:#241803; box-shadow:0 10px 28px rgba(216,179,73,.32); }
+.btn-gold{ background:var(--gold-grad); color:#241803; box-shadow:0 10px 28px rgba(216,179,73,.44); }
 .btn-gold:hover{ transform:translateY(-3px); box-shadow:0 16px 38px rgba(216,179,73,.46); }
 .btn-ghost{ background:rgba(255,255,255,.04); color:var(--cream); border-color:var(--line-2); backdrop-filter:blur(6px); }
 .btn-ghost:hover{ background:rgba(216,179,73,.12); border-color:var(--gold); transform:translateY(-3px); }
 .btn-outline{ background:transparent; color:var(--gold-2); border-color:var(--gold-3); }
 .btn-outline:hover{ background:var(--gold); color:#241803; transform:translateY(-3px); }
-.btn-dark{ background:#120d08; color:var(--gold-2); border-color:var(--line-2); }
-.btn-dark:hover{ transform:translateY(-3px); background:#000; }
+.btn-dark{ background:#241a10; color:var(--gold-2); border-color:var(--line-2); }
+.btn-dark:hover{ transform:translateY(-3px); background:#1a130b; }
 
 /* ============ ניווט ============ */
 .site-header{
@@ -74,7 +74,7 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
   padding:14px 0; transition:background .35s ease, padding .35s ease, box-shadow .35s ease;
 }
 .site-header.scrolled{
-  background:rgba(12,10,8,.82); backdrop-filter:blur(14px);
+  background:rgba(43,32,21,.86); backdrop-filter:blur(14px);
   padding:8px 0; box-shadow:0 8px 30px rgba(0,0,0,.4); border-bottom:1px solid var(--line);
 }
 .nav-wrap{ display:flex; align-items:center; justify-content:space-between; gap:18px; }
@@ -98,7 +98,7 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
 .hero{
   position:relative; min-height:100svh; display:flex; align-items:center;
   text-align:center; padding:120px 0 80px; overflow:hidden;
-  background:radial-gradient(1200px 700px at 50% -10%, #241a0e 0%, var(--bg) 60%);
+  background:radial-gradient(1200px 700px at 50% -10%, #5b4527 0%, var(--bg) 60%);
 }
 .hero-bg{ position:absolute; inset:0; z-index:0; }
 .orb{ position:absolute; border-radius:50%; filter:blur(70px); opacity:.5; animation:float 14s ease-in-out infinite; }
@@ -243,7 +243,7 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
   position:relative; aspect-ratio:4/5; border-radius:var(--radius); overflow:hidden;
   border:1px solid var(--line-2);
   background:
-    radial-gradient(circle at 50% 30%, #2a2016, #14100b),
+    radial-gradient(circle at 50% 30%, #2a2016, #352a1a),
     repeating-linear-gradient(45deg, rgba(216,179,73,.05) 0 12px, transparent 12px 24px);
   box-shadow:var(--shadow);
 }
@@ -270,7 +270,7 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
 /* ============ סגולות / כרטיסים ============ */
 .cards-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
 .card{
-  background:linear-gradient(180deg,var(--panel),#12100b);
+  background:linear-gradient(180deg,var(--panel),#2e2417);
   border:1px solid var(--line); border-radius:var(--radius); padding:32px 26px;
   transition:transform .3s ease, border-color .3s ease, box-shadow .3s ease;
   position:relative; overflow:hidden;
@@ -290,24 +290,24 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
 /* רקע תמונה אמיתי הקשור לכל סגולה (מעובד לגוון כהה שמשתלב ברקע האתר) */
 .card > *{ position:relative; z-index:1; }
 .card[class*="s-"]{ background-size:cover; background-position:center; }
-.card.s-refua{ background-image:linear-gradient(180deg,rgba(16,11,6,.42),rgba(10,7,3,.72)),url("../assets/segulot/refua.jpg?v=627"); }
-.card.s-zivug{ background-image:linear-gradient(180deg,rgba(16,11,6,.42),rgba(10,7,3,.72)),url("../assets/segulot/zivug.jpg?v=627"); }
-.card.s-parnasa{ background-image:linear-gradient(180deg,rgba(16,11,6,.42),rgba(10,7,3,.72)),url("../assets/segulot/parnasa.jpg?v=627"); }
-.card.s-pri{ background-image:linear-gradient(180deg,rgba(16,11,6,.42),rgba(10,7,3,.72)),url("../assets/segulot/pri.jpg?v=627"); }
-.card.s-hatzlacha{ background-image:linear-gradient(180deg,rgba(16,11,6,.42),rgba(10,7,3,.72)),url("../assets/segulot/hatzlacha.jpg?v=627"); }
-.card.s-shmira{ background-image:linear-gradient(180deg,rgba(16,11,6,.42),rgba(10,7,3,.72)),url("../assets/segulot/shmira.jpg?v=627"); }
+.card.s-refua{ background-image:linear-gradient(180deg,rgba(24,16,9,.30),rgba(15,11,6,.56)),url("../assets/segulot/refua.jpg?v=627"); }
+.card.s-zivug{ background-image:linear-gradient(180deg,rgba(24,16,9,.30),rgba(15,11,6,.56)),url("../assets/segulot/zivug.jpg?v=627"); }
+.card.s-parnasa{ background-image:linear-gradient(180deg,rgba(24,16,9,.30),rgba(15,11,6,.56)),url("../assets/segulot/parnasa.jpg?v=627"); }
+.card.s-pri{ background-image:linear-gradient(180deg,rgba(24,16,9,.30),rgba(15,11,6,.56)),url("../assets/segulot/pri.jpg?v=627"); }
+.card.s-hatzlacha{ background-image:linear-gradient(180deg,rgba(24,16,9,.30),rgba(15,11,6,.56)),url("../assets/segulot/hatzlacha.jpg?v=627"); }
+.card.s-shmira{ background-image:linear-gradient(180deg,rgba(24,16,9,.30),rgba(15,11,6,.56)),url("../assets/segulot/shmira.jpg?v=627"); }
 
 /* ============ הילולא ============ */
 .hillula{ text-align:center; overflow:hidden; }
 .hillula-bg{
   position:absolute; inset:0; z-index:0; opacity:.5;
-  background:radial-gradient(700px 380px at 50% 0%, #3a2a12, transparent 70%);
+  background:radial-gradient(700px 380px at 50% 0%, #4c3a18, transparent 70%);
 }
 .hillula-inner{ position:relative; z-index:1; }
 .countdown{ display:flex; gap:16px; justify-content:center; margin:38px 0; flex-wrap:wrap; }
 .cd-box{
   min-width:96px; padding:20px 14px; border-radius:16px;
-  background:linear-gradient(180deg,var(--panel),#100d09); border:1px solid var(--line-2);
+  background:linear-gradient(180deg,var(--panel),#2c2216); border:1px solid var(--line-2);
   box-shadow:var(--shadow);
 }
 .cd-num{ display:block; font-family:var(--ff-serif); font-size:2.6rem; font-weight:900; color:var(--gold-2); line-height:1; }
@@ -330,7 +330,7 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
 .gallery-item{
   position:relative; aspect-ratio:4/3; border-radius:14px; overflow:hidden;
   border:1px solid var(--line); cursor:pointer;
-  background:linear-gradient(135deg,#1d1610,#241b11);
+  background:linear-gradient(135deg,#3e3120,#4b3b25);
   transition:transform .3s ease, box-shadow .3s ease, border-color .3s ease;
 }
 .gallery-item img{ width:100%; height:100%; object-fit:cover; display:block; transition:transform .6s ease; }
@@ -348,14 +348,14 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
   max-width:760px; margin:0 auto; text-align:center; padding:48px 36px; border-radius:24px;
   background:
     radial-gradient(500px 240px at 50% -20%, rgba(216,179,73,.12), transparent 70%),
-    linear-gradient(180deg,var(--panel),#100d09);
+    linear-gradient(180deg,var(--panel),#2c2216);
   border:1px solid var(--line-2); box-shadow:var(--shadow);
 }
 .prayer-text{ font-family:var(--ff-serif); font-size:1.3rem; color:var(--cream); line-height:1.7; margin:18px 0 28px; }
 .prayer-actions{ display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
 
 /* ============ CTA נר ============ */
-.candle-cta{ text-align:center; background:radial-gradient(700px 400px at 50% 120%, #2a1e10, var(--bg)); }
+.candle-cta{ text-align:center; background:radial-gradient(700px 400px at 50% 120%, #4a3820, var(--bg)); }
 .candle-cta-inner{ max-width:640px; margin:0 auto; }
 
 /* ============ צור קשר ============ */
@@ -369,7 +369,7 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
 .field{ margin-bottom:16px; }
 .field label{ display:block; margin-bottom:7px; font-size:.92rem; color:var(--gold-2); font-weight:500; }
 .field input,.field select,.field textarea{
-  width:100%; padding:12px 14px; border-radius:11px; background:#0f0c08; color:var(--cream);
+  width:100%; padding:12px 14px; border-radius:11px; background:#251c12; color:var(--cream);
   border:1px solid var(--line-2); font-family:var(--ff-sans); font-size:1rem; transition:border-color .2s ease, box-shadow .2s ease;
 }
 .field input:focus,.field select:focus,.field textarea:focus{
@@ -385,7 +385,7 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
 .donate-banner p{ margin:0; color:#3a2a08; font-weight:500; max-width:560px; }
 
 /* ============ פוטר ============ */
-.site-footer{ background:#08060409; background:#080604; border-top:1px solid var(--line); }
+.site-footer{ background:#241a1009; background:#241a10; border-top:1px solid var(--line); }
 .footer-grid{ display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr; gap:36px; padding:60px 22px 36px; }
 .footer-col h4{ color:var(--gold-2); margin:0 0 16px; font-size:1.1rem; }
 .footer-col ul{ list-style:none; padding:0; margin:0; display:grid; gap:10px; }
@@ -396,7 +396,7 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
 .socials a{ width:42px; height:42px; display:grid; place-items:center; border-radius:50%; background:var(--panel); border:1px solid var(--line); color:var(--gold-2); font-weight:700; transition:.25s; }
 .socials a:hover{ background:var(--gold); color:#241803; transform:translateY(-3px); }
 .footer-keywords{ text-align:center; color:#6b6149; font-size:.82rem; padding:22px; border-top:1px solid var(--line); line-height:2; }
-.footer-bottom{ background:#050403; padding:18px 0; }
+.footer-bottom{ background:#1c140c; padding:18px 0; }
 .footer-bottom .container{ display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap; color:var(--muted); font-size:.86rem; }
 
 /* ============ כפתור תרומה צף ============ */
@@ -456,7 +456,7 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
 
 /* ===== עובדות מופלאות ===== */
 .facts-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
-.fact-card{ display:flex; flex-direction:column; align-items:center; text-align:center; gap:9px; padding:26px 18px; background:linear-gradient(160deg,rgba(29,22,16,.7),rgba(18,13,9,.7)); border:1px solid var(--line); border-radius:14px; transition:transform .3s ease, border-color .3s ease; }
+.fact-card{ display:flex; flex-direction:column; align-items:center; text-align:center; gap:9px; padding:26px 18px; background:linear-gradient(160deg,rgba(62,49,30,.62),rgba(47,37,23,.62)); border:1px solid var(--line); border-radius:14px; transition:transform .3s ease, border-color .3s ease; }
 .fact-card:hover{ transform:translateY(-5px); border-color:var(--line-2); }
 .fact-emoji{ font-size:2rem; line-height:1; }
 .fact-t{ font-family:var(--ff-serif); font-size:1.12rem; color:var(--gold-2); font-weight:700; margin:2px 0 0; line-height:1.3; }
@@ -467,7 +467,7 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
 /* ===== מה מתקיים בהילולא ===== */
 .hp-title{ font-family:var(--ff-serif); font-size:1.35rem; color:var(--gold-2); margin:38px 0 16px; }
 .hillula-program{ display:flex; flex-wrap:wrap; justify-content:center; gap:12px; max-width:780px; margin:0 auto; }
-.hp-item{ display:flex; flex-direction:column; align-items:center; gap:7px; min-width:124px; padding:18px 14px; background:rgba(20,15,9,.5); border:1px solid var(--line); border-radius:14px; transition:transform .3s ease, border-color .3s ease; }
+.hp-item{ display:flex; flex-direction:column; align-items:center; gap:7px; min-width:124px; padding:18px 14px; background:rgba(58,46,29,.45); border:1px solid var(--line); border-radius:14px; transition:transform .3s ease, border-color .3s ease; }
 .hp-item:hover{ transform:translateY(-4px); border-color:var(--line-2); }
 .hp-ic{ font-size:1.8rem; line-height:1; }
 .hp-item b{ color:var(--cream); font-weight:600; font-size:.96rem; }
@@ -488,7 +488,7 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
 
 /* ===== שאלות נפוצות (אקורדיון נטיבי, ללא JS) ===== */
 .faq-list{ max-width:780px; margin:30px auto 0; display:grid; gap:12px; }
-.faq-item{ background:linear-gradient(135deg,#1b1510,#140e08); border:1px solid var(--line); border-radius:14px; overflow:hidden; transition:border-color .25s ease; }
+.faq-item{ background:linear-gradient(135deg,#3b2f1e,#312618); border:1px solid var(--line); border-radius:14px; overflow:hidden; transition:border-color .25s ease; }
 .faq-item[open]{ border-color:#6d5121; }
 .faq-item summary{ cursor:pointer; padding:16px 46px 16px 22px; font-family:var(--ff-serif); font-size:1.1rem; color:#f2db8a; list-style:none; position:relative; }
 .faq-item summary::-webkit-details-marker{ display:none; }
@@ -554,7 +554,7 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
   .float-donate, .scroll-cue, .nav-toggle{ display:none!important; }
   .site-header{ position:static; }
   .hero{ min-height:auto; }
-  body{ background:#0c0a08; }
+  body{ background:#2b2015; }
 }
 
 /* נגישות: כיבוד העדפת תנועה מופחתת */
@@ -573,7 +573,7 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
 @media (prefers-reduced-motion: reduce){ .ysh-track{ animation:none; } }
 
 .ysh-ball{ position:relative; flex:0 0 auto; width:300px; height:300px; border-radius:20px; overflow:hidden;
-  direction:rtl; cursor:pointer; padding:0; border:1px solid var(--line-2); background:#120d07; font-family:inherit;
+  direction:rtl; cursor:pointer; padding:0; border:1px solid var(--line-2); background:#2a2015; font-family:inherit;
   box-shadow:0 16px 44px rgba(0,0,0,.5), inset 0 0 0 1px rgba(247,231,163,.08);
   transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
 .ysh-ball:hover{ transform:translateY(-6px) scale(1.025); border-color:rgba(247,231,163,.55);
@@ -602,7 +602,7 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
 .ysh-modal.open{ display:flex; }
 .ysh-modal-ov{ position:absolute; inset:0; background:rgba(6,5,3,.82); -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px); }
 .ysh-panel{ position:relative; z-index:2; width:min(620px,100%); max-height:86vh; overflow:auto; text-align:center;
-  background:linear-gradient(180deg,#1b140b,#120d07); border:1px solid var(--line-2); border-radius:20px;
+  background:linear-gradient(180deg,#372b18,#2a2111); border:1px solid var(--line-2); border-radius:20px;
   box-shadow:0 30px 90px rgba(0,0,0,.7); padding:36px 32px 28px; }
 .ysh-panel .ym-img{ width:104px; height:104px; border-radius:50%; object-fit:cover; margin:0 auto 14px; display:block;
   border:1px solid var(--line-2); box-shadow:0 0 0 6px rgba(247,231,163,.06); }
@@ -614,3 +614,32 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
 .ysh-close{ position:absolute; top:12px; left:14px; z-index:3; width:38px; height:38px; border-radius:50%;
   background:rgba(255,255,255,.06); border:1px solid var(--line-2); color:#e8d7a4; font-size:1.4rem; line-height:1; cursor:pointer; }
 .ysh-close:hover{ background:rgba(255,255,255,.12); }
+
+/* ===== חדשות ועדכוני המרכז ===== */
+.news-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:26px; max-width:1040px; margin:0 auto; }
+.news-teaser{ display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:24px; max-width:1000px; margin:0 auto; }
+.news-card{ background:linear-gradient(160deg,#372b19,#2a2113); border:1px solid var(--line-2); border-radius:18px;
+  overflow:hidden; display:flex; flex-direction:column; box-shadow:0 12px 34px rgba(0,0,0,.32);
+  transition:transform .22s ease, box-shadow .22s ease, border-color .22s ease; }
+.news-card:hover{ transform:translateY(-5px); border-color:rgba(247,231,163,.5); box-shadow:0 20px 50px rgba(0,0,0,.45); }
+.nc-img{ height:172px; background-size:cover; background-position:center; position:relative; }
+.nc-img::after{ content:""; position:absolute; inset:0; background:linear-gradient(180deg,rgba(10,8,4,.05),rgba(10,8,4,.5)); }
+.nc-body{ padding:20px 22px 22px; display:flex; flex-direction:column; flex:1; }
+.nc-meta{ display:flex; align-items:center; gap:10px; margin-bottom:9px; }
+.nc-cat{ font-size:.72rem; font-weight:800; letter-spacing:.04em; color:#1a1206;
+  background:linear-gradient(180deg,#f3d98b,#d3ad55); border-radius:999px; padding:3px 11px; }
+.nc-date{ font-size:.82rem; color:var(--muted); }
+.nc-title{ font-family:var(--ff-serif); font-weight:800; color:var(--gold-2); font-size:1.3rem; line-height:1.3; margin:0 0 9px; }
+.nc-excerpt{ color:#d8cbac; font-size:1.02rem; line-height:1.6; margin:0 0 16px; flex:1; }
+.nc-more{ align-self:flex-start; font-family:inherit; font-size:.9rem; font-weight:800; color:var(--gold-2);
+  background:none; border:1px solid var(--line-2); border-radius:999px; padding:7px 18px; cursor:pointer; transition:background .2s ease; }
+.nc-more:hover{ background:rgba(247,231,163,.08); }
+.ysh-panel .nm-img{ width:100%; height:184px; border-radius:14px; object-fit:cover; box-shadow:none; border:1px solid var(--line-2); }
+.ysh-panel .nm-body{ text-align:right; }
+.ysh-panel .nm-body p{ margin:0 0 13px; }
+.ysh-panel .nm-body p:last-child{ margin-bottom:0; }
+
+/* ===== רשת סיפורים (עמוד הסיפורים) — אותם כרטיסים בפריסת רשת ===== */
+.ysh-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(258px,1fr)); gap:24px; max-width:1040px; margin:0 auto; }
+.ysh-grid .ysh-ball{ width:100%; height:auto; aspect-ratio:1/1; }
+@media (max-width:600px){ .ysh-grid{ grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px; } .ysh-grid .ysh-ball{ width:100%; } }
