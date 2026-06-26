@@ -121,3 +121,21 @@
   .ded-row, .d-fields{ grid-template-columns:1fr; }
   .d-fields .field:first-child{ grid-column:auto; }
 }
+
+
+/* ===== מסלולי התרמה ===== */
+.tracks-section{ padding-top:40px; padding-bottom:30px; }
+.tracks-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(290px,1fr)); gap:22px; max-width:1040px; margin:26px auto 0; }
+.track-card{ display:flex; flex-direction:column; text-align:right; background:linear-gradient(160deg,#3c2f1e,#2c2114);
+  border:1px solid var(--line-2); border-radius:18px; padding:24px 24px 22px; box-shadow:0 12px 30px rgba(0,0,0,.3);
+  transition:transform .22s ease, border-color .22s ease, box-shadow .22s ease; }
+.track-card:hover{ transform:translateY(-5px); border-color:rgba(247,231,163,.55); box-shadow:0 20px 46px rgba(0,0,0,.42); }
+.track-card.picked{ border-color:var(--gold-2); box-shadow:0 0 0 2px rgba(247,231,163,.45), 0 20px 46px rgba(0,0,0,.42); }
+.track-ic{ font-size:2.1rem; line-height:1; }
+.track-name{ font-family:var(--ff-serif); color:var(--gold-2); font-size:1.4rem; font-weight:800; margin:12px 0 8px; }
+.track-desc{ color:var(--cream); font-size:1rem; line-height:1.6; margin:0 0 12px; flex:1; opacity:.93; }
+.track-perk{ color:#ecdcb1; font-size:.92rem; margin:0 0 16px; }
+.track-foot{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:auto; flex-wrap:wrap; }
+.track-amt{ font-family:var(--ff-serif); color:var(--gold-2); font-size:1.5rem; font-weight:800; white-space:nowrap; }
+.track-amt small{ font-size:.78rem; color:var(--muted); font-weight:600; }
+.track-pick{ white-space:nowrap; }

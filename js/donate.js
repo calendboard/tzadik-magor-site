@@ -131,5 +131,36 @@
     status.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
+  /* ---------- מסלולי התרמה (כרטיסים שממלאים את הטופס) ---------- */
+  function setAmount(amt) {
+    state.amount = amt;
+    var matched = false;
+    $all(".amount").forEach(function (b) {
+      var on = parseInt(b.getAttribute("data-amount"), 10) === amt;
+      b.classList.toggle("active", on); if (on) matched = true;
+    });
+    if (customInput) customInput.value = matched ? "" : amt;
+  }
+  function setFreq(f) {
+    state.freq = f;
+    $all(".freq").forEach(function (b) { b.classList.toggle("active", b.getAttribute("data-freq") === f); });
+  }
+  $all(".track-pick").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var card = btn.closest(".track-card");
+      $all(".track-card").forEach(function (c) { c.classList.remove("picked"); });
+      if (card) card.classList.add("picked");
+      $all(".seg-tab").forEach(function (t) { t.classList.remove("active"); });
+      state.purpose = btn.getAttribute("data-purpose");
+      setAmount(parseInt(btn.getAttribute("data-amount"), 10) || 100);
+      setFreq(btn.getAttribute("data-freq") || "once");
+      render();
+      var f = $("#donateForm"); if (f) f.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
+  $all(".seg-tab").forEach(function (tab) {
+    tab.addEventListener("click", function () { $all(".track-card").forEach(function (c) { c.classList.remove("picked"); }); });
+  });
+
   render();
 })();
