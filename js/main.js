@@ -374,8 +374,8 @@
       b.type = "button";
       b.setAttribute("aria-label", s.title + " — לחצו לקריאת הסיפור");
       b.innerHTML =
-        '<span class="ysh-bg" style="background-image:url(\'' + s.img + '\')"></span>' +
         '<span class="ysh-in">' +
+          '<span class="ysh-deco" aria-hidden="true"></span>' +
           '<span class="ysh-tag">' + s.tag + '</span>' +
           '<span class="ysh-t">' + s.title + '</span>' +
           '<span class="ysh-s">' + s.sum + '</span>' +
@@ -400,18 +400,16 @@
       '<div class="ysh-modal-ov"></div>' +
       '<div class="ysh-panel" role="dialog" aria-modal="true" aria-label="סיפור ישועה">' +
         '<button class="ysh-close" type="button" aria-label="סגירה">×</button>' +
-        '<img class="ym-img" alt="" />' +
         '<span class="ym-tag"></span>' +
         '<h3 class="ym-t"></h3>' +
         '<div class="ym-body"></div>' +
       '</div>';
     document.body.appendChild(ym);
-    var ymImg = ym.querySelector(".ym-img"),
-        ymTag = ym.querySelector(".ym-tag"),
+    var ymTag = ym.querySelector(".ym-tag"),
         ymT = ym.querySelector(".ym-t"),
         ymBody = ym.querySelector(".ym-body");
     function yshOpen(s) {
-      ymImg.src = s.img; ymTag.textContent = s.tag; ymT.textContent = s.title;
+      ymTag.textContent = s.tag; ymT.textContent = s.title;
       ymBody.textContent = s.full;
       ym.classList.add("open"); document.body.style.overflow = "hidden";
     }
