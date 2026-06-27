@@ -643,3 +643,17 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
 .ysh-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(258px,1fr)); gap:24px; max-width:1040px; margin:0 auto; }
 .ysh-grid .ysh-ball{ width:100%; height:auto; aspect-ratio:1/1; }
 @media (max-width:600px){ .ysh-grid{ grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px; } .ysh-grid .ysh-ball{ width:100%; } }
+
+/* ===== גדולי הרבנים על הצדיק ===== */
+.rabbis{ background:linear-gradient(180deg,var(--bg),var(--bg-2)); }
+.rabbis-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(268px,1fr)); gap:22px; max-width:1080px; margin:0 auto; }
+.rabbi-card{ position:relative; display:flex; flex-direction:column; background:linear-gradient(160deg,#3c2f1e,#2c2114);
+  border:1px solid var(--line-2); border-radius:18px; padding:26px 26px 22px; box-shadow:0 12px 30px rgba(0,0,0,.3);
+  transition:transform .22s ease, border-color .22s ease; }
+.rabbi-card:hover{ transform:translateY(-4px); border-color:rgba(247,231,163,.5); }
+.rabbi-card .rq-mark{ font-family:var(--ff-serif); color:var(--gold-2); font-size:3.2rem; line-height:.5; height:26px; opacity:.55; }
+.rabbi-card blockquote{ margin:0 0 16px; color:var(--cream); font-size:1.07rem; line-height:1.72; font-family:var(--ff-serif); flex:1; }
+.rabbi-card figcaption{ display:flex; flex-direction:column; gap:3px; border-top:1px solid var(--line); padding-top:12px; }
+.rabbi-card figcaption b{ color:var(--gold-2); font-size:1.05rem; }
+.rabbi-card figcaption span{ color:var(--muted); font-size:.85rem; }
+.rabbis-note{ text-align:center; color:var(--muted); font-size:.85rem; margin-top:26px; }
