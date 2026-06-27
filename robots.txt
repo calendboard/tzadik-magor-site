@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://www.hatzadik-magor.co.il/sitemap.xml
+Sitemap: https://calendboard.github.io/tzadik-magor-site/sitemap.xml
