@@ -356,17 +356,15 @@
         '<span class="ym-tag"></span>' +
         '<h3 class="ym-t"></h3>' +
         '<div class="ym-body"></div>' +
-        '<p class="ym-src"></p>' +
       '</div>';
     document.body.appendChild(ym);
     var ymImg = ym.querySelector(".ym-img"),
         ymTag = ym.querySelector(".ym-tag"),
         ymT = ym.querySelector(".ym-t"),
-        ymBody = ym.querySelector(".ym-body"),
-        ymSrc = ym.querySelector(".ym-src");
+        ymBody = ym.querySelector(".ym-body");
     function yshOpen(s) {
       ymImg.src = s.img; ymTag.textContent = s.tag; ymT.textContent = s.title;
-      ymBody.textContent = s.full; ymSrc.textContent = s.source;
+      ymBody.textContent = s.full;
       ym.classList.add("open"); document.body.style.overflow = "hidden";
     }
     function yshClose() { ym.classList.remove("open"); document.body.style.overflow = ""; }
