@@ -139,3 +139,7 @@
 .track-amt{ font-family:var(--ff-serif); color:var(--gold-2); font-size:1.5rem; font-weight:800; white-space:nowrap; }
 .track-amt small{ font-size:.78rem; color:var(--muted); font-weight:600; }
 .track-pick{ white-space:nowrap; }
+.tracks-once{ grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); max-width:760px; }
+.track-featured{ background:linear-gradient(160deg,#4a3a22,#332512); border-color:var(--gold); box-shadow:0 16px 40px rgba(0,0,0,.4), 0 0 0 1px rgba(247,231,163,.18); }
+.track-featured .track-amt{ font-size:1.15rem; }
+.tracks-divider{ text-align:center; color:var(--gold-2); font-size:1.02rem; font-weight:600; letter-spacing:.02em; margin:38px auto 4px; max-width:1040px; opacity:.92; }
