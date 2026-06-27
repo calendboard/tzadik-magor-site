@@ -447,4 +447,114 @@
     nm.querySelector(".ysh-modal-ov").addEventListener("click", newsClose);
     document.addEventListener("keydown", function (e) { if (e.key === "Escape") newsClose(); });
   }
+
+  /* ---------- ארכיון הישועות המאומת (תצוגת עדויות + טופס שליחה) ---------- */
+  /* === כתובת היעד לקבלת העדויות (FormSubmit – שירות חינמי, ללא שרת) ===
+     להחלפה: שימו את כתובת המייל האמיתית של המרכז במקום הכתובת הזמנית.
+     בפעם הראשונה FormSubmit ישלח לאותה כתובת מייל אישור חד-פעמי – יש ללחוץ עליו פעם אחת. */
+  var ARCHIVE_EMAIL = "info@hatzadik-magor.co.il";
+  var ARCHIVE_WA = "97226597098"; // וואטסאפ לקבלת עדויות (אותו מספר של המרכז)
+
+  /* === עדויות שאומתו ואושרו לפרסום ===
+     מתחיל ריק בכוונה – לא ממציאים עדויות. כשמגיעה עדות אמיתית ומאומתת,
+     מוסיפים כאן אובייקט: { tag, body, by, place }  (by = שם לפרסום, אפשר ראשי תיבות). */
+  var ARCHIVE = [
+    // דוגמה למבנה (מוסתר – הסירו את ה-// כשמוסיפים עדות אמיתית):
+    // { tag: "רפואה", body: "כאן הסיפור כפי שנמסר…", by: "מ. כהן", place: "ירושלים" },
+  ];
+
+  var archGrid = document.getElementById("archiveGrid");
+  if (archGrid) {
+    if (ARCHIVE.length === 0) {
+      archGrid.innerHTML =
+        '<div class="arch-empty">' +
+          '<span class="ico" aria-hidden="true">🕯️</span>' +
+          '<h3>הארכיון נפתח עכשיו</h3>' +
+          '<p>כאן יתפרסמו עדויות הישועה שתשלחו — לאחר אימות ובאישורכם. ' +
+          'היו הראשונים לשתף ולחזק את כלל ישראל בכוח הצדיק.</p>' +
+        '</div>';
+    } else {
+      ARCHIVE.forEach(function (t) {
+        var c = document.createElement("figure");
+        c.className = "testimony-card";
+        c.innerHTML =
+          (t.tag ? '<span class="tc-tag">' + t.tag + '</span>' : '') +
+          '<blockquote class="tc-body"></blockquote>' +
+          '<figcaption class="tc-by"><b></b><span></span></figcaption>';
+        c.querySelector(".tc-body").textContent = t.body || "";
+        c.querySelector(".tc-by b").textContent = t.by || "מתפלל/ת";
+        c.querySelector(".tc-by span").textContent = t.place || "";
+        archGrid.appendChild(c);
+      });
+    }
+  }
+
+  /* טופס שליחת עדות */
+  var archForm = document.getElementById("archiveForm");
+  var archStatus = document.getElementById("archiveStatus");
+  if (archForm) {
+    function setStatus(msg, ok) {
+      if (!archStatus) return;
+      archStatus.textContent = msg;
+      archStatus.style.color = ok === true ? "" : ok === false ? "#f0b8b8" : "var(--gold-2)";
+    }
+    archForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var name = archForm.querySelector("#aName");
+      var phone = archForm.querySelector("#aPhone");
+      var story = archForm.querySelector("#aStory");
+      var consent = archForm.querySelector("#aConsent");
+      if (!name.value.trim() || !phone.value.trim() || !story.value.trim()) {
+        setStatus("נא למלא שם, טלפון וסיפור הישועה 🙏", false); return;
+      }
+      if (consent && !consent.checked) {
+        setStatus("נא לאשר את הפרסום באתר (אפשר בעילום שם) 🙏", false); return;
+      }
+      var btn = archForm.querySelector('button[type="submit"]');
+      if (btn) { btn.disabled = true; }
+      setStatus("שולח… 🕯️");
+
+      function showWaFallback() {
+        if (btn) { btn.disabled = false; }
+        var waText = "בס\"ד, אני רוצה לשתף עדות ישועה בזכות הצדיק מעג׳ור:%0A%0A" +
+          "שם: " + encodeURIComponent(name.value.trim()) + "%0A" +
+          "סוג הישועה: " + encodeURIComponent((archForm.querySelector("#aType") || {}).value || "") + "%0A%0A" +
+          encodeURIComponent(story.value.trim());
+        var waUrl = "https://wa.me/" + ARCHIVE_WA + "?text=" + waText;
+        archStatus.innerHTML = 'לשליחת העדות, לחצו לשליחה בוואטסאפ: ' +
+          '<a href="' + waUrl + '" target="_blank" rel="noopener" style="color:var(--gold-2);font-weight:700">פתיחת וואטסאפ »</a>';
+        archStatus.style.color = "var(--gold-2)";
+      }
+
+      var data = {
+        _subject: "עדות ישועה חדשה לארכיון – הצדיק מעג׳ור",
+        _captcha: "false",
+        _template: "table",
+        "שם מלא": name.value.trim(),
+        "טלפון": phone.value.trim(),
+        "סוג הישועה": (archForm.querySelector("#aType") || {}).value || "",
+        "שם לפרסום": (archForm.querySelector("#aPublic") || {}).value.trim() || "(לא צוין)",
+        "הסיפור": story.value.trim(),
+        "אישור פרסום": consent && consent.checked ? "כן" : "לא"
+      };
+
+      fetch("https://formsubmit.co/ajax/" + ARCHIVE_EMAIL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify(data)
+      }).then(function (r) { return r.json(); }).then(function (j) {
+        if (j && (j.success === "true" || j.success === true)) {
+          setStatus("תודה מקרב לב! עדותכם התקבלה ותיבדק לפני הפרסום. שתזכו להמשך ישועות! 🕯️", true);
+          archForm.reset();
+          if (btn) { btn.disabled = false; }
+        } else {
+          // היעד עדיין לא הופעל / השליחה לא אושרה – מפנים לוואטסאפ (נתיב שעובד תמיד)
+          showWaFallback();
+        }
+      }).catch(function () {
+        // נפילה אלגנטית: אם השליחה נחסמה (למשל אינטרנט מסונן) – מציעים וואטסאפ
+        showWaFallback();
+      });
+    });
+  }
 })();
