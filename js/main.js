@@ -5,6 +5,23 @@
 (function () {
   "use strict";
 
+  /* ---------- הגדרות פנייה (מקום אחד לכל הטפסים) ----------
+     כתובת המייל שאליה מגיעות כל הפניות (צור-קשר + ארכיון) + מספר וואטסאפ.
+     ★ להחלפה כשיהיה מייל Zoho: שנו רק את SITE_EMAIL כאן — זה משפיע על כל הטפסים.
+     שירות השליחה = FormSubmit (חינמי, ללא שרת). בפעם הראשונה הוא ישלח לכתובת
+     הזו מייל אישור חד-פעמי שצריך ללחוץ עליו פעם אחת כדי להפעיל. */
+  var SITE_EMAIL = "info@hatzadik-magor.co.il";
+  var SITE_WA = "97226597098";
+
+  /* שליחת פנייה דרך FormSubmit; מחזיר Promise. */
+  function sendLead(data) {
+    return fetch("https://formsubmit.co/ajax/" + SITE_EMAIL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify(data)
+    }).then(function (r) { return r.json(); });
+  }
+
   /* ---------- שנה נוכחית בפוטר ---------- */
   var yearEl = document.getElementById("year");
   if (yearEl) yearEl.textContent = new Date().getFullYear();
@@ -142,16 +159,47 @@
       e.preventDefault();
       var name = form.querySelector("#cName");
       var phone = form.querySelector("#cPhone");
+      var topic = form.querySelector("#cTopic");
+      var msg = form.querySelector("#cMsg");
       if (!name.value.trim() || !phone.value.trim()) {
         if (status) { status.textContent = "נא למלא שם וטלפון 🙏"; status.style.color = "#f0b8b8"; }
         return;
       }
-      // ====== נקודת חיבור: כאן מחברים שליחה אמיתית (אימייל / וואטסאפ / שרת) ======
-      if (status) {
-        status.style.color = "";
-        status.textContent = "תודה! פנייתכם נשלחה ונחזור אליכם בהקדם. שתזכו לישועות! 🕯️";
+      var btn = form.querySelector('button[type="submit"]');
+      if (btn) { btn.disabled = true; }
+      if (status) { status.style.color = "var(--gold-2)"; status.textContent = "שולח… 🕯️"; }
+
+      function contactWaFallback() {
+        if (btn) { btn.disabled = false; }
+        var t = "בס\"ד, פנייה מאתר הצדיק מעג׳ור:%0A%0A" +
+          "שם: " + encodeURIComponent(name.value.trim()) + "%0A" +
+          "נושא: " + encodeURIComponent((topic || {}).value || "") + "%0A%0A" +
+          encodeURIComponent((msg || {}).value || "");
+        var url = "https://wa.me/" + SITE_WA + "?text=" + t;
+        if (status) {
+          status.innerHTML = 'לשליחת הפנייה, לחצו לשליחה בוואטסאפ: ' +
+            '<a href="' + url + '" target="_blank" rel="noopener" style="color:var(--gold-2);font-weight:700">פתיחת וואטסאפ »</a>';
+          status.style.color = "var(--gold-2)";
+        }
       }
-      form.reset();
+
+      sendLead({
+        _subject: "פנייה חדשה מאתר הצדיק מעג׳ור",
+        _captcha: "false",
+        _template: "table",
+        "שם מלא": name.value.trim(),
+        "טלפון": phone.value.trim(),
+        "נושא הפנייה": (topic || {}).value || "",
+        "הודעה": (msg || {}).value.trim() || "(ללא)"
+      }).then(function (j) {
+        if (j && (j.success === "true" || j.success === true)) {
+          if (status) { status.style.color = ""; status.textContent = "תודה! פנייתכם נשלחה ונחזור אליכם בהקדם. שתזכו לישועות! 🕯️"; }
+          form.reset();
+          if (btn) { btn.disabled = false; }
+        } else {
+          contactWaFallback();
+        }
+      }).catch(function () { contactWaFallback(); });
     });
   }
 
@@ -449,11 +497,7 @@
   }
 
   /* ---------- ארכיון הישועות המאומת (תצוגת עדויות + טופס שליחה) ---------- */
-  /* === כתובת היעד לקבלת העדויות (FormSubmit – שירות חינמי, ללא שרת) ===
-     להחלפה: שימו את כתובת המייל האמיתית של המרכז במקום הכתובת הזמנית.
-     בפעם הראשונה FormSubmit ישלח לאותה כתובת מייל אישור חד-פעמי – יש ללחוץ עליו פעם אחת. */
-  var ARCHIVE_EMAIL = "info@hatzadik-magor.co.il";
-  var ARCHIVE_WA = "97226597098"; // וואטסאפ לקבלת עדויות (אותו מספר של המרכז)
+  /* כתובת היעד + וואטסאפ מוגדרים פעם אחת בראש הקובץ (SITE_EMAIL / SITE_WA). */
 
   /* === עדויות שאומתו ואושרו לפרסום ===
      מתחיל ריק בכוונה – לא ממציאים עדויות. כשמגיעה עדות אמיתית ומאומתת,
@@ -520,7 +564,7 @@
           "שם: " + encodeURIComponent(name.value.trim()) + "%0A" +
           "סוג הישועה: " + encodeURIComponent((archForm.querySelector("#aType") || {}).value || "") + "%0A%0A" +
           encodeURIComponent(story.value.trim());
-        var waUrl = "https://wa.me/" + ARCHIVE_WA + "?text=" + waText;
+        var waUrl = "https://wa.me/" + SITE_WA + "?text=" + waText;
         archStatus.innerHTML = 'לשליחת העדות, לחצו לשליחה בוואטסאפ: ' +
           '<a href="' + waUrl + '" target="_blank" rel="noopener" style="color:var(--gold-2);font-weight:700">פתיחת וואטסאפ »</a>';
         archStatus.style.color = "var(--gold-2)";
@@ -538,11 +582,7 @@
         "אישור פרסום": consent && consent.checked ? "כן" : "לא"
       };
 
-      fetch("https://formsubmit.co/ajax/" + ARCHIVE_EMAIL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Accept": "application/json" },
-        body: JSON.stringify(data)
-      }).then(function (r) { return r.json(); }).then(function (j) {
+      sendLead(data).then(function (j) {
         if (j && (j.success === "true" || j.success === true)) {
           setStatus("תודה מקרב לב! עדותכם התקבלה ותיבדק לפני הפרסום. שתזכו להמשך ישועות! 🕯️", true);
           archForm.reset();
