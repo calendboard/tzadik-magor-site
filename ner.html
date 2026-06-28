@@ -97,13 +97,13 @@
               <input id="nerDeath" name="deathdate" data-label="תאריך פטירה" type="text" placeholder="לדוגמה: ט״ו בכסלו תשפ״ה" />
             </div>
             <div class="field">
-              <label for="nerDed">הקדשה <span style="color:var(--muted);font-weight:400">(רשות)</span></label>
-              <select id="nerDed" name="dedication" data-label="הקדשה">
-                <option value="">ללא הקדשה</option>
-                <option>הוקדש ע״י המשפחה</option>
-                <option>הוקדש ע״י הילדים והנכדים</option>
-                <option>הוקדש באהבה ובגעגוע</option>
-              </select>
+              <label for="nerDed">הקדשה <span style="color:var(--muted);font-weight:400">(רשות · עד 40 תווים)</span></label>
+              <input id="nerDed" name="dedication" data-label="הקדשה" type="text" list="dedList" maxlength="40" placeholder="בחרו הצעה או כתבו הקדשה קצרה משלכם" />
+              <datalist id="dedList">
+                <option value="הוקדש ע״י המשפחה"></option>
+                <option value="הוקדש ע״י הילדים והנכדים"></option>
+                <option value="הוקדש באהבה ובגעגוע"></option>
+              </datalist>
             </div>
             <div class="field">
               <label for="nerName">השם שלכם <span style="color:var(--gold)">*</span></label>
