@@ -17,12 +17,16 @@
   <!-- פונטים מקומיים – ללא תלות חיצונית (ידידותי לסינון) -->
   <link rel="stylesheet" href="css/fonts.css" />
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="css/styles.css?v=668" />
+  <link rel="stylesheet" href="css/styles.css?v=669" />
 
   <style>
     .stories-hero{ padding:128px 0 16px; text-align:center; position:relative; overflow:hidden; }
     .stories-hero .candle{ margin:0 auto 22px; }
     .stories-page{ padding:30px 0 70px; }
+    .arch-confirm-row{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:24px; }
+    .arch-confirm-row .btn{ min-width:180px; }
+    #archPreview{ margin:0 auto; }
+    #archStep2 h2, #archStep2 > p{ text-align:center; }
   </style>
 </head>
 
@@ -34,7 +38,7 @@
     <div class="container nav-wrap">
       <a class="brand" href="index.html#hero" aria-label="הצדיק מעג׳ור – לדף הבית">
         <span class="brand-mark" aria-hidden="true">
-          <img src="assets/logo-emblem.png?v=668" width="46" height="46" alt="" class="brand-logo" />
+          <img src="assets/logo-emblem.png?v=669" width="46" height="46" alt="" class="brand-logo" />
         </span>
         <span class="brand-text">הצדיק <b>מעג׳ור</b></span>
       </a>
@@ -89,9 +93,10 @@
           <div class="at"><span class="ico" aria-hidden="true">🕯️</span><b>רק באישורכם</b><span>שום סיפור אינו עולה לאתר ללא הסכמתכם המפורשת.</span></div>
         </div>
 
-        <div class="arch-layout" style="margin-top:44px">
-          <!-- טופס שליחת עדות -->
-          <div>
+        <div class="arch-wizard" style="max-width:640px;margin:44px auto 0">
+
+          <!-- שלב 1: מילוי הפרטים -->
+          <div id="archStep1">
             <h2 class="section-title" style="font-size:1.7rem;margin-bottom:6px">שתפו את הישועה שלכם</h2>
             <p style="color:var(--muted);margin:0 0 20px;line-height:1.7">ספרו לנו מה עבר עליכם וכיצד נושעתם בזכות הצדיק. כתבו בלשונכם — אין צורך בניסוח מיוחד.</p>
 
@@ -127,19 +132,38 @@
                 <input id="aConsent" name="consent" type="checkbox" />
                 <label for="aConsent">אני מאשר/ת לפרסם את עדותי באתר לחיזוק הרבים (אפשר בעילום שם).</label>
               </div>
-              <button type="submit" class="btn btn-gold btn-block">שליחת העדות 🕯️</button>
+              <button type="submit" class="btn btn-gold btn-block">תצוגה מקדימה של הסיפור ›</button>
               <p class="form-status" id="archiveStatus" role="status" aria-live="polite"></p>
-              <p class="arch-or">מעדיפים לשלוח ישירות? <a href="https://wa.me/97226597098">שלחו לנו בוואטסאפ »</a></p>
               <p class="arch-note">פרטי הקשר שלכם נשמרים אצלנו בלבד ואינם מתפרסמים לעולם. הסיפור יתפרסם רק באישורכם — ואפשר בעילום שם.</p>
             </form>
           </div>
 
-          <!-- עדויות שהתקבלו -->
-          <div>
-            <h2 class="section-title" style="font-size:1.7rem;margin-bottom:6px">ישועות שהתקבלו</h2>
-            <p style="color:var(--muted);margin:0 0 20px;line-height:1.7">עדויות אמיתיות של מתפללים שראו ישועה בזכות הצדיק.</p>
-            <div class="arch-grid" id="archiveGrid"></div>
+          <!-- שלב 2: תצוגה מקדימה -->
+          <div id="archStep2" hidden>
+            <h2 class="section-title" style="font-size:1.7rem;margin-bottom:6px">כך ייראה הסיפור שלכם</h2>
+            <p style="color:var(--muted);margin:0 0 20px;line-height:1.7">זו תצוגה מקדימה לפני השליחה. בדקו שהכול תקין — אפשר לחזור ולערוך.</p>
+            <div id="archPreview"></div>
+            <div class="arch-confirm-row">
+              <button type="button" id="archEdit" class="btn btn-outline">✏️ חזרה לעריכה</button>
+              <button type="button" id="archConfirm" class="btn btn-gold">✓ אישור ושליחה</button>
+            </div>
+            <p class="form-status" id="archiveStatus2" role="status" aria-live="polite"></p>
           </div>
+
+          <!-- שלב 3: תודה / עובר לבדיקה -->
+          <div id="archStep3" class="lead-success" hidden>
+            <div class="candle" aria-hidden="true">
+              <div class="flame"><div class="flame-glow"></div></div>
+              <div class="wick"></div>
+              <div class="candle-body"></div>
+              <div class="candle-light"></div>
+            </div>
+            <h3>תודה על השיתוף! 🕯️</h3>
+            <p>סיפור הישועה שלכם התקבל ועובר לבדיקת המרכז.<br>
+               לאחר אישור הוא יתפרסם בדף הסיפורים והישועות — לחיזוק כלל ישראל בכוח הצדיק.<br>
+               שתזכו להמשך ישועות וברכות, אמן! 🙏</p>
+          </div>
+
         </div>
 
         <p class="stories-note" style="margin-top:40px">* כל פרסום נתון לשיקול דעת מרכז הצדיק מעג׳ור.</p>
@@ -212,6 +236,6 @@
     <button class="hb-close" id="hilulaClose" type="button" aria-label="סגירת הבאנר">×</button>
   </div>
 
-  <script src="js/main.js?v=668" defer></script>
+  <script src="js/main.js?v=669" defer></script>
 </body>
 </html>

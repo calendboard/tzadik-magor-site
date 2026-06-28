@@ -862,15 +862,45 @@
     }
   }
 
-  /* טופס שליחת עדות */
+  /* טופס שיתוף ישועה — זרימה: מילוי → תצוגה מקדימה → אישור → תודה */
   var archForm = document.getElementById("archiveForm");
-  var archStatus = document.getElementById("archiveStatus");
   if (archForm) {
-    function setStatus(msg, ok) {
-      if (!archStatus) return;
-      archStatus.textContent = msg;
-      archStatus.style.color = ok === true ? "" : ok === false ? "#f0b8b8" : "var(--gold-2)";
+    var archStep1 = document.getElementById("archStep1");
+    var archStep2 = document.getElementById("archStep2");
+    var archStep3 = document.getElementById("archStep3");
+    var archPreview = document.getElementById("archPreview");
+    var archStatus = document.getElementById("archiveStatus");
+    var archStatus2 = document.getElementById("archiveStatus2");
+    var archEdit = document.getElementById("archEdit");
+    var archConfirm = document.getElementById("archConfirm");
+
+    function aVal(sel) { var el = archForm.querySelector(sel); return el ? el.value.trim() : ""; }
+    function archSet(el, msg, ok) {
+      if (!el) return;
+      el.textContent = msg;
+      el.style.color = ok === true ? "" : ok === false ? "#f0b8b8" : "var(--gold-2)";
     }
+    function archScrollTo(el) {
+      if (!el) return;
+      window.scrollTo({ top: el.getBoundingClientRect().top + window.pageYOffset - 90, behavior: "smooth" });
+    }
+    function buildPreview() {
+      var type = aVal("#aType");
+      var by = aVal("#aPublic") || "מתפלל/ת (בעילום שם)";
+      archPreview.innerHTML = "";
+      var c = document.createElement("figure");
+      c.className = "testimony-card";
+      c.innerHTML =
+        '<span class="tc-tag"></span>' +
+        '<blockquote class="tc-body"></blockquote>' +
+        '<figcaption class="tc-by"><b></b><span></span></figcaption>';
+      c.querySelector(".tc-tag").textContent = type;
+      c.querySelector(".tc-body").textContent = aVal("#aStory");
+      c.querySelector(".tc-by b").textContent = by;
+      archPreview.appendChild(c);
+    }
+
+    /* שלב 1 → תצוגה מקדימה */
     archForm.addEventListener("submit", function (e) {
       e.preventDefault();
       var name = archForm.querySelector("#aName");
@@ -878,54 +908,65 @@
       var story = archForm.querySelector("#aStory");
       var consent = archForm.querySelector("#aConsent");
       if (!name.value.trim() || !phone.value.trim() || !story.value.trim()) {
-        setStatus("נא למלא שם, טלפון וסיפור הישועה 🙏", false); return;
+        archSet(archStatus, "נא למלא שם, טלפון וסיפור הישועה 🙏", false); return;
       }
       if (consent && !consent.checked) {
-        setStatus("נא לאשר את הפרסום באתר (אפשר בעילום שם) 🙏", false); return;
+        archSet(archStatus, "נא לאשר את הפרסום באתר (אפשר בעילום שם) 🙏", false); return;
       }
       var badA = badContactField(archForm);
-      if (badA) { setStatus(badA.msg, false); badA.el.focus(); return; }
-      var btn = archForm.querySelector('button[type="submit"]');
-      if (btn) { btn.disabled = true; }
-      setStatus("שולח… 🕯️");
+      if (badA) { archSet(archStatus, badA.msg, false); badA.el.focus(); return; }
+      archSet(archStatus, "");
+      buildPreview();
+      if (archStep1) archStep1.hidden = true;
+      if (archStep2) archStep2.hidden = false;
+      archScrollTo(archStep2);
+    });
+
+    /* חזרה לעריכה */
+    if (archEdit) archEdit.addEventListener("click", function () {
+      if (archStep2) archStep2.hidden = true;
+      if (archStep1) archStep1.hidden = false;
+      archSet(archStatus2, "");
+      archScrollTo(archStep1);
+    });
+
+    /* אישור ושליחה */
+    if (archConfirm) archConfirm.addEventListener("click", function () {
+      archConfirm.disabled = true; if (archEdit) archEdit.disabled = true;
+      archSet(archStatus2, "שולח… 🕯️");
 
       function showWaFallback() {
-        if (btn) { btn.disabled = false; }
-        var waText = "בס\"ד, אני רוצה לשתף עדות ישועה בזכות הצדיק מעג׳ור:%0A%0A" +
-          "שם: " + encodeURIComponent(name.value.trim()) + "%0A" +
-          "סוג הישועה: " + encodeURIComponent((archForm.querySelector("#aType") || {}).value || "") + "%0A%0A" +
-          encodeURIComponent(story.value.trim());
+        archConfirm.disabled = false; if (archEdit) archEdit.disabled = false;
+        var waText = "בס\"ד, אני רוצה לשתף סיפור ישועה בזכות הצדיק מעג׳ור:%0A%0A" +
+          "שם: " + encodeURIComponent(aVal("#aName")) + "%0A" +
+          "סוג הישועה: " + encodeURIComponent(aVal("#aType")) + "%0A%0A" +
+          encodeURIComponent(aVal("#aStory"));
         var waUrl = "https://wa.me/" + SITE_WA + "?text=" + waText;
-        archStatus.innerHTML = 'לשליחת העדות, לחצו לשליחה בוואטסאפ: ' +
-          '<a href="' + waUrl + '" target="_blank" rel="noopener" style="color:var(--gold-2);font-weight:700">פתיחת וואטסאפ »</a>';
-        archStatus.style.color = "var(--gold-2)";
+        archStatus2.innerHTML = 'לשליחה, לחצו: <a href="' + waUrl +
+          '" target="_blank" rel="noopener" style="color:var(--gold-2);font-weight:700">שליחה בוואטסאפ »</a>';
+        archStatus2.style.color = "var(--gold-2)";
       }
 
       var data = {
         _subject: "📜 סיפור ישועה לפרסום — אתר הצדיק מעג׳ור",
         _captcha: "false",
         _template: "table",
-        "שם מלא": name.value.trim(),
-        "טלפון": phone.value.trim(),
-        "סוג הישועה": (archForm.querySelector("#aType") || {}).value || "",
-        "שם לפרסום": (archForm.querySelector("#aPublic") || {}).value.trim() || "(לא צוין)",
-        "הסיפור": story.value.trim(),
-        "אישור פרסום": consent && consent.checked ? "כן" : "לא"
+        "שם מלא": aVal("#aName"),
+        "טלפון": aVal("#aPhone"),
+        "סוג הישועה": aVal("#aType"),
+        "שם לפרסום": aVal("#aPublic") || "(לא צוין)",
+        "הסיפור": aVal("#aStory"),
+        "אישור פרסום": "כן"
       };
 
       sendLead(data).then(function (j) {
         if (j && (j.success === "true" || j.success === true)) {
-          setStatus("תודה מקרב לב! סיפורכם התקבל ויעלה לאתר באישורכם בלבד. שתזכו להמשך ישועות וברכות! 🕯️", true);
+          if (archStep2) archStep2.hidden = true;
+          if (archStep3) archStep3.hidden = false;
           archForm.reset();
-          if (btn) { btn.disabled = false; }
-        } else {
-          // היעד עדיין לא הופעל / השליחה לא אושרה – מפנים לוואטסאפ (נתיב שעובד תמיד)
-          showWaFallback();
-        }
-      }).catch(function () {
-        // נפילה אלגנטית: אם השליחה נחסמה (למשל אינטרנט מסונן) – מציעים וואטסאפ
-        showWaFallback();
-      });
+          archScrollTo(archStep3);
+        } else { showWaFallback(); }
+      }).catch(showWaFallback);
     });
   }
 })();
