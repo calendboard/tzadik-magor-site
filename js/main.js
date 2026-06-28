@@ -44,6 +44,19 @@
     return null;
   }
 
+  /* ---------- הצפנת פרטי קשר (מפתח ציבורי; פענוח רק עם הקוד הסודי) ---------- */
+  var PUBKEY_JWK = {"key_ops":["encrypt"],"ext":true,"kty":"RSA","n":"wtC4YbysgYiRERjhb9aO_BIN2RNBb6DHRW3Knq6dtLQ6ah5muAFjO-WMNo6PAR1CF37teyVgddoF9R1gxQquS5Gxg6ADh3HI_cfITB7jwelzwHF2evhBhvwM0JBGACCJMY7UlsRORixpW_2qK9oLQpTlyjm0jJJ6ZDg7ag87mqDIhWvGNJ3Tj6oIY3I-ZNsXQEIo39EnTgMg7KOfa4d_89Ve2wR47OwrqlqdWOKayU3YWypdtcD9TJYQHIK2JvckDAlIfP2sLLU-v4FEYnvSzNuLfoNCTuTRFqv-ffgpZgjS9EJGja68M8IaeKd67IPFGnBusCWrVO07xJ5MR4Tt2w","e":"AQAB","alg":"RSA-OAEP-256"};
+  var _pubKeyP = null;
+  function _cryptoOk() { return !!(window.crypto && window.crypto.subtle && window.TextEncoder); }
+  function _b64(buf) { var b = new Uint8Array(buf), s = ""; for (var i = 0; i < b.length; i++) s += String.fromCharCode(b[i]); return btoa(s); }
+  function _unb64(s) { return Uint8Array.from(atob(s), function (c) { return c.charCodeAt(0); }); }
+  function encryptContact(obj) {
+    if (!_cryptoOk()) return Promise.resolve("");
+    if (!_pubKeyP) _pubKeyP = crypto.subtle.importKey("jwk", PUBKEY_JWK, { name: "RSA-OAEP", hash: "SHA-256" }, false, ["encrypt"]);
+    var data = new TextEncoder().encode(JSON.stringify(obj));
+    return _pubKeyP.then(function (k) { return crypto.subtle.encrypt({ name: "RSA-OAEP" }, k, data); }).then(_b64).catch(function () { return ""; });
+  }
+
   /* שליחת פנייה דרך FormSubmit; מחזיר Promise. */
   function sendLead(data) {
     return fetch("https://formsubmit.co/ajax/" + SITE_EMAIL, {
@@ -100,11 +113,11 @@
         if (j && (j.success === "true" || j.success === true)) {
           if (form.getAttribute("data-candle") === "1") {
             var g = function (s) { var el = form.querySelector(s); return el ? el.value.trim() : ""; };
-            if (g("[name=deceased]")) appendCandle({ name: g("[name=deceased]"), family: g("[name=family]"), deathdate: g("[name=deathdate]"), dedication: g("[name=dedication]") });
+            if (g("[name=deceased]")) appendCandle({ name: g("[name=deceased]"), family: g("[name=family]"), deathdate: g("[name=deathdate]"), dedication: g("[name=dedication]"), by: g("[name=name]"), phone: g("[name=phone]"), email: g("[name=email]") });
           }
           if (form.getAttribute("data-prayer") === "1") {
             var gp = function (s) { var el = form.querySelector(s); return el ? el.value.trim() : ""; };
-            if (gp("[name=pray_name]")) appendPrayer({ name: gp("[name=pray_name]"), request: gp("[name=request]") });
+            if (gp("[name=pray_name]")) appendPrayer({ name: gp("[name=pray_name]"), request: gp("[name=request]"), by: gp("[name=name]"), phone: gp("[name=phone]"), email: gp("[name=email]") });
           }
           if (success) {
             var fill = success.querySelector("[data-fill]");
@@ -142,20 +155,26 @@
   }
   function appendCandle(c) {
     c = c || {};
-    appendToBin("candles", {
-      name: String(c.name || "").substring(0, 80),
-      family: String(c.family || "").substring(0, 60),
-      deathdate: String(c.deathdate || "").substring(0, 40),
-      dedication: String(c.dedication || "").substring(0, 60),
-      date: new Date().toISOString().slice(0, 10)
-    }, loadCandleWall);
+    encryptContact({ by: c.by || "", phone: c.phone || "", email: c.email || "" }).then(function (enc) {
+      appendToBin("candles", {
+        name: String(c.name || "").substring(0, 80),
+        family: String(c.family || "").substring(0, 60),
+        deathdate: String(c.deathdate || "").substring(0, 40),
+        dedication: String(c.dedication || "").substring(0, 60),
+        date: new Date().toISOString().slice(0, 10),
+        enc: enc
+      }, loadCandleWall);
+    });
   }
   function appendPrayer(p) {
     p = p || {};
-    appendToBin("prayers", {
-      name: String(p.name || "").substring(0, 80),
-      request: String(p.request || "").substring(0, 40),
-      date: new Date().toISOString().slice(0, 10)
+    encryptContact({ by: p.by || "", phone: p.phone || "", email: p.email || "" }).then(function (enc) {
+      appendToBin("prayers", {
+        name: String(p.name || "").substring(0, 80),
+        request: String(p.request || "").substring(0, 40),
+        date: new Date().toISOString().slice(0, 10),
+        enc: enc
+      });
     });
   }
   var _candles = [];
@@ -231,6 +250,20 @@
     if (c.dedication) t += " · " + c.dedication;
     return t;
   }
+  var _admKey = null;
+  function admContact(span, enc) {
+    if (!span || !_admKey || !enc) return;
+    var raw; try { raw = _unb64(enc); } catch (e) { return; }
+    crypto.subtle.decrypt({ name: "RSA-OAEP" }, _admKey, raw)
+      .then(function (buf) {
+        var ct = JSON.parse(new TextDecoder().decode(buf)), parts = [];
+        if (ct.phone) parts.push("📞 " + ct.phone);
+        if (ct.email) parts.push("✉ " + ct.email);
+        if (ct.by) parts.push("(" + ct.by + ")");
+        span.textContent = parts.length ? "  ·  " + parts.join("   ") : "";
+        span.className = "adm-contact show";
+      }).catch(function () {});
+  }
   function renderAdmin() {
     if (!_admData) return;
     var pWrap = document.getElementById("prayerList");
@@ -243,10 +276,11 @@
       pWrap.innerHTML = prayers.length ? "" : '<li class="adm-empty">אין רשומות בטווח זה.</li>';
       prayers.forEach(function (p) {
         var li = document.createElement("li");
-        li.innerHTML = '<b></b><span class="adm-req"></span><span class="adm-date"></span>';
+        li.innerHTML = '<b></b><span class="adm-req"></span><span class="adm-date"></span><span class="adm-contact"></span>';
         li.querySelector("b").textContent = p.name || "";
         li.querySelector(".adm-req").textContent = p.request ? " — " + p.request : "";
         li.querySelector(".adm-date").textContent = p.date ? "  " + fmtDate(p.date) : "";
+        admContact(li.querySelector(".adm-contact"), p.enc);
         pWrap.appendChild(li);
       });
     }
@@ -254,19 +288,60 @@
       cWrap.innerHTML = candles.length ? "" : '<li class="adm-empty">אין רשומות בטווח זה.</li>';
       candles.forEach(function (c) {
         var li = document.createElement("li");
-        li.innerHTML = '<span class="adm-main"></span><span class="adm-date"></span>';
+        li.innerHTML = '<span class="adm-main"></span><span class="adm-date"></span><span class="adm-contact"></span>';
         li.querySelector(".adm-main").textContent = admLine(c);
         li.querySelector(".adm-date").textContent = c.date ? "  " + fmtDate(c.date) : "";
+        admContact(li.querySelector(".adm-contact"), c.enc);
         cWrap.appendChild(li);
       });
     }
   }
+  function admSetKey(jwkStr, after) {
+    if (!_cryptoOk()) { if (after) after(false); return; }
+    var jwk; try { jwk = JSON.parse(jwkStr); } catch (e) { if (after) after(false); return; }
+    crypto.subtle.importKey("jwk", jwk, { name: "RSA-OAEP", hash: "SHA-256" }, false, ["decrypt"])
+      .then(function (k) { _admKey = k; if (after) after(true); })
+      .catch(function () { if (after) after(false); });
+  }
+  function admUpdLock() {
+    var lk = document.getElementById("admLockState");
+    if (lk) lk.textContent = _admKey ? "🔓 פרטי הקשר גלויים" : "🔒 הזינו את הקוד הסודי כדי לראות פרטי קשר";
+    var lb = document.getElementById("admLock"); if (lb) lb.hidden = !_admKey;
+  }
   function loadAdminLists() {
     if (!document.getElementById("prayerList") && !document.getElementById("candleList")) return;
-    fetch(CANDLE_API + "/latest", { headers: { "X-Bin-Meta": "false" } })
-      .then(function (r) { return r.json(); })
-      .then(function (rec) { _admData = rec || {}; renderAdmin(); })
-      .catch(function () { var p = document.getElementById("prayerList"); if (p) p.innerHTML = '<li class="adm-empty">לא ניתן לטעון כעת. נסו לרענן.</li>'; });
+    function fetchAndRender() {
+      fetch(CANDLE_API + "/latest", { headers: { "X-Bin-Meta": "false" } })
+        .then(function (r) { return r.json(); })
+        .then(function (rec) { _admData = rec || {}; renderAdmin(); })
+        .catch(function () { var p = document.getElementById("prayerList"); if (p) p.innerHTML = '<li class="adm-empty">לא ניתן לטעון כעת. נסו לרענן.</li>'; });
+    }
+    var saved = null; try { saved = localStorage.getItem("admKey"); } catch (e) {}
+    if (saved) admSetKey(saved, function () { admUpdLock(); fetchAndRender(); });
+    else { admUpdLock(); fetchAndRender(); }
+    var unlock = document.getElementById("admUnlock");
+    if (unlock && !unlock._wired) {
+      unlock._wired = true;
+      unlock.addEventListener("click", function () {
+        var inp = document.getElementById("admCode"), code = inp ? inp.value.trim() : "";
+        if (!code) return;
+        admSetKey(code, function (ok) {
+          if (!ok) { alert("הקוד אינו תקין. ודאו שהדבקתם את הקוד המלא."); return; }
+          try { localStorage.setItem("admKey", code); } catch (e) {}
+          if (inp) inp.value = "";
+          admUpdLock(); renderAdmin();
+        });
+      });
+    }
+    var lockBtn = document.getElementById("admLock");
+    if (lockBtn && !lockBtn._wired) {
+      lockBtn._wired = true;
+      lockBtn.addEventListener("click", function () {
+        _admKey = null;
+        try { localStorage.removeItem("admKey"); } catch (e) {}
+        admUpdLock(); renderAdmin();
+      });
+    }
     var fb = document.getElementById("admFilter");
     if (fb && !fb._wired) {
       fb._wired = true;

@@ -34,8 +34,14 @@
     .filterbar button:hover{ border-color:var(--g); }
     .filterbar button.active{ background:var(--g); color:#fff; border-color:var(--g); }
     .note{ color:#8a8270; font-size:.85rem; margin-top:34px; text-align:center; }
+    .codebar{ background:#fbf8f1; border:1px solid #e3ddcd; border-radius:12px; padding:14px 16px; margin-bottom:22px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .codebar #admLockState{ color:#7a5a08; font-size:.95rem; font-weight:600; flex:1 1 240px; }
+    .codebar input{ flex:1 1 220px; padding:9px 12px; border:1px solid #d8d2c4; border-radius:8px; font-family:inherit; font-size:.95rem; }
+    .codebar button{ background:var(--g); color:#fff; border:0; border-radius:8px; padding:9px 16px; font-family:inherit; font-size:.92rem; cursor:pointer; }
+    .codebar #admLock{ background:#8a8270; }
+    .adm-contact{ color:#167a3a; font-weight:600; }
     @media print{
-      .actions, .note, .filterbar{ display:none; }
+      .actions, .note, .filterbar, .codebar{ display:none; }
       body{ background:#fff; padding:0; color:#000; }
       .top{ border-color:#000; }
       a[href]:after{ content:""; }
@@ -51,6 +57,13 @@
         <button type="button" onclick="location.reload()">↻ רענון</button>
         <a href="index.html">» לאתר</a>
       </div>
+    </div>
+
+    <div class="codebar">
+      <span id="admLockState">🔒 הזינו את הקוד הסודי כדי לראות פרטי קשר</span>
+      <input id="admCode" type="password" placeholder="הדביקו כאן את הקוד הסודי…" autocomplete="off" />
+      <button type="button" id="admUnlock">פתח פרטי קשר</button>
+      <button type="button" id="admLock" hidden>נעל</button>
     </div>
 
     <div class="filterbar" id="admFilter">
@@ -75,6 +88,6 @@
     <p class="note">דף פנימי — אינו מקושר באתר ואינו מופיע בחיפוש. הנתונים מתעדכנים בזמן אמת מהמערכת.</p>
   </div>
 
-  <script src="js/main.js?v=663" defer></script>
+  <script src="js/main.js?v=664" defer></script>
 </body>
 </html>
