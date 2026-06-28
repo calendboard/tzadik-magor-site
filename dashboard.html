@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ניהול כתבות — הצדיק מעג׳ור</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="stylesheet" href="css/fonts.css" />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <style>
+    :root{ --g:#9c7320; --g2:#7a5a08; --bg:#f6f4ee; --card:#fff; --line:#e3ddcd; --ink:#262017; --muted:#8a8270; }
+    *{ box-sizing:border-box; }
+    body{ font-family:"Heebo",Arial,sans-serif; background:var(--bg); color:var(--ink); margin:0; line-height:1.55; }
+    .wrap{ max-width:920px; margin:0 auto; padding:26px 20px 80px; }
+    a{ color:var(--g2); }
+    h1{ font-size:1.5rem; margin:0; color:var(--g2); }
+    .muted{ color:var(--muted); }
+    .btn{ background:var(--g); color:#fff; border:0; border-radius:9px; padding:11px 20px; font-family:inherit; font-size:.98rem; font-weight:600; cursor:pointer; }
+    .btn:hover{ background:var(--g2); }
+    .btn:disabled{ opacity:.55; cursor:default; }
+    .btn-ghost{ background:#fff; color:var(--g2); border:1px solid var(--line); }
+    .btn-ghost:hover{ background:#faf8f2; }
+    .btn-danger{ background:#fff; color:#b23b3b; border:1px solid #e6c6c6; }
+    .btn-danger:hover{ background:#fbeeee; }
+    .btn-sm{ padding:7px 13px; font-size:.88rem; border-radius:8px; }
+    input, textarea, select{ width:100%; padding:11px 13px; border:1px solid #d8d2c4; border-radius:9px; font-family:inherit; font-size:1rem; background:#fff; color:var(--ink); }
+    textarea{ resize:vertical; min-height:130px; line-height:1.7; }
+    label{ display:block; font-weight:600; margin:0 0 6px; font-size:.95rem; }
+    .field{ margin-bottom:16px; }
+    .hint{ color:var(--muted); font-size:.84rem; font-weight:400; }
+
+    /* כניסה */
+    #login{ max-width:380px; margin:9vh auto 0; background:var(--card); border:1px solid var(--line); border-radius:16px; padding:30px 26px; text-align:center; box-shadow:0 10px 40px rgba(80,60,10,.07); }
+    #login .logo{ width:54px; height:54px; margin:0 auto 12px; display:block; }
+    #login h1{ font-size:1.35rem; margin-bottom:4px; }
+    #login p{ color:var(--muted); margin:0 0 22px; font-size:.92rem; }
+    #login input{ text-align:center; }
+    #loginMsg{ min-height:20px; margin:12px 0 0; font-size:.9rem; }
+
+    /* ראש העמוד */
+    .top{ display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap; border-bottom:2px solid var(--g); padding-bottom:16px; margin-bottom:24px; }
+    .top .who{ font-size:.85rem; color:var(--muted); }
+
+    /* רשימת כתבות */
+    .art-row{ display:flex; align-items:center; gap:14px; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px 14px; margin-bottom:12px; }
+    .art-row .thumb{ width:74px; height:56px; border-radius:8px; background:#eee center/cover no-repeat; flex:0 0 auto; border:1px solid var(--line); }
+    .art-row .info{ flex:1; min-width:0; }
+    .art-row .info b{ display:block; font-size:1.05rem; }
+    .art-row .info .meta{ color:var(--muted); font-size:.82rem; }
+    .art-row .acts{ display:flex; gap:8px; flex:0 0 auto; }
+    .empty{ text-align:center; color:var(--muted); padding:40px 0; }
+
+    /* עורך */
+    .editor{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:22px; margin-bottom:24px; box-shadow:0 6px 24px rgba(80,60,10,.06); }
+    .editor h2{ margin:0 0 18px; font-size:1.25rem; color:var(--g2); }
+    .row2{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    @media (max-width:560px){ .row2{ grid-template-columns:1fr; } }
+    .img-drop{ border:2px dashed #d8d2c4; border-radius:12px; padding:18px; text-align:center; cursor:pointer; background:#faf8f2; transition:border-color .15s; }
+    .img-drop:hover{ border-color:var(--g); }
+    .img-drop.has{ padding:0; border-style:solid; overflow:hidden; }
+    .img-drop img{ width:100%; max-height:230px; object-fit:cover; display:block; }
+    .img-drop .ph{ color:var(--muted); font-size:.92rem; }
+    .editor-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:8px; flex-wrap:wrap; }
+    #editMsg{ font-size:.9rem; margin:0; align-self:center; margin-inline-end:auto; }
+    .hidden{ display:none !important; }
+    .spin{ display:inline-block; width:15px; height:15px; border:2px solid #fff; border-top-color:transparent; border-radius:50%; animation:sp .7s linear infinite; vertical-align:-2px; margin-inline-start:6px; }
+    @keyframes sp{ to{ transform:rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <!-- מסך כניסה -->
+  <div id="login">
+    <img class="logo" src="assets/logo-emblem.png" alt="" />
+    <h1>ניהול כתבות</h1>
+    <p>הצדיק מעג׳ור · אזור צוות</p>
+    <form id="loginForm">
+      <input id="pw" type="password" placeholder="הזינו את סיסמת הצוות" autocomplete="current-password" />
+      <p id="loginMsg" class="muted"></p>
+      <button class="btn" type="submit" style="width:100%">כניסה</button>
+    </form>
+  </div>
+
+  <!-- הדשבורד -->
+  <div id="app" class="wrap hidden">
+    <div class="top">
+      <div>
+        <h1>📰 ניהול כתבות</h1>
+        <div class="who">מחובר/ת · <a href="index.html" target="_blank">צפייה באתר »</a></div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button id="newBtn" class="btn">➕ כתבה חדשה</button>
+        <button id="logoutBtn" class="btn btn-ghost btn-sm">יציאה</button>
+      </div>
+    </div>
+
+    <!-- עורך (מוסתר עד שלוחצים הוספה/עריכה) -->
+    <div id="editor" class="editor hidden">
+      <h2 id="editorTitle">כתבה חדשה</h2>
+      <div class="field">
+        <label>תמונה ראשית</label>
+        <div id="imgDrop" class="img-drop">
+          <div class="ph">📷 לחצו להעלאת תמונה מהמחשב<br><span class="hint">JPG / PNG · נדחסת אוטומטית</span></div>
+          <img id="imgPreview" class="hidden" alt="" />
+        </div>
+        <input id="imgFile" type="file" accept="image/*" class="hidden" />
+      </div>
+      <div class="field">
+        <label for="fTitle">כותרת <span style="color:var(--g)">*</span></label>
+        <input id="fTitle" type="text" placeholder="כותרת הכתבה" />
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="fCat">קטגוריה</label>
+          <input id="fCat" type="text" list="catList" placeholder="לדוגמה: הילולא" />
+          <datalist id="catList">
+            <option value="הילולא"></option><option value="מהמרכז"></option>
+            <option value="עדכון"></option><option value="ישועות"></option><option value="אירוע"></option>
+          </datalist>
+        </div>
+        <div class="field">
+          <label for="fDate">תאריך (טקסט חופשי)</label>
+          <input id="fDate" type="text" placeholder="לדוגמה: תמוז תשפ״ו" />
+        </div>
+      </div>
+      <div class="field">
+        <label for="fExcerpt">תקציר קצר <span class="hint">(מוצג על הכרטיס)</span></label>
+        <textarea id="fExcerpt" rows="2" style="min-height:auto" placeholder="משפט-שניים שמסכמים את הכתבה"></textarea>
+      </div>
+      <div class="field">
+        <label for="fBody">גוף הכתבה <span style="color:var(--g)">*</span> <span class="hint">(שורה ריקה בין פסקה לפסקה)</span></label>
+        <textarea id="fBody" rows="8" placeholder="כתבו כאן את הכתבה המלאה…&#10;&#10;להפרדת פסקה — השאירו שורה ריקה."></textarea>
+      </div>
+      <div class="editor-actions">
+        <p id="editMsg" class="muted"></p>
+        <button id="cancelBtn" class="btn btn-ghost" type="button">ביטול</button>
+        <button id="saveBtn" class="btn" type="button">💾 שמירה ופרסום</button>
+      </div>
+    </div>
+
+    <!-- רשימת הכתבות -->
+    <div id="list"><p class="empty">טוען…</p></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+  (function () {
+    var SB_URL = "https://wfhgenhmoofyegysysac.supabase.co";
+    var SB_KEY = "sb_publishable_XbSp3aL_Y_O3m8yzZ_qmOQ_vp5W3EYn";
+    var TEAM_EMAIL = "hatzadikmagor@gmail.com";
+    var sb = window.supabase.createClient(SB_URL, SB_KEY);
+
+    var $ = function (id) { return document.getElementById(id); };
+    var loginBox = $("login"), app = $("app");
+    var editing = null;      // מזהה כתבה בעריכה (null = חדשה)
+    var pendingImageUrl = ""; // url התמונה הנוכחית בעורך
+
+    /* ---------- כניסה ---------- */
+    $("loginForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var pw = $("pw").value;
+      if (!pw) return;
+      $("loginMsg").textContent = "מתחבר…";
+      $("loginMsg").style.color = "var(--muted)";
+      sb.auth.signInWithPassword({ email: TEAM_EMAIL, password: pw }).then(function (res) {
+        if (res.error) {
+          $("loginMsg").textContent = "סיסמה שגויה. נסו שוב.";
+          $("loginMsg").style.color = "#b23b3b";
+        } else { showApp(); }
+      });
+    });
+    $("logoutBtn").addEventListener("click", function () {
+      sb.auth.signOut().then(function () { location.reload(); });
+    });
+    function showApp() {
+      loginBox.classList.add("hidden");
+      app.classList.remove("hidden");
+      loadArticles();
+    }
+    // אם כבר מחוברים (session שמור)
+    sb.auth.getSession().then(function (r) { if (r.data && r.data.session) showApp(); });
+
+    /* ---------- טעינת הרשימה ---------- */
+    function loadArticles() {
+      var list = $("list");
+      list.innerHTML = '<p class="empty">טוען…</p>';
+      sb.from("articles").select("*").order("sort", { ascending: false }).then(function (res) {
+        if (res.error) { list.innerHTML = '<p class="empty">שגיאה בטעינה.</p>'; return; }
+        var rows = res.data || [];
+        if (!rows.length) { list.innerHTML = '<p class="empty">אין עדיין כתבות. לחצו "כתבה חדשה" ➕</p>'; return; }
+        list.innerHTML = "";
+        rows.forEach(function (a) {
+          var row = document.createElement("div");
+          row.className = "art-row";
+          var thumb = document.createElement("div");
+          thumb.className = "thumb";
+          if (a.image_url) thumb.style.backgroundImage = "url('" + a.image_url + "')";
+          var info = document.createElement("div");
+          info.className = "info";
+          var b = document.createElement("b"); b.textContent = a.title || "(ללא כותרת)";
+          var meta = document.createElement("div"); meta.className = "meta";
+          meta.textContent = [a.cat, a.date].filter(Boolean).join(" · ");
+          info.appendChild(b); info.appendChild(meta);
+          var acts = document.createElement("div"); acts.className = "acts";
+          var ed = document.createElement("button"); ed.className = "btn btn-ghost btn-sm"; ed.textContent = "✏️ עריכה";
+          ed.onclick = function () { openEditor(a); };
+          var del = document.createElement("button"); del.className = "btn btn-danger btn-sm"; del.textContent = "🗑️ מחיקה";
+          del.onclick = function () { deleteArticle(a); };
+          acts.appendChild(ed); acts.appendChild(del);
+          row.appendChild(thumb); row.appendChild(info); row.appendChild(acts);
+          list.appendChild(row);
+        });
+      });
+    }
+
+    /* ---------- עורך ---------- */
+    function openEditor(a) {
+      editing = a ? a.id : null;
+      pendingImageUrl = a ? (a.image_url || "") : "";
+      $("editorTitle").textContent = a ? "עריכת כתבה" : "כתבה חדשה";
+      $("fTitle").value = a ? (a.title || "") : "";
+      $("fCat").value = a ? (a.cat || "") : "";
+      $("fDate").value = a ? (a.date || "") : "";
+      $("fExcerpt").value = a ? (a.excerpt || "") : "";
+      $("fBody").value = a ? (a.body || "") : "";
+      setPreview(pendingImageUrl);
+      $("editMsg").textContent = "";
+      $("editor").classList.remove("hidden");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+    function closeEditor() { $("editor").classList.add("hidden"); editing = null; pendingImageUrl = ""; }
+    $("newBtn").addEventListener("click", function () { openEditor(null); });
+    $("cancelBtn").addEventListener("click", closeEditor);
+
+    function setPreview(url) {
+      var img = $("imgPreview"), drop = $("imgDrop");
+      if (url) { img.src = url; img.classList.remove("hidden"); drop.classList.add("has");
+        drop.querySelector(".ph").classList.add("hidden"); }
+      else { img.classList.add("hidden"); drop.classList.remove("has");
+        drop.querySelector(".ph").classList.remove("hidden"); }
+    }
+
+    /* ---------- העלאת תמונה (דחיסה + העלאה ל-Storage) ---------- */
+    $("imgDrop").addEventListener("click", function () { $("imgFile").click(); });
+    $("imgFile").addEventListener("change", function () {
+      var file = this.files && this.files[0];
+      if (!file) return;
+      $("editMsg").textContent = "מעלה תמונה…"; $("editMsg").style.color = "var(--muted)";
+      resizeImage(file, 1200, 0.82).then(function (blob) {
+        var name = "img-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7) + ".jpg";
+        return sb.storage.from("news-images").upload(name, blob, { contentType: "image/jpeg", upsert: true })
+          .then(function (res) {
+            if (res.error) throw res.error;
+            var pub = sb.storage.from("news-images").getPublicUrl(name);
+            pendingImageUrl = pub.data.publicUrl;
+            setPreview(pendingImageUrl);
+            $("editMsg").textContent = "התמונה הועלתה ✓"; $("editMsg").style.color = "#167a3a";
+          });
+      }).catch(function (err) {
+        $("editMsg").textContent = "שגיאה בהעלאת התמונה.";
+        $("editMsg").style.color = "#b23b3b";
+        console.error(err);
+      });
+    });
+    function resizeImage(file, maxW, q) {
+      return new Promise(function (resolve, reject) {
+        var img = new Image();
+        img.onload = function () {
+          var scale = Math.min(1, maxW / img.width);
+          var w = Math.round(img.width * scale), h = Math.round(img.height * scale);
+          var c = document.createElement("canvas"); c.width = w; c.height = h;
+          c.getContext("2d").drawImage(img, 0, 0, w, h);
+          c.toBlob(function (b) { b ? resolve(b) : reject(new Error("blob")); }, "image/jpeg", q);
+        };
+        img.onerror = reject;
+        img.src = URL.createObjectURL(file);
+      });
+    }
+
+    /* ---------- שמירה ---------- */
+    $("saveBtn").addEventListener("click", function () {
+      var title = $("fTitle").value.trim();
+      var body = $("fBody").value.trim();
+      if (!title || !body) {
+        $("editMsg").textContent = "נא למלא כותרת וגוף כתבה.";
+        $("editMsg").style.color = "#b23b3b"; return;
+      }
+      var rec = {
+        title: title,
+        cat: $("fCat").value.trim(),
+        date: $("fDate").value.trim(),
+        excerpt: $("fExcerpt").value.trim(),
+        body: body,
+        image_url: pendingImageUrl || null
+      };
+      var btn = $("saveBtn"); btn.disabled = true;
+      $("editMsg").textContent = "שומר…"; $("editMsg").style.color = "var(--muted)";
+      var op;
+      if (editing) { op = sb.from("articles").update(rec).eq("id", editing); }
+      else { rec.sort = Date.now(); op = sb.from("articles").insert(rec); }
+      op.then(function (res) {
+        btn.disabled = false;
+        if (res.error) { $("editMsg").textContent = "שגיאה בשמירה: " + res.error.message; $("editMsg").style.color = "#b23b3b"; return; }
+        closeEditor();
+        loadArticles();
+      });
+    });
+
+    /* ---------- מחיקה ---------- */
+    function deleteArticle(a) {
+      if (!confirm('למחוק את הכתבה "' + (a.title || "") + '"? פעולה זו אינה הפיכה.')) return;
+      sb.from("articles").delete().eq("id", a.id).then(function (res) {
+        if (res.error) { alert("שגיאה במחיקה: " + res.error.message); return; }
+        loadArticles();
+      });
+    }
+  })();
+  </script>
+</body>
+</html>

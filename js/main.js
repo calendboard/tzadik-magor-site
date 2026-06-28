@@ -750,54 +750,32 @@
     document.addEventListener("keydown", function (e) { if (e.key === "Escape") yshClose(); });
   }
 
-  /* ---------- חדשות ועדכוני המרכז (כרטיסים + מודאל כתבה) ---------- */
+  /* ---------- חדשות ועדכוני המרכז (כרטיסים + מודאל כתבה) — נטען מ-Supabase ---------- */
   var newsGrid = document.getElementById("newsGrid");
   var newsTeaser = document.getElementById("newsTeaser");
   if (newsGrid || newsTeaser) {
-    /* === להוספת כתבה: הוסיפו אובייקט בראש הרשימה (החדש ביותר ראשון) === */
-    var NEWS = [
-      { date: "תמוז תשפ״ו", cat: "הילולא", img: "assets/hilula/crowd-night.jpg",
-        title: "לקראת ההילולא הקדושה — כ״א בתמוז",
-        excerpt: "מתקרבים ימי ההילולא של פועל הישועות. הפרטים על המעמד, התפילות וההשתתפות.",
-        body: [
-          "מדי שנה, בכ״א בתמוז, נאספים אלפי יהודים מכל קצוות הארץ אל ציון הצדיק רבי יצחק גברא זצ״ל בעג׳ור — להשתטח, להדליק נרות, לומר תהילים ולבקש ישועה.",
-          "השנה תחול ההילולא ביום שני, כ״א בתמוז תשפ״ו (6 ביולי 2026). במהלך היום יתקיימו הדלקה מרכזית, תפילות, אמירת תהילים וסעודת מצווה.",
-          "מי שאינו יכול להגיע מוזמן למסור שם לתפילה ולהיות שותף בהוצאות ההילולא — וזכות הצדיק תגן עליו ועל בני ביתו."
-        ] },
-      { date: "סיון תשפ״ו", cat: "מהמרכז", img: "assets/hilula/ziyon-prayer.jpg",
-        title: "מסירת שמות לתפילה על הציון",
-        excerpt: "ניתן למסור שם לתפילה ולהדליק נר נשמה על ציון הצדיק — מכל מקום בארץ.",
-        body: [
-          "מרכז ״הצדיק מעג׳ור״ מאפשר לכל יהודי למסור שם לתפילה על הציון הקדוש, גם למי שאינו יכול להגיע בעצמו.",
-          "השמות נמסרים לתפילה על הציון לישועה, רפואה, זיווג, פרנסה ופרי בטן. ניתן גם להדליק נר נשמה ולהקדיש לעילוי נשמת יקיריכם.",
-          "למסירת שם ולפרטים נוספים — צרו קשר, או היכנסו לעמוד התרומה וההקדשה."
-        ] },
-      { date: "אייר תשפ״ו", cat: "עדכון", img: "assets/hilula/ziyon-night.jpg",
-        title: "ברוכים הבאים לאתר הרשמי של המרכז",
-        excerpt: "השקנו את האתר הרשמי — תולדות הצדיק, סגולות, סיפורי ישועה, גלריה ועוד.",
-        body: [
-          "בשעה טובה ומוצלחת אנו שמחים להשיק את האתר הרשמי של מרכז ״הצדיק מעג׳ור״ — רבי יצחק בן יצחק גברא זצ״ל, פועל הישועות.",
-          "באתר תמצאו את תולדות חייו של הצדיק, סגולותיו, סיפורי מופת וישועות, גלריית תמונות מההילולות, תפילות ותהילים — הכל במקום אחד.",
-          "מדור החדשות יתעדכן באופן שוטף בכל הנעשה במרכז ובהכנות לקראת ההילולא. שתזכו לישועות בזכות הצדיק!"
-        ] }
-    ];
+    var SB_URL = "https://wfhgenhmoofyegysysac.supabase.co";
+    var SB_KEY = "sb_publishable_XbSp3aL_Y_O3m8yzZ_qmOQ_vp5W3EYn";
 
     function newsCard(a) {
       var c = document.createElement("article");
       c.className = "news-card";
       c.innerHTML =
-        '<div class="nc-img" style="background-image:url(\'' + a.img + '\')"></div>' +
+        '<div class="nc-img"></div>' +
         '<div class="nc-body">' +
-          '<div class="nc-meta"><span class="nc-cat">' + a.cat + '</span><span class="nc-date">' + a.date + '</span></div>' +
-          '<h3 class="nc-title">' + a.title + '</h3>' +
-          '<p class="nc-excerpt">' + a.excerpt + '</p>' +
+          '<div class="nc-meta"><span class="nc-cat"></span><span class="nc-date"></span></div>' +
+          '<h3 class="nc-title"></h3>' +
+          '<p class="nc-excerpt"></p>' +
           '<button class="nc-more" type="button">קרא עוד ›</button>' +
         '</div>';
+      if (a.img) c.querySelector(".nc-img").style.backgroundImage = "url('" + a.img + "')";
+      c.querySelector(".nc-cat").textContent = a.cat;
+      c.querySelector(".nc-date").textContent = a.date;
+      c.querySelector(".nc-title").textContent = a.title;
+      c.querySelector(".nc-excerpt").textContent = a.excerpt;
       c.querySelector(".nc-more").addEventListener("click", function () { newsOpen(a); });
       return c;
     }
-    if (newsGrid) { NEWS.forEach(function (a) { newsGrid.appendChild(newsCard(a)); }); }
-    if (newsTeaser) { NEWS.slice(0, 3).forEach(function (a) { newsTeaser.appendChild(newsCard(a)); }); }
 
     var nm = document.createElement("div");
     nm.className = "ysh-modal";
@@ -814,7 +792,9 @@
     var nmImg = nm.querySelector(".nm-img"), nmTag = nm.querySelector(".nm-tag"),
         nmT = nm.querySelector(".nm-t"), nmBody = nm.querySelector(".nm-body");
     function newsOpen(a) {
-      nmImg.src = a.img; nmTag.textContent = a.cat + " · " + a.date; nmT.textContent = a.title;
+      if (a.img) { nmImg.src = a.img; nmImg.style.display = ""; } else { nmImg.style.display = "none"; }
+      nmTag.textContent = (a.cat ? a.cat + " · " : "") + a.date;
+      nmT.textContent = a.title;
       nmBody.innerHTML = "";
       a.body.forEach(function (p) { var el = document.createElement("p"); el.textContent = p; nmBody.appendChild(el); });
       nm.classList.add("open"); document.body.style.overflow = "hidden";
@@ -823,6 +803,25 @@
     nm.querySelector(".ysh-close").addEventListener("click", newsClose);
     nm.querySelector(".ysh-modal-ov").addEventListener("click", newsClose);
     document.addEventListener("keydown", function (e) { if (e.key === "Escape") newsClose(); });
+
+    function renderNews(NEWS) {
+      if (newsGrid) { newsGrid.innerHTML = ""; NEWS.forEach(function (a) { newsGrid.appendChild(newsCard(a)); }); }
+      if (newsTeaser) { newsTeaser.innerHTML = ""; NEWS.slice(0, 3).forEach(function (a) { newsTeaser.appendChild(newsCard(a)); }); }
+    }
+
+    fetch(SB_URL + "/rest/v1/articles?select=*&order=sort.desc", { headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY } })
+      .then(function (r) { return r.json(); })
+      .then(function (rows) {
+        var NEWS = (rows || []).map(function (a) {
+          return { date: a.date || "", cat: a.cat || "", img: a.image_url || "",
+            title: a.title || "", excerpt: a.excerpt || "",
+            body: String(a.body || "").split(/\n{2,}/).map(function (s) { return s.trim(); }).filter(Boolean) };
+        });
+        renderNews(NEWS);
+      })
+      .catch(function () {
+        if (newsGrid) newsGrid.innerHTML = '<p style="color:var(--muted);text-align:center;grid-column:1/-1">לא ניתן לטעון כעת את הכתבות. נסו לרענן.</p>';
+      });
   }
 
   /* ---------- ארכיון הישועות המאומת (תצוגת עדויות + טופס שליחה) ---------- */
