@@ -583,32 +583,27 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
 @keyframes yshMarquee{ from{ transform:translateX(-50%); } to{ transform:translateX(0); } }
 @media (prefers-reduced-motion: reduce){ .ysh-track{ animation:none; } }
 
-.ysh-ball{ position:relative; flex:0 0 auto; width:300px; height:300px; border-radius:20px; overflow:hidden;
+.ysh-ball{ position:relative; flex:0 0 auto; width:300px; height:300px; border-radius:18px; overflow:hidden;
   direction:rtl; cursor:pointer; padding:0; border:1px solid var(--line-2); font-family:inherit;
-  background:
-    radial-gradient(125% 78% at 50% 0%, rgba(216,179,73,.20), rgba(0,0,0,0) 58%),
-    linear-gradient(165deg,#3c2f1d 0%,#2b2014 58%,#20160a 100%);
+  display:flex; flex-direction:column; background:#20160a;
   box-shadow:0 16px 44px rgba(0,0,0,.5), inset 0 0 0 1px rgba(247,231,163,.08);
   transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
 .ysh-ball:hover{ transform:translateY(-6px) scale(1.025); border-color:rgba(247,231,163,.55);
   box-shadow:0 26px 64px rgba(0,0,0,.6), 0 0 30px rgba(214,179,73,.28), inset 0 0 0 1px rgba(247,231,163,.16); }
+.ysh-ball:hover .ysh-photo img{ transform:scale(1.06); }
 .ysh-ball:focus-visible{ outline:2px solid var(--gold-2); outline-offset:3px; }
-.ysh-ball::after{ content:""; position:absolute; left:50%; top:0; transform:translateX(-50%); z-index:1;
-  width:56%; height:3px; border-radius:0 0 8px 8px; background:linear-gradient(90deg,transparent,var(--gold-2),transparent); }
-.ysh-in{ position:absolute; inset:0; z-index:2; display:flex; flex-direction:column; align-items:center; justify-content:center;
-  text-align:center; padding:30px 24px; gap:11px; }
-.ysh-deco::before{ content:"✦"; color:var(--gold-2); font-size:1.15rem; opacity:.8; display:block; line-height:1; }
-.ysh-tag{ font-size:.78rem; letter-spacing:.06em; color:var(--gold-2); opacity:.95;
-  border:1px solid var(--line-2); border-radius:999px; padding:4px 14px; }
-.ysh-t{ font-family:var(--ff-serif); font-weight:800; color:#fbe8b0; font-size:1.5rem; line-height:1.2; margin:0; }
-.ysh-s{ color:#e4d7b9; font-size:1.06rem; line-height:1.45; margin:0; }
-.ysh-cta{ margin-top:6px; font-size:.9rem; font-weight:800; color:#1a1206;
-  background:linear-gradient(180deg,#f3d98b,#d3ad55); border-radius:999px; padding:8px 20px; }
+.ysh-photo{ position:relative; flex:1 1 auto; overflow:hidden; min-height:0; }
+.ysh-photo img{ width:100%; height:100%; object-fit:cover; display:block; transition:transform .55s ease; }
+.ysh-photo::after{ content:""; position:absolute; inset:0;
+  background:linear-gradient(180deg,rgba(0,0,0,0) 58%,rgba(20,14,6,.4) 100%); }
+.ysh-cap{ position:relative; flex:0 0 auto; background:linear-gradient(180deg,#2b2014,#20160a);
+  border-top:1px solid rgba(247,231,163,.22); padding:11px 14px 13px; text-align:center;
+  display:flex; flex-direction:column; align-items:center; gap:3px; }
+.ysh-tag{ font-size:.72rem; letter-spacing:.07em; color:var(--gold-2); opacity:.92; font-weight:700; }
+.ysh-t{ font-family:var(--ff-serif); font-weight:800; color:#fbe8b0; font-size:1.16rem; line-height:1.24; margin:0; }
 @media (max-width:600px){
-  .ysh-ball{ width:260px; height:260px; }
-  .ysh-in{ padding:20px; }
-  .ysh-t{ font-size:1.3rem; }
-  .ysh-s{ font-size:.98rem; }
+  .ysh-ball{ width:240px; height:240px; }
+  .ysh-t{ font-size:1.05rem; }
 }
 
 /* ===== מודאל סיפור ישועה ===== */
@@ -622,6 +617,8 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
   border:1px solid var(--line-2); box-shadow:0 0 0 6px rgba(247,231,163,.06); }
 .ysh-panel .ym-tag{ display:inline-block; font-size:.72rem; letter-spacing:.12em; color:var(--gold-2);
   border:1px solid var(--line-2); border-radius:999px; padding:3px 14px; margin-bottom:12px; }
+.ysh-panel .ym-photo{ width:100%; height:210px; object-fit:cover; border-radius:14px; display:block; margin:0 0 16px;
+  border:1px solid var(--line-2); box-shadow:0 10px 30px rgba(0,0,0,.4); }
 .ysh-panel .ym-t{ font-family:var(--ff-serif); font-weight:800; color:var(--gold-2); font-size:1.66rem; margin:0 0 14px; }
 .ysh-panel .ym-body{ color:var(--cream); font-size:1.16rem; line-height:1.9; margin:0 0 16px; text-align:right; }
 .ysh-panel .ym-src{ color:var(--muted); font-size:.84rem; border-top:1px solid var(--line); padding-top:12px; margin:0; }
