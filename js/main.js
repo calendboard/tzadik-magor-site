@@ -13,6 +13,22 @@
   var SITE_EMAIL = "hatzadikmagor@gmail.com";
   var SITE_WA = "97226597098";
 
+  /* זיהוי מגדר מתוך השם: "… בת …" = נקבה, "… בן …" = זכר. ריק = לא ידוע. */
+  function nameGender(s) {
+    s = " " + String(s || "").replace(/[׳'״"]/g, "") + " ";
+    if (/\sבת\s/.test(s)) return "f";
+    if (/\sבן\s/.test(s)) return "m";
+    return "";
+  }
+  /* ממלא אלמנטים עם data-g="זכר|נקבה" לפי המגדר (ברירת מחדל = זכר). */
+  function applyGender(root, gender) {
+    if (!root) return;
+    root.querySelectorAll("[data-g]").forEach(function (ge) {
+      var parts = ge.getAttribute("data-g").split("|");
+      ge.textContent = (gender === "f" && parts[1]) ? parts[1] : parts[0];
+    });
+  }
+
   /* שליחת פנייה דרך FormSubmit; מחזיר Promise. */
   function sendLead(data) {
     return fetch("https://formsubmit.co/ajax/" + SITE_EMAIL, {
@@ -71,7 +87,9 @@
           }
           if (success) {
             var fill = success.querySelector("[data-fill]");
-            if (fill) { var src = form.querySelector(fill.getAttribute("data-fill")); fill.textContent = src ? src.value.trim() : ""; }
+            var srcVal = "";
+            if (fill) { var src = form.querySelector(fill.getAttribute("data-fill")); srcVal = src ? src.value.trim() : ""; fill.textContent = srcVal; }
+            applyGender(success, nameGender(srcVal));
             form.style.display = "none";
             success.hidden = false;
             success.scrollIntoView({ behavior: "smooth", block: "center" });
