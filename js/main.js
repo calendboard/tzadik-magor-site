@@ -66,8 +66,8 @@
       sendLead(data).then(function (j) {
         if (j && (j.success === "true" || j.success === true)) {
           if (form.getAttribute("data-candle") === "1") {
-            var dn = form.querySelector("[name=deceased]");
-            if (dn && dn.value.trim()) appendCandle(dn.value.trim());
+            var g = function (s) { var el = form.querySelector(s); return el ? el.value.trim() : ""; };
+            if (g("[name=deceased]")) appendCandle({ name: g("[name=deceased]"), family: g("[name=family]"), deathdate: g("[name=deathdate]"), dedication: g("[name=dedication]") });
           }
           if (success) {
             var fill = success.querySelector("[data-fill]");
@@ -87,12 +87,19 @@
 
   /* ---------- קיר הנרות (זיכרון משותף ציבורי דרך JSONBin) ---------- */
   var CANDLE_API = "https://api.jsonbin.io/v3/b/6a40f90fda38895dfe0b10e7";
-  function appendCandle(name) {
+  function appendCandle(c) {
+    c = c || {};
     fetch(CANDLE_API + "/latest", { headers: { "X-Bin-Meta": "false" } })
       .then(function (r) { return r.json(); })
       .then(function (rec) {
         var candles = (rec && rec.candles) || [];
-        candles.push({ name: String(name).substring(0, 80), date: new Date().toISOString().slice(0, 10) });
+        candles.push({
+          name: String(c.name || "").substring(0, 80),
+          family: String(c.family || "").substring(0, 60),
+          deathdate: String(c.deathdate || "").substring(0, 40),
+          dedication: String(c.dedication || "").substring(0, 60),
+          date: new Date().toISOString().slice(0, 10)
+        });
         return fetch(CANDLE_API, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ candles: candles }) });
       })
       .then(function () { loadCandleWall(); })
@@ -123,9 +130,14 @@
           '<span class="wc-glow"></span><span class="wc-flame"></span>' +
           '<span class="wc-wick"></span><span class="wc-wax"></span>' +
         '</div>' +
-        '<figcaption class="wall-name"></figcaption><div class="wall-date"></div>';
+        '<figcaption class="wall-name"></figcaption>' +
+        '<div class="wall-family"></div>' +
+        '<div class="wall-death"></div>' +
+        '<div class="wall-ded"></div>';
       el.querySelector(".wall-name").textContent = c.name || "";
-      el.querySelector(".wall-date").textContent = fmtDate(c.date);
+      var fam = el.querySelector(".wall-family"); if (c.family) fam.textContent = "למשפחת " + c.family; else fam.remove();
+      var dth = el.querySelector(".wall-death"); if (c.deathdate) dth.textContent = c.deathdate; else dth.remove();
+      var ded = el.querySelector(".wall-ded"); if (c.dedication) ded.textContent = c.dedication; else ded.remove();
       wall.appendChild(el);
     });
   }
