@@ -65,6 +65,10 @@
 
       sendLead(data).then(function (j) {
         if (j && (j.success === "true" || j.success === true)) {
+          if (form.getAttribute("data-candle") === "1") {
+            var dn = form.querySelector("[name=deceased]");
+            if (dn && dn.value.trim()) appendCandle(dn.value.trim());
+          }
           if (success) {
             var fill = success.querySelector("[data-fill]");
             if (fill) { var src = form.querySelector(fill.getAttribute("data-fill")); fill.textContent = src ? src.value.trim() : ""; }
@@ -80,6 +84,46 @@
       }).catch(function () { fallbackWA(); });
     });
   }
+
+  /* ---------- קיר הנרות (זיכרון משותף ציבורי דרך JSONBin) ---------- */
+  var CANDLE_API = "https://api.jsonbin.io/v3/b/6a40f90fda38895dfe0b10e7";
+  function appendCandle(name) {
+    fetch(CANDLE_API + "/latest", { headers: { "X-Bin-Meta": "false" } })
+      .then(function (r) { return r.json(); })
+      .then(function (rec) {
+        var candles = (rec && rec.candles) || [];
+        candles.push({ name: String(name).substring(0, 80), date: new Date().toISOString().slice(0, 10) });
+        return fetch(CANDLE_API, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ candles: candles }) });
+      })
+      .then(function () { loadCandleWall(); })
+      .catch(function () {});
+  }
+  function loadCandleWall() {
+    var wall = document.getElementById("candleWall");
+    if (!wall) return;
+    fetch(CANDLE_API + "/latest", { headers: { "X-Bin-Meta": "false" } })
+      .then(function (r) { return r.json(); })
+      .then(function (rec) {
+        var list = (rec && rec.candles) || [];
+        var countEl = document.getElementById("candleCount");
+        if (countEl) countEl.textContent = list.length.toLocaleString("he-IL");
+        wall.innerHTML = "";
+        if (!list.length) {
+          wall.innerHTML = '<p class="cw-empty">עדיין לא הודלקו נרות — היו הראשונים להאיר 🕯️</p>';
+          return;
+        }
+        list.slice().reverse().slice(0, 150).forEach(function (c) {
+          var el = document.createElement("div");
+          el.className = "cw-candle";
+          el.innerHTML = '<span class="cw-flame" aria-hidden="true"><i></i></span><span class="cw-name"></span>';
+          el.querySelector(".cw-name").textContent = c.name || "";
+          wall.appendChild(el);
+        });
+      })
+      .catch(function () {});
+  }
+  loadCandleWall();
+
   $all_leadForms();
   function $all_leadForms() {
     document.querySelectorAll(".lead-form").forEach(function (f) { setupLeadForm(f); });
