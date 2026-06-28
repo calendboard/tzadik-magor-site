@@ -16,7 +16,7 @@
 
   <link rel="stylesheet" href="css/fonts.css" />
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="css/styles.css?v=659" />
+  <link rel="stylesheet" href="css/styles.css?v=660" />
 
   <style>
     .stories-hero{ padding:128px 0 16px; text-align:center; position:relative; overflow:hidden; }
@@ -33,7 +33,7 @@
     <div class="container nav-wrap">
       <a class="brand" href="index.html#hero" aria-label="הצדיק מעג׳ור – לדף הבית">
         <span class="brand-mark" aria-hidden="true">
-          <img src="assets/logo-emblem.png?v=659" width="46" height="46" alt="" class="brand-logo" />
+          <img src="assets/logo-emblem.png?v=660" width="46" height="46" alt="" class="brand-logo" />
         </span>
         <span class="brand-text">הצדיק <b>מעג׳ור</b></span>
       </a>
@@ -82,7 +82,7 @@
         <div class="lead-wrap">
 
           <!-- טופס מסירת שם -->
-          <form class="lead-form" id="tefilaForm" novalidate
+          <form class="lead-form" id="tefilaForm" novalidate data-prayer="1"
                 data-subject="🙏 מסירת שם לתפילה — אתר הצדיק מעג׳ור">
             <div class="field">
               <label for="tName">השם לתפילה (ושם האם) <span style="color:var(--gold)">*</span></label>
@@ -100,6 +100,10 @@
               </select>
             </div>
             <div class="field">
+              <label for="tDetails">בקשה / פרטים נוספים <span style="color:var(--muted);font-weight:400">(רשות)</span></label>
+              <textarea id="tDetails" name="details" data-label="בקשה / פרטים" rows="4" placeholder="אפשר לפרט כאן ככל שתרצו — הבקשה תועבר לתפילה"></textarea>
+            </div>
+            <div class="field">
               <label for="tYourName">השם שלכם <span style="color:var(--gold)">*</span></label>
               <input id="tYourName" name="name" data-label="שם הפונה" type="text" autocomplete="name" required />
             </div>
@@ -108,8 +112,8 @@
               <input id="tPhone" name="phone" data-label="טלפון" type="tel" autocomplete="tel" inputmode="tel" required />
             </div>
             <div class="field">
-              <label for="tEmail">אימייל <span style="color:var(--muted);font-weight:400">(רשות)</span></label>
-              <input id="tEmail" name="email" data-label="אימייל" type="email" autocomplete="email" />
+              <label for="tEmail">אימייל <span style="color:var(--gold)">*</span></label>
+              <input id="tEmail" name="email" data-label="אימייל" type="email" autocomplete="email" required />
             </div>
             <button type="submit" class="btn btn-gold btn-block">מסירת השם לתפילה 🙏</button>
             <p class="form-status" role="status" aria-live="polite"></p>
@@ -193,6 +197,6 @@
     <button class="hb-close" id="hilulaClose" type="button" aria-label="סגירת הבאנר">×</button>
   </div>
 
-  <script src="js/main.js?v=659" defer></script>
+  <script src="js/main.js?v=660" defer></script>
 </body>
 </html>

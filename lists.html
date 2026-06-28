@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>רשימות להילולא — הצדיק מעג׳ור (פנימי)</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="stylesheet" href="css/fonts.css" />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <style>
+    :root{ --g:#9c7320; --g2:#7a5a08; }
+    *{ box-sizing:border-box; }
+    body{ font-family:"Heebo",Arial,sans-serif; background:#f6f4ee; color:#241; color:#262017; margin:0; padding:26px; line-height:1.55; }
+    .wrap{ max-width:1040px; margin:0 auto; }
+    .top{ display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;
+      border-bottom:2px solid var(--g); padding-bottom:14px; margin-bottom:26px; }
+    h1{ font-size:1.55rem; margin:0; color:var(--g2); }
+    .actions{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+    .actions button{ background:var(--g); color:#fff; border:0; border-radius:8px; padding:10px 18px; font-family:inherit; font-size:.98rem; cursor:pointer; }
+    .actions button:hover{ background:var(--g2); }
+    .actions a{ color:var(--g2); text-decoration:none; font-weight:600; }
+    .cols{ display:grid; grid-template-columns:1fr 1fr; gap:34px; }
+    @media (max-width:760px){ .cols{ grid-template-columns:1fr; } }
+    .col h2{ font-size:1.3rem; color:var(--g2); border-bottom:1px solid #d8d2c4; padding-bottom:8px; margin-top:0; }
+    ol{ margin:0; padding-inline-start:1.6em; }
+    li{ padding:5px 2px; font-size:1.06rem; border-bottom:1px dotted #e0dac9; }
+    li b{ font-weight:700; }
+    .adm-req{ color:var(--g2); }
+    .adm-empty{ list-style:none; color:#999; }
+    .note{ color:#8a8270; font-size:.85rem; margin-top:34px; text-align:center; }
+    @media print{
+      .actions, .note{ display:none; }
+      body{ background:#fff; padding:0; color:#000; }
+      .top{ border-color:#000; }
+      a[href]:after{ content:""; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <h1>רשימות להילולא · הצדיק מעג׳ור</h1>
+      <div class="actions">
+        <button type="button" onclick="window.print()">🖨️ הדפסה</button>
+        <button type="button" onclick="location.reload()">↻ רענון</button>
+        <a href="index.html">» לאתר</a>
+      </div>
+    </div>
+
+    <div class="cols">
+      <div class="col">
+        <h2>🙏 שמות לתפילה (<span id="prayerCount">0</span>)</h2>
+        <ol id="prayerList"><li class="adm-empty">טוען…</li></ol>
+      </div>
+      <div class="col">
+        <h2>🕯️ נרות נשמה (<span id="candleListCount">0</span>)</h2>
+        <ol id="candleList"><li class="adm-empty">טוען…</li></ol>
+      </div>
+    </div>
+
+    <p class="note">דף פנימי — אינו מקושר באתר ואינו מופיע בחיפוש. הנתונים מתעדכנים בזמן אמת מהמערכת.</p>
+  </div>
+
+  <script src="js/main.js?v=660" defer></script>
+</body>
+</html>

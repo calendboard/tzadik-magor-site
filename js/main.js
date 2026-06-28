@@ -85,6 +85,10 @@
             var g = function (s) { var el = form.querySelector(s); return el ? el.value.trim() : ""; };
             if (g("[name=deceased]")) appendCandle({ name: g("[name=deceased]"), family: g("[name=family]"), deathdate: g("[name=deathdate]"), dedication: g("[name=dedication]") });
           }
+          if (form.getAttribute("data-prayer") === "1") {
+            var gp = function (s) { var el = form.querySelector(s); return el ? el.value.trim() : ""; };
+            if (gp("[name=pray_name]")) appendPrayer({ name: gp("[name=pray_name]"), request: gp("[name=request]") });
+          }
           if (success) {
             var fill = success.querySelector("[data-fill]");
             var srcVal = "";
@@ -105,23 +109,37 @@
 
   /* ---------- קיר הנרות (זיכרון משותף ציבורי דרך JSONBin) ---------- */
   var CANDLE_API = "https://api.jsonbin.io/v3/b/6a40f90fda38895dfe0b10e7";
-  function appendCandle(c) {
-    c = c || {};
+  /* מוסיף פריט למערך בקופסה (candles/prayers) תוך שמירה על שאר המבנה */
+  function appendToBin(key, item, after) {
     fetch(CANDLE_API + "/latest", { headers: { "X-Bin-Meta": "false" } })
       .then(function (r) { return r.json(); })
       .then(function (rec) {
-        var candles = (rec && rec.candles) || [];
-        candles.push({
-          name: String(c.name || "").substring(0, 80),
-          family: String(c.family || "").substring(0, 60),
-          deathdate: String(c.deathdate || "").substring(0, 40),
-          dedication: String(c.dedication || "").substring(0, 60),
-          date: new Date().toISOString().slice(0, 10)
-        });
-        return fetch(CANDLE_API, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ candles: candles }) });
+        rec = rec || {};
+        if (!Array.isArray(rec.candles)) rec.candles = [];
+        if (!Array.isArray(rec.prayers)) rec.prayers = [];
+        rec[key].push(item);
+        return fetch(CANDLE_API, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(rec) });
       })
-      .then(function () { loadCandleWall(); })
+      .then(function () { if (after) after(); })
       .catch(function () {});
+  }
+  function appendCandle(c) {
+    c = c || {};
+    appendToBin("candles", {
+      name: String(c.name || "").substring(0, 80),
+      family: String(c.family || "").substring(0, 60),
+      deathdate: String(c.deathdate || "").substring(0, 40),
+      dedication: String(c.dedication || "").substring(0, 60),
+      date: new Date().toISOString().slice(0, 10)
+    }, loadCandleWall);
+  }
+  function appendPrayer(p) {
+    p = p || {};
+    appendToBin("prayers", {
+      name: String(p.name || "").substring(0, 80),
+      request: String(p.request || "").substring(0, 40),
+      date: new Date().toISOString().slice(0, 10)
+    });
   }
   var _candles = [];
   function fmtDate(d) {
@@ -178,6 +196,49 @@
     if (search && !search._wired) { search._wired = true; search.addEventListener("input", function () { renderWall(search.value); }); }
   }
   loadCandleWall();
+
+  /* ---------- דף הרשימות (admin): כל השמות לתפילה + כל הנרות ---------- */
+  function loadAdminLists() {
+    var pWrap = document.getElementById("prayerList");
+    var cWrap = document.getElementById("candleList");
+    if (!pWrap && !cWrap) return;
+    fetch(CANDLE_API + "/latest", { headers: { "X-Bin-Meta": "false" } })
+      .then(function (r) { return r.json(); })
+      .then(function (rec) {
+        rec = rec || {};
+        var prayers = rec.prayers || [], candles = rec.candles || [];
+        var pc = document.getElementById("prayerCount"); if (pc) pc.textContent = prayers.length;
+        var clc = document.getElementById("candleListCount"); if (clc) clc.textContent = candles.length;
+        if (pWrap) {
+          pWrap.innerHTML = "";
+          if (!prayers.length) pWrap.innerHTML = '<li class="adm-empty">אין עדיין שמות לתפילה.</li>';
+          prayers.slice().reverse().forEach(function (p) {
+            var li = document.createElement("li");
+            li.innerHTML = '<b></b><span class="adm-req"></span>';
+            li.querySelector("b").textContent = p.name || "";
+            li.querySelector(".adm-req").textContent = p.request ? " — " + p.request : "";
+            pWrap.appendChild(li);
+          });
+        }
+        if (cWrap) {
+          cWrap.innerHTML = "";
+          if (!candles.length) cWrap.innerHTML = '<li class="adm-empty">אין עדיין נרות.</li>';
+          candles.slice().reverse().forEach(function (c) {
+            var li = document.createElement("li");
+            var t = c.name || "";
+            if (c.family) t += " · למשפחת " + c.family;
+            if (c.deathdate) t += " · " + c.deathdate;
+            if (c.dedication) t += " · " + c.dedication;
+            li.textContent = t;
+            cWrap.appendChild(li);
+          });
+        }
+      })
+      .catch(function () {
+        if (pWrap) pWrap.innerHTML = '<li class="adm-empty">לא ניתן לטעון כעת. נסו לרענן.</li>';
+      });
+  }
+  loadAdminLists();
 
   $all_leadForms();
   function $all_leadForms() {
