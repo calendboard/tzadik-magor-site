@@ -26,10 +26,16 @@
     li{ padding:5px 2px; font-size:1.06rem; border-bottom:1px dotted #e0dac9; }
     li b{ font-weight:700; }
     .adm-req{ color:var(--g2); }
+    .adm-date{ color:#a99a78; font-size:.82rem; white-space:nowrap; }
     .adm-empty{ list-style:none; color:#999; }
+    .filterbar{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:24px; align-items:center; }
+    .filterbar .fl-lbl{ color:#8a8270; font-size:.92rem; margin-inline-end:4px; }
+    .filterbar button{ background:#fff; border:1px solid #d8d2c4; color:#5a4a20; border-radius:999px; padding:8px 18px; font-family:inherit; font-size:.95rem; cursor:pointer; }
+    .filterbar button:hover{ border-color:var(--g); }
+    .filterbar button.active{ background:var(--g); color:#fff; border-color:var(--g); }
     .note{ color:#8a8270; font-size:.85rem; margin-top:34px; text-align:center; }
     @media print{
-      .actions, .note{ display:none; }
+      .actions, .note, .filterbar{ display:none; }
       body{ background:#fff; padding:0; color:#000; }
       .top{ border-color:#000; }
       a[href]:after{ content:""; }
@@ -47,6 +53,14 @@
       </div>
     </div>
 
+    <div class="filterbar" id="admFilter">
+      <span class="fl-lbl">סינון לפי זמן:</span>
+      <button type="button" data-days="0">היום</button>
+      <button type="button" data-days="7">שבוע</button>
+      <button type="button" data-days="30">חודש</button>
+      <button type="button" data-days="" class="active">הכל</button>
+    </div>
+
     <div class="cols">
       <div class="col">
         <h2>🙏 שמות לתפילה (<span id="prayerCount">0</span>)</h2>
@@ -61,6 +75,6 @@
     <p class="note">דף פנימי — אינו מקושר באתר ואינו מופיע בחיפוש. הנתונים מתעדכנים בזמן אמת מהמערכת.</p>
   </div>
 
-  <script src="js/main.js?v=661" defer></script>
+  <script src="js/main.js?v=662" defer></script>
 </body>
 </html>

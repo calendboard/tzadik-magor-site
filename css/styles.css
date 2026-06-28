@@ -430,7 +430,7 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
   .main-nav.open{ opacity:1; visibility:visible; transform:none; pointer-events:auto; }
   .main-nav a{ font-size:1.15rem; padding:12px 14px; }
   .nav-toggle{ display:flex; }
-  .nav-cta .btn-gold{ display:none; }
+  .nav-cta .btn-gold, .nav-cta-2{ display:none; }
   .section{ padding:72px 0; }
   .hero-stats{ gap:16px; }
   .stat-sep{ display:none; }

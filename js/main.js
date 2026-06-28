@@ -214,46 +214,70 @@
   }
   loadCandleWall();
 
-  /* ---------- דף הרשימות (admin): כל השמות לתפילה + כל הנרות ---------- */
-  function loadAdminLists() {
+  /* ---------- דף הרשימות (admin): שמות לתפילה + נרות, עם תאריך וסינון ---------- */
+  var _admData = null, _admDays = null;
+  function withinDays(dateStr, days) {
+    if (days == null) return true;
+    var d = new Date(String(dateStr).slice(0, 10) + "T00:00:00");
+    if (isNaN(d)) return true;
+    var t = new Date(); t.setHours(0, 0, 0, 0);
+    var diff = Math.floor((t - d) / 86400000);
+    return diff >= 0 && diff <= days;
+  }
+  function admLine(c) {
+    var t = c.name || "";
+    if (c.family) t += " · למשפחת " + c.family;
+    if (c.deathdate) t += " · " + c.deathdate;
+    if (c.dedication) t += " · " + c.dedication;
+    return t;
+  }
+  function renderAdmin() {
+    if (!_admData) return;
     var pWrap = document.getElementById("prayerList");
     var cWrap = document.getElementById("candleList");
-    if (!pWrap && !cWrap) return;
+    var prayers = (_admData.prayers || []).slice().reverse().filter(function (p) { return withinDays(p.date, _admDays); });
+    var candles = (_admData.candles || []).slice().reverse().filter(function (c) { return withinDays(c.date, _admDays); });
+    var pc = document.getElementById("prayerCount"); if (pc) pc.textContent = prayers.length;
+    var clc = document.getElementById("candleListCount"); if (clc) clc.textContent = candles.length;
+    if (pWrap) {
+      pWrap.innerHTML = prayers.length ? "" : '<li class="adm-empty">אין רשומות בטווח זה.</li>';
+      prayers.forEach(function (p) {
+        var li = document.createElement("li");
+        li.innerHTML = '<b></b><span class="adm-req"></span><span class="adm-date"></span>';
+        li.querySelector("b").textContent = p.name || "";
+        li.querySelector(".adm-req").textContent = p.request ? " — " + p.request : "";
+        li.querySelector(".adm-date").textContent = p.date ? "  " + fmtDate(p.date) : "";
+        pWrap.appendChild(li);
+      });
+    }
+    if (cWrap) {
+      cWrap.innerHTML = candles.length ? "" : '<li class="adm-empty">אין רשומות בטווח זה.</li>';
+      candles.forEach(function (c) {
+        var li = document.createElement("li");
+        li.innerHTML = '<span class="adm-main"></span><span class="adm-date"></span>';
+        li.querySelector(".adm-main").textContent = admLine(c);
+        li.querySelector(".adm-date").textContent = c.date ? "  " + fmtDate(c.date) : "";
+        cWrap.appendChild(li);
+      });
+    }
+  }
+  function loadAdminLists() {
+    if (!document.getElementById("prayerList") && !document.getElementById("candleList")) return;
     fetch(CANDLE_API + "/latest", { headers: { "X-Bin-Meta": "false" } })
       .then(function (r) { return r.json(); })
-      .then(function (rec) {
-        rec = rec || {};
-        var prayers = rec.prayers || [], candles = rec.candles || [];
-        var pc = document.getElementById("prayerCount"); if (pc) pc.textContent = prayers.length;
-        var clc = document.getElementById("candleListCount"); if (clc) clc.textContent = candles.length;
-        if (pWrap) {
-          pWrap.innerHTML = "";
-          if (!prayers.length) pWrap.innerHTML = '<li class="adm-empty">אין עדיין שמות לתפילה.</li>';
-          prayers.slice().reverse().forEach(function (p) {
-            var li = document.createElement("li");
-            li.innerHTML = '<b></b><span class="adm-req"></span>';
-            li.querySelector("b").textContent = p.name || "";
-            li.querySelector(".adm-req").textContent = p.request ? " — " + p.request : "";
-            pWrap.appendChild(li);
-          });
-        }
-        if (cWrap) {
-          cWrap.innerHTML = "";
-          if (!candles.length) cWrap.innerHTML = '<li class="adm-empty">אין עדיין נרות.</li>';
-          candles.slice().reverse().forEach(function (c) {
-            var li = document.createElement("li");
-            var t = c.name || "";
-            if (c.family) t += " · למשפחת " + c.family;
-            if (c.deathdate) t += " · " + c.deathdate;
-            if (c.dedication) t += " · " + c.dedication;
-            li.textContent = t;
-            cWrap.appendChild(li);
-          });
-        }
-      })
-      .catch(function () {
-        if (pWrap) pWrap.innerHTML = '<li class="adm-empty">לא ניתן לטעון כעת. נסו לרענן.</li>';
+      .then(function (rec) { _admData = rec || {}; renderAdmin(); })
+      .catch(function () { var p = document.getElementById("prayerList"); if (p) p.innerHTML = '<li class="adm-empty">לא ניתן לטעון כעת. נסו לרענן.</li>'; });
+    var fb = document.getElementById("admFilter");
+    if (fb && !fb._wired) {
+      fb._wired = true;
+      fb.addEventListener("click", function (e) {
+        var b = e.target.closest("[data-days]"); if (!b) return;
+        var v = b.getAttribute("data-days");
+        _admDays = (v === "" || v == null) ? null : parseInt(v, 10);
+        fb.querySelectorAll("[data-days]").forEach(function (x) { x.classList.toggle("active", x === b); });
+        renderAdmin();
       });
+    }
   }
   loadAdminLists();
 
