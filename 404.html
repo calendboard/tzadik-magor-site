@@ -35,14 +35,14 @@
     <p>ייתכן שהקישור שגוי או שהדף הוסר. נשיב אתכם הביתה — לזכות הצדיק מעג׳ור, שזכותו תגן עליכם.</p>
     <div class="btns">
       <a class="b gold" id="homeBtn" href="/tzadik-magor-site/">חזרה לדף הבית »</a>
-      <a class="b ghost" id="donateBtn" href="/tzadik-magor-site/donate.html">להדלקת נר ולתרומה</a>
+      <a class="b ghost" id="donateBtn" href="/tzadik-magor-site/ner.html">הדלקת נר נשמה</a>
     </div>
   </div>
   <script>
     // base = first path segment (works on github project-page AND on a future root domain)
     var base = (location.pathname.match(/^\/[^\/]+\//) || ['/'])[0];
     document.getElementById('homeBtn').href = base;
-    document.getElementById('donateBtn').href = base + 'donate.html';
+    document.getElementById('donateBtn').href = base + "ner.html";
     var fav = document.querySelector('link[rel=icon]'); if (fav) fav.href = base + 'assets/favicon.svg';
     // nicer fonts if available
     var l = document.createElement('link'); l.rel='stylesheet'; l.href = base + 'css/fonts.css'; document.head.appendChild(l);

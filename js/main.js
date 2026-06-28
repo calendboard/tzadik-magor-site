@@ -22,6 +22,69 @@
     }).then(function (r) { return r.json(); });
   }
 
+  /* מנגנון טופס-ליד גנרי (שם לתפילה / נר לעילוי נשמה / כל טופס איסוף פרטים).
+     הטופס צריך: class="lead-form" + data-subject="כותרת המייל".
+     כל שדה: name + (data-label="תווית בעברית"). שדות חובה: required.
+     אופציונלי: אלמנט אחים ".lead-success" (מוסתר) שיוצג אחרי שליחה,
+     ובתוכו אלמנט [data-fill="#שדה"] שימולא בערך מהשדה (למשל שם הנפטר). */
+  function setupLeadForm(form) {
+    if (!form) return;
+    var status = form.querySelector(".form-status");
+    var btn = form.querySelector('button[type="submit"]');
+    var success = form.parentNode ? form.parentNode.querySelector(".lead-success") : null;
+    var subject = form.getAttribute("data-subject") || "פנייה מאתר הצדיק מעג׳ור";
+
+    function setStatus(msg, ok) {
+      if (!status) return;
+      status.innerHTML = msg;
+      status.style.color = ok === false ? "#f0b8b8" : "var(--gold-2)";
+    }
+    function fallbackWA() {
+      if (btn) btn.disabled = false;
+      var lines = "בס\"ד, פנייה מאתר הצדיק מעג׳ור:%0A%0A";
+      form.querySelectorAll("[name]").forEach(function (f) {
+        if (f.value && f.value.trim()) lines += encodeURIComponent((f.getAttribute("data-label") || f.name) + ": " + f.value.trim()) + "%0A";
+      });
+      var url = "https://wa.me/" + SITE_WA + "?text=" + lines;
+      setStatus('לשליחה, לחצו לוואטסאפ: <a href="' + url + '" target="_blank" rel="noopener" style="color:var(--gold-2);font-weight:700">פתיחת וואטסאפ »</a>');
+    }
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var req = form.querySelectorAll("[required]");
+      for (var i = 0; i < req.length; i++) {
+        if (!req[i].value.trim()) { setStatus("נא למלא את כל שדות החובה 🙏", false); req[i].focus(); return; }
+      }
+      if (btn) btn.disabled = true;
+      setStatus("שולח… 🕯️");
+
+      var data = { _subject: subject, _captcha: "false", _template: "table" };
+      form.querySelectorAll("[name]").forEach(function (f) {
+        if (f.value && f.value.trim()) data[f.getAttribute("data-label") || f.name] = f.value.trim();
+      });
+
+      sendLead(data).then(function (j) {
+        if (j && (j.success === "true" || j.success === true)) {
+          if (success) {
+            var fill = success.querySelector("[data-fill]");
+            if (fill) { var src = form.querySelector(fill.getAttribute("data-fill")); fill.textContent = src ? src.value.trim() : ""; }
+            form.style.display = "none";
+            success.hidden = false;
+            success.scrollIntoView({ behavior: "smooth", block: "center" });
+          } else {
+            setStatus("התקבל בהצלחה! תודה 🕯️", true);
+            form.reset();
+          }
+          if (btn) btn.disabled = false;
+        } else { fallbackWA(); }
+      }).catch(function () { fallbackWA(); });
+    });
+  }
+  $all_leadForms();
+  function $all_leadForms() {
+    document.querySelectorAll(".lead-form").forEach(function (f) { setupLeadForm(f); });
+  }
+
   /* ---------- שנה נוכחית בפוטר ---------- */
   var yearEl = document.getElementById("year");
   if (yearEl) yearEl.textContent = new Date().getFullYear();
@@ -184,7 +247,7 @@
       }
 
       sendLead({
-        _subject: "פנייה חדשה מאתר הצדיק מעג׳ור",
+        _subject: "✉️ צור קשר — אתר הצדיק מעג׳ור",
         _captcha: "false",
         _template: "table",
         "שם מלא": name.value.trim(),
@@ -569,7 +632,7 @@
       }
 
       var data = {
-        _subject: "עדות ישועה חדשה לארכיון – הצדיק מעג׳ור",
+        _subject: "📜 עדות לארכיון הישועות — אתר הצדיק מעג׳ור",
         _captcha: "false",
         _template: "table",
         "שם מלא": name.value.trim(),
