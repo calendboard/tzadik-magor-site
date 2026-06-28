@@ -29,6 +29,21 @@
     });
   }
 
+  /* אימות מייל וטלפון — לידים תקינים בלבד */
+  function validEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(v).trim()); }
+  function validPhone(v) {
+    var d = String(v).replace(/[^\d]/g, "");
+    return d.length >= 9 && d.length <= 15;
+  }
+  /* בודק שדות מייל/טלפון בטופס; מחזיר אלמנט שגוי או null */
+  function badContactField(form) {
+    var em = form.querySelector('input[type="email"]');
+    if (em && em.value.trim() && !validEmail(em.value)) return { el: em, msg: "כתובת האימייל אינה תקינה — נא לבדוק 🙏" };
+    var ph = form.querySelector('input[type="tel"]');
+    if (ph && ph.value.trim() && !validPhone(ph.value)) return { el: ph, msg: "מספר הטלפון אינו תקין — נא להזין מספר מלא 🙏" };
+    return null;
+  }
+
   /* שליחת פנייה דרך FormSubmit; מחזיר Promise. */
   function sendLead(data) {
     return fetch("https://formsubmit.co/ajax/" + SITE_EMAIL, {
@@ -71,6 +86,8 @@
       for (var i = 0; i < req.length; i++) {
         if (!req[i].value.trim()) { setStatus("נא למלא את כל שדות החובה 🙏", false); req[i].focus(); return; }
       }
+      var bad = badContactField(form);
+      if (bad) { setStatus(bad.msg, false); bad.el.focus(); return; }
       if (btn) btn.disabled = true;
       setStatus("שולח… 🕯️");
 
@@ -388,6 +405,8 @@
         if (status) { status.textContent = "נא למלא שם וטלפון 🙏"; status.style.color = "#f0b8b8"; }
         return;
       }
+      var badC = badContactField(form);
+      if (badC) { if (status) { status.textContent = badC.msg; status.style.color = "#f0b8b8"; } badC.el.focus(); return; }
       var btn = form.querySelector('button[type="submit"]');
       if (btn) { btn.disabled = true; }
       if (status) { status.style.color = "var(--gold-2)"; status.textContent = "שולח… 🕯️"; }
@@ -775,6 +794,8 @@
       if (consent && !consent.checked) {
         setStatus("נא לאשר את הפרסום באתר (אפשר בעילום שם) 🙏", false); return;
       }
+      var badA = badContactField(archForm);
+      if (badA) { setStatus(badA.msg, false); badA.el.focus(); return; }
       var btn = archForm.querySelector('button[type="submit"]');
       if (btn) { btn.disabled = true; }
       setStatus("שולח… 🕯️");
