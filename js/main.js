@@ -98,29 +98,54 @@
       .then(function () { loadCandleWall(); })
       .catch(function () {});
   }
+  var _candles = [];
+  function fmtDate(d) {
+    if (!d) return "";
+    var p = String(d).slice(0, 10).split("-");
+    return p.length === 3 ? p[2] + "." + p[1] + "." + p[0] : "";
+  }
+  function renderWall(filter) {
+    var wall = document.getElementById("candleWall");
+    if (!wall) return;
+    var list = _candles.slice().reverse();
+    filter = (filter || "").trim();
+    if (filter) list = list.filter(function (c) { return (c.name || "").indexOf(filter) !== -1; });
+    if (!list.length) {
+      wall.innerHTML = '<p class="cw-empty">' + (filter ? "לא נמצא נר בשם זה." : "עדיין לא הודלקו נרות — היו הראשונים להאיר 🕯️") + "</p>";
+      return;
+    }
+    wall.innerHTML = "";
+    list.slice(0, 400).forEach(function (c) {
+      var el = document.createElement("figure");
+      el.className = "wall-cell reveal in";
+      el.innerHTML =
+        '<div class="wall-candle" aria-hidden="true">' +
+          '<span class="wc-glow"></span><span class="wc-flame"></span>' +
+          '<span class="wc-wick"></span><span class="wc-wax"></span>' +
+        '</div>' +
+        '<figcaption class="wall-name"></figcaption><div class="wall-date"></div>';
+      el.querySelector(".wall-name").textContent = c.name || "";
+      el.querySelector(".wall-date").textContent = fmtDate(c.date);
+      wall.appendChild(el);
+    });
+  }
   function loadCandleWall() {
     var wall = document.getElementById("candleWall");
     if (!wall) return;
     fetch(CANDLE_API + "/latest", { headers: { "X-Bin-Meta": "false" } })
       .then(function (r) { return r.json(); })
       .then(function (rec) {
-        var list = (rec && rec.candles) || [];
+        _candles = (rec && rec.candles) || [];
         var countEl = document.getElementById("candleCount");
-        if (countEl) countEl.textContent = list.length.toLocaleString("he-IL");
-        wall.innerHTML = "";
-        if (!list.length) {
-          wall.innerHTML = '<p class="cw-empty">עדיין לא הודלקו נרות — היו הראשונים להאיר 🕯️</p>';
-          return;
-        }
-        list.slice().reverse().slice(0, 150).forEach(function (c) {
-          var el = document.createElement("div");
-          el.className = "cw-candle";
-          el.innerHTML = '<span class="cw-flame" aria-hidden="true"><i></i></span><span class="cw-name"></span>';
-          el.querySelector(".cw-name").textContent = c.name || "";
-          wall.appendChild(el);
-        });
+        if (countEl) countEl.textContent = _candles.length.toLocaleString("he-IL");
+        var search = document.getElementById("candleSearch");
+        renderWall(search ? search.value : "");
       })
-      .catch(function () {});
+      .catch(function () {
+        if (wall && !wall.children.length) wall.innerHTML = '<p class="cw-empty">לא ניתן לטעון את הקיר כרגע. נסו לרענן 🙏</p>';
+      });
+    var search = document.getElementById("candleSearch");
+    if (search && !search._wired) { search._wired = true; search.addEventListener("input", function () { renderWall(search.value); }); }
   }
   loadCandleWall();
 

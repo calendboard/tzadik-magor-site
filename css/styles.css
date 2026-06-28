@@ -715,19 +715,47 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
 .lead-success .ls-name{ color:var(--gold-2); font-weight:700; }
 .lead-success .ls-again{ display:inline-block; margin-top:22px; color:var(--gold-2); font-weight:600; text-decoration:underline; cursor:pointer; background:none; border:0; font-family:inherit; font-size:1rem; }
 
-/* ====================== קיר הנרות ====================== */
-.candle-wall{ display:flex; flex-wrap:wrap; gap:24px 12px; justify-content:center; max-width:960px; margin:10px auto 0; }
-.cw-candle{ display:flex; flex-direction:column; align-items:center; gap:8px; width:86px; }
-.cw-flame{ position:relative; width:18px; height:46px; display:block; }
-.cw-flame::after{ content:""; position:absolute; left:50%; bottom:0; transform:translateX(-50%); width:12px; height:30px; border-radius:3px;
-  background:linear-gradient(180deg,#fbeed0,#e6cd92); box-shadow:inset 0 -3px 5px rgba(0,0,0,.12); }
-.cw-flame i{ position:absolute; left:50%; bottom:30px; transform:translateX(-50%); width:9px; height:16px;
-  border-radius:50% 50% 50% 50% / 62% 62% 40% 40%;
-  background:radial-gradient(circle at 50% 72%, #fff6cf, #ffb43a 68%, #ff7a00);
-  box-shadow:0 0 13px 3px rgba(255,170,45,.6); transform-origin:50% 100%; animation:cwflick 1.7s ease-in-out infinite; }
-@keyframes cwflick{ 0%,100%{ transform:translateX(-50%) scale(1) rotate(-1.5deg); opacity:.92; } 50%{ transform:translateX(-50%) scale(1.07,1.13) rotate(1.5deg); opacity:1; } }
-.cw-name{ color:var(--gold-2); font-size:.82rem; text-align:center; line-height:1.32; max-width:86px; word-break:break-word; }
-.cw-empty{ text-align:center; color:var(--muted); font-size:1.04rem; width:100%; padding:18px 0; }
+/* ====================== קיר הנרות (פרימיום) ====================== */
 .candle-wall-head{ text-align:center; margin:0 0 6px; }
 .candle-wall-head .cw-count{ color:var(--gold-2); font-weight:800; }
-@media (prefers-reduced-motion: reduce){ .cw-flame i{ animation:none; } }
+.cw-count{ color:var(--gold-2); font-weight:800; }
+
+/* תיבת חיפוש */
+.candle-search-wrap{ max-width:440px; margin:0 auto 38px; position:relative; }
+.candle-search-wrap .cs-ico{ position:absolute; inset-inline-start:16px; top:50%; transform:translateY(-50%); color:var(--gold-3); font-size:1.05rem; pointer-events:none; }
+#candleSearch{ width:100%; padding:14px 46px 14px 18px; border-radius:999px; border:1px solid var(--line-2);
+  background:var(--bg-2); color:var(--cream); font-family:inherit; font-size:1rem; }
+#candleSearch:focus{ outline:none; border-color:var(--gold); box-shadow:0 0 0 3px rgba(216,179,73,.18); }
+
+/* רשת הקיר */
+.candle-wall{ display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:20px; max-width:1140px; margin:0 auto; }
+@media (max-width:560px){ .candle-wall{ grid-template-columns:repeat(auto-fill,minmax(108px,1fr)); gap:12px; } }
+
+/* תא נר — גומחה זוהרת */
+.wall-cell{ position:relative; margin:0; padding:30px 10px 16px; text-align:center; border-radius:16px; overflow:hidden;
+  background:
+    radial-gradient(circle at 50% 22%, rgba(255,176,70,.22), rgba(0,0,0,0) 58%),
+    linear-gradient(180deg,#2a1f12 0%,#1c1409 100%);
+  border:1px solid var(--line); box-shadow:0 12px 30px rgba(0,0,0,.4), inset 0 0 0 1px rgba(247,231,163,.05); }
+
+/* נר ריאליסטי */
+.wall-candle{ position:relative; width:34px; height:92px; margin:0 auto 16px; }
+.wall-candle .wc-wax{ position:absolute; left:50%; bottom:0; transform:translateX(-50%); width:24px; height:60px; border-radius:5px 5px 4px 4px;
+  background:linear-gradient(90deg,#cdb07c 0%,#fbf1d8 38%,#fff 50%,#f0dcae 64%,#c9a86f 100%);
+  box-shadow:inset 0 -4px 6px rgba(0,0,0,.18); }
+.wall-candle .wc-wax::before{ content:""; position:absolute; top:-3px; left:0; right:0; height:7px; border-radius:50%; background:#fff6e0; }
+.wall-candle .wc-wick{ position:absolute; left:50%; bottom:60px; transform:translateX(-50%); width:2px; height:7px; background:#3a2a16; border-radius:1px; }
+.wall-candle .wc-glow{ position:absolute; left:50%; bottom:50px; transform:translateX(-50%); width:74px; height:74px; border-radius:50%;
+  background:radial-gradient(circle, rgba(255,184,80,.55), rgba(255,150,40,0) 62%); animation:wcglow 2.6s ease-in-out infinite; }
+.wall-candle .wc-flame{ position:absolute; left:50%; bottom:64px; transform:translateX(-50%); width:16px; height:30px;
+  border-radius:50% 50% 50% 50% / 64% 64% 36% 36%;
+  background:radial-gradient(ellipse at 50% 78%, #fff7d4 0%, #ffd75e 32%, #ff9f2c 68%, #ff6a00 100%);
+  box-shadow:0 -3px 14px rgba(255,150,40,.7); transform-origin:50% 100%; animation:wcflick 1.9s ease-in-out infinite; }
+.wall-candle .wc-flame::before{ content:""; position:absolute; left:50%; bottom:-2px; transform:translateX(-50%); width:8px; height:11px; border-radius:50%; background:rgba(95,150,255,.45); }
+@keyframes wcflick{ 0%,100%{ transform:translateX(-50%) scaleY(1) rotate(-2deg); } 30%{ transform:translateX(-52%) scaleY(1.07) rotate(2deg); } 60%{ transform:translateX(-48%) scaleY(.96) rotate(-1deg); } }
+@keyframes wcglow{ 0%,100%{ opacity:.7; } 50%{ opacity:1; } }
+
+.wall-name{ color:var(--gold-2); font-family:var(--ff-serif); font-weight:700; font-size:.98rem; line-height:1.3; word-break:break-word; }
+.wall-date{ color:var(--muted); font-size:.74rem; margin-top:4px; }
+.cw-empty{ grid-column:1/-1; text-align:center; color:var(--muted); font-size:1.06rem; padding:30px 0; }
+@media (prefers-reduced-motion: reduce){ .wall-candle .wc-flame, .wall-candle .wc-glow{ animation:none; } }
