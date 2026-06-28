@@ -19,10 +19,11 @@
   <link rel="stylesheet" href="css/styles.css?v=658" />
 
   <style>
-    .wall-hero{ padding:122px 0 30px; text-align:center; position:relative; overflow:hidden; }
+    .wall-hero{ padding:114px 0 14px; text-align:center; position:relative; overflow:hidden; }
     .wall-hero::after{ content:""; position:absolute; inset:0; z-index:-1;
       background:radial-gradient(60% 50% at 50% 0%, rgba(216,179,73,.16), rgba(0,0,0,0) 70%); pointer-events:none; }
-    .wall-page{ padding:18px 0 72px; }
+    .wall-page{ padding:14px 0 72px; }
+    .wall-foot{ margin-top:56px; padding-top:42px; text-align:center; border-top:1px solid var(--line); }
   </style>
 </head>
 
@@ -61,27 +62,32 @@
   </header>
 
   <main id="main">
-    <!-- כותרת הקיר -->
+    <!-- כותרת תמציתית -->
     <section class="wall-hero">
       <div class="container">
-        <h1 class="section-title" style="font-size:clamp(2.6rem,7vw,4.4rem);margin-bottom:14px">נר ה׳ נשמת אדם<span class="sr-only"> · קיר נרות הנשמה על ציון הצדיק מעג׳ור</span></h1>
-        <p class="section-lead" style="max-width:680px;margin-inline:auto">
-          נרות נשמה שהודלקו לעילוי נשמת יקירים, מאירים על ציון הצדיק רבי יצחק גברא זצ״ל.
-        </p>
-        <p class="section-lead" style="margin-top:10px"><span class="cw-count" id="candleCount">0</span> נרות הודלקו עד כה.</p>
-        <div class="hero-actions" style="justify-content:center;margin-top:26px">
-          <a class="btn btn-gold btn-lg" href="ner.html">🕯️ הדליקו נר לזכר יקירכם</a>
-        </div>
+        <h1 class="section-title" style="font-size:clamp(2.4rem,6.5vw,4rem);margin:0">נר ה׳ נשמת אדם<span class="sr-only"> · קיר נרות הנשמה על ציון הצדיק מעג׳ור</span></h1>
       </div>
     </section>
 
+    <!-- הנרות — במוקד -->
     <section class="wall-page">
       <div class="container">
-        <div class="candle-search-wrap">
-          <span class="cs-ico" aria-hidden="true">🔍</span>
-          <input id="candleSearch" type="search" placeholder="חיפוש נר לפי שם…" aria-label="חיפוש נר לפי שם" />
-        </div>
         <div class="candle-wall" id="candleWall" aria-live="polite"></div>
+
+        <!-- ספירה, חיפוש והדלקת נר — בתחתית -->
+        <div class="wall-foot">
+          <p class="section-lead" style="margin:0 auto;max-width:640px">
+            נרות נשמה שהודלקו לעילוי נשמת יקירים, מאירים על ציון הצדיק רבי יצחק גברא זצ״ל.<br>
+            <span class="cw-count" id="candleCount">0</span> נרות הודלקו עד כה.
+          </p>
+          <div class="candle-search-wrap" style="margin:24px auto 0">
+            <span class="cs-ico" aria-hidden="true">🔍</span>
+            <input id="candleSearch" type="search" placeholder="חיפוש נר לפי שם…" aria-label="חיפוש נר לפי שם" />
+          </div>
+          <div class="hero-actions" style="justify-content:center;margin-top:28px">
+            <a class="btn btn-gold btn-lg" href="ner.html">🕯️ הדליקו נר לזכר יקירכם</a>
+          </div>
+        </div>
       </div>
     </section>
   </main>
