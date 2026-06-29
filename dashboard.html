@@ -106,6 +106,17 @@
         <input id="imgFile" type="file" accept="image/*" class="hidden" />
       </div>
       <div class="field">
+        <label>סרטון <span class="hint">(רשות — קישור יוטיוב או העלאת קובץ)</span></label>
+        <input id="fVideo" type="text" placeholder="הדביקו כאן קישור יוטיוב…" />
+        <div style="display:flex;gap:10px;align-items:center;margin-top:8px;flex-wrap:wrap">
+          <button type="button" id="vidUploadBtn" class="btn btn-ghost btn-sm">⬆ העלאת קובץ וידאו</button>
+          <button type="button" id="vidClearBtn" class="btn btn-ghost btn-sm hidden">✕ הסרת סרטון</button>
+          <span id="vidStatus" class="hint"></span>
+        </div>
+        <input id="vidFile" type="file" accept="video/*" class="hidden" />
+        <p class="hint" style="margin:6px 0 0">העלאת קובץ — עד ~50MB (לסרטונים ארוכים עדיף קישור יוטיוב).</p>
+      </div>
+      <div class="field">
         <label for="fTitle">כותרת <span style="color:var(--g)">*</span></label>
         <input id="fTitle" type="text" placeholder="כותרת הכתבה" />
       </div>
@@ -223,6 +234,8 @@
       $("fDate").value = a ? (a.date || "") : "";
       $("fExcerpt").value = a ? (a.excerpt || "") : "";
       $("fBody").value = a ? (a.body || "") : "";
+      $("fVideo").value = a ? (a.video_url || "") : "";
+      updateVidStatus();
       setPreview(pendingImageUrl);
       $("editMsg").textContent = "";
       $("editor").classList.remove("hidden");
@@ -277,6 +290,36 @@
       });
     }
 
+    /* ---------- וידאו (קישור יוטיוב או העלאת קובץ) ---------- */
+    function updateVidStatus() {
+      var url = $("fVideo").value.trim();
+      var clear = $("vidClearBtn"), st = $("vidStatus");
+      if (url) {
+        clear.classList.remove("hidden");
+        st.textContent = /youtu/.test(url) ? "סרטון יוטיוב מקושר ✓" : "קובץ וידאו מצורף ✓";
+        st.style.color = "#167a3a";
+      } else { clear.classList.add("hidden"); st.textContent = ""; }
+    }
+    $("fVideo").addEventListener("input", updateVidStatus);
+    $("vidClearBtn").addEventListener("click", function () { $("fVideo").value = ""; updateVidStatus(); });
+    $("vidUploadBtn").addEventListener("click", function () { $("vidFile").click(); });
+    $("vidFile").addEventListener("change", function () {
+      var file = this.files && this.files[0];
+      if (!file) return;
+      $("vidStatus").textContent = "מעלה סרטון… (עשוי לקחת זמן)"; $("vidStatus").style.color = "var(--muted)";
+      var ext = (file.name.split(".").pop() || "mp4").toLowerCase();
+      var name = "vid-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7) + "." + ext;
+      sb.storage.from("news-images").upload(name, file, { contentType: file.type || "video/mp4", upsert: true })
+        .then(function (res) {
+          if (res.error) {
+            $("vidStatus").textContent = "שגיאה בהעלאה (ייתכן שהקובץ גדול מ-50MB — נסו קישור יוטיוב).";
+            $("vidStatus").style.color = "#b23b3b"; return;
+          }
+          $("fVideo").value = sb.storage.from("news-images").getPublicUrl(name).data.publicUrl;
+          updateVidStatus();
+        });
+    });
+
     /* ---------- שמירה ---------- */
     $("saveBtn").addEventListener("click", function () {
       var title = $("fTitle").value.trim();
@@ -291,7 +334,8 @@
         date: $("fDate").value.trim(),
         excerpt: $("fExcerpt").value.trim(),
         body: body,
-        image_url: pendingImageUrl || null
+        image_url: pendingImageUrl || null,
+        video_url: $("fVideo").value.trim() || null
       };
       var btn = $("saveBtn"); btn.disabled = true;
       $("editMsg").textContent = "שומר…"; $("editMsg").style.color = "var(--muted)";

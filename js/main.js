@@ -757,6 +757,11 @@
     var SB_URL = "https://wfhgenhmoofyegysysac.supabase.co";
     var SB_KEY = "sb_publishable_XbSp3aL_Y_O3m8yzZ_qmOQ_vp5W3EYn";
 
+    function ytId(url) {
+      var m = String(url || "").match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/))([\w-]{11})/);
+      return m ? m[1] : null;
+    }
+
     function newsCard(a) {
       var c = document.createElement("article");
       c.className = "news-card";
@@ -773,6 +778,7 @@
       c.querySelector(".nc-date").textContent = a.date;
       c.querySelector(".nc-title").textContent = a.title;
       c.querySelector(".nc-excerpt").textContent = a.excerpt;
+      if (a.video) { var pb = document.createElement("span"); pb.className = "nc-play"; pb.setAttribute("aria-hidden", "true"); pb.textContent = "▶"; c.querySelector(".nc-img").appendChild(pb); }
       c.querySelector(".nc-more").addEventListener("click", function () { newsOpen(a); });
       return c;
     }
@@ -784,22 +790,39 @@
       '<div class="ysh-panel" role="dialog" aria-modal="true" aria-label="כתבה">' +
         '<button class="ysh-close" type="button" aria-label="סגירה">×</button>' +
         '<img class="ym-img nm-img" alt="" />' +
+        '<div class="nm-video"></div>' +
         '<span class="ym-tag nm-tag"></span>' +
         '<h3 class="ym-t nm-t"></h3>' +
         '<div class="ym-body nm-body"></div>' +
       '</div>';
     document.body.appendChild(nm);
     var nmImg = nm.querySelector(".nm-img"), nmTag = nm.querySelector(".nm-tag"),
-        nmT = nm.querySelector(".nm-t"), nmBody = nm.querySelector(".nm-body");
+        nmT = nm.querySelector(".nm-t"), nmBody = nm.querySelector(".nm-body"),
+        nmVideo = nm.querySelector(".nm-video");
     function newsOpen(a) {
       if (a.img) { nmImg.src = a.img; nmImg.style.display = ""; } else { nmImg.style.display = "none"; }
+      nmVideo.innerHTML = "";
+      if (a.video) {
+        var yt = ytId(a.video);
+        if (yt) {
+          var wrap = document.createElement("div"); wrap.className = "nm-video-wrap";
+          var ifr = document.createElement("iframe");
+          ifr.src = "https://www.youtube-nocookie.com/embed/" + yt;
+          ifr.title = "סרטון"; ifr.setAttribute("frameborder", "0"); ifr.allowFullscreen = true;
+          ifr.setAttribute("allow", "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture");
+          wrap.appendChild(ifr); nmVideo.appendChild(wrap);
+        } else {
+          var v = document.createElement("video"); v.className = "nm-video-el";
+          v.controls = true; v.preload = "metadata"; v.src = a.video; nmVideo.appendChild(v);
+        }
+      }
       nmTag.textContent = (a.cat ? a.cat + " · " : "") + a.date;
       nmT.textContent = a.title;
       nmBody.innerHTML = "";
       a.body.forEach(function (p) { var el = document.createElement("p"); el.textContent = p; nmBody.appendChild(el); });
       nm.classList.add("open"); document.body.style.overflow = "hidden";
     }
-    function newsClose() { nm.classList.remove("open"); document.body.style.overflow = ""; }
+    function newsClose() { nm.classList.remove("open"); nmVideo.innerHTML = ""; document.body.style.overflow = ""; }
     nm.querySelector(".ysh-close").addEventListener("click", newsClose);
     nm.querySelector(".ysh-modal-ov").addEventListener("click", newsClose);
     document.addEventListener("keydown", function (e) { if (e.key === "Escape") newsClose(); });
@@ -813,7 +836,7 @@
       .then(function (r) { return r.json(); })
       .then(function (rows) {
         var NEWS = (rows || []).map(function (a) {
-          return { date: a.date || "", cat: a.cat || "", img: a.image_url || "",
+          return { date: a.date || "", cat: a.cat || "", img: a.image_url || "", video: a.video_url || "",
             title: a.title || "", excerpt: a.excerpt || "",
             body: String(a.body || "").split(/\n{2,}/).map(function (s) { return s.trim(); }).filter(Boolean) };
         });
