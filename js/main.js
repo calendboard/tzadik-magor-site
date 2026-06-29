@@ -593,8 +593,10 @@
   /* ---------- שיתוף בוואטסאפ (כתובת חיה לפי הדומיין) ---------- */
   var waShare = document.querySelectorAll(".wa-share");
   if (waShare.length) {
-    var base = location.origin + location.pathname.replace(/[^/]*$/, "");
-    var msg = "בזכות הצדיק מעג׳ור — רבי יצחק גברא זצ״ל 🕯️ ישועות, סגולות והדלקת נר נשמה: " + base;
+    var site = location.origin + "/";
+    var msg = "🕯️ *הצדיק מעג׳ור — רבי יצחק גברא זצ״ל*\nפועל הישועות\n\n" +
+      "תולדות חייו, סגולות, סיפורי מופת, הדלקת נר נשמה ומסירת שם לתפילה על הציון 👇\n" +
+      site + "\n\nשתפו ותזכו לזכות הצדיק!";
     var href = "https://wa.me/?text=" + encodeURIComponent(msg);
     Array.prototype.forEach.call(waShare, function (el) { el.setAttribute("href", href); el.setAttribute("target", "_blank"); el.setAttribute("rel", "noopener"); });
   }
