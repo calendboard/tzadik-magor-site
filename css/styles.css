@@ -438,6 +438,9 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
   .stat-sep{ display:none; }
   .donate-banner-inner{ flex-direction:column; text-align:center; }
   .footer-bottom .container{ justify-content:center; text-align:center; }
+  /* שני כפתורי הפעולה תמיד זה לצד זה במובייל (מסתגל למספר הכפתורים) */
+  .hero-actions{ display:grid!important; grid-auto-flow:column; grid-auto-columns:1fr; gap:10px; flex-wrap:nowrap; }
+  .hero-actions .btn{ min-width:0; width:auto; padding:13px 8px; font-size:.86rem; line-height:1.25; }
 }
 @media (max-width:520px){
   .cards-grid,.stories-grid,.gallery-grid,.footer-grid{ grid-template-columns:1fr; }
@@ -450,8 +453,7 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
   .brand-text{ white-space:nowrap; }
   .brand-mark img,.brand-logo{ width:38px!important; height:38px!important; }
   .nav-cta{ flex-shrink:0; }
-  .hero-actions .btn,.hero-actions{ width:100%; }
-  .hero-actions{ flex-direction:column; gap:12px; }
+  .hero-actions .btn{ font-size:.8rem; padding:12px 6px; }
 }
 
 /* ===== כפתור חזרה למעלה ===== */
