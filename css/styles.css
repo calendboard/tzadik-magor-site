@@ -773,3 +773,17 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
   border:2px solid rgba(255,255,255,.85); pointer-events:none; }
 a.news-card{ text-decoration:none; color:inherit; cursor:pointer; }
 .nc-vthumb{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+
+/* ---------- כפתורי צף ליצירת קשר ---------- */
+.float-contact{ position:fixed; left:14px; top:50%; transform:translateY(-50%); z-index:950; display:flex; flex-direction:column; gap:12px; }
+.fc-btn{ width:50px; height:50px; border-radius:50%; display:grid; place-items:center; box-shadow:0 6px 18px rgba(0,0,0,.38); transition:transform .15s ease, filter .15s ease; }
+.fc-btn:hover{ transform:scale(1.09); filter:brightness(1.06); }
+.fc-btn svg{ width:28px; height:28px; display:block; }
+.fc-wa{ background:#25d366; }
+.fc-mail{ background:linear-gradient(135deg,#e0b94a,#c9952f); }
+@media (max-width:760px){
+  .float-contact{ left:10px; gap:10px; }
+  .fc-btn{ width:46px; height:46px; }
+  .fc-btn svg{ width:25px; height:25px; }
+}
+@media print{ .float-contact{ display:none !important; } }

@@ -13,6 +13,23 @@
   var SITE_EMAIL = "hatzadikmagor@gmail.com";
   var SITE_WA = "97226597098";
 
+  /* ---------- כפתורי צף ליצירת קשר (וואטסאפ + מייל) ---------- */
+  (function () {
+    if (document.querySelector(".float-contact")) return;
+    var wrap = document.createElement("div");
+    wrap.className = "float-contact";
+    var wa = document.createElement("a");
+    wa.className = "fc-btn fc-wa"; wa.href = "https://wa.me/" + SITE_WA;
+    wa.target = "_blank"; wa.rel = "noopener"; wa.setAttribute("aria-label", "וואטסאפ"); wa.title = "וואטסאפ";
+    wa.innerHTML = '<svg viewBox="0 0 32 32" aria-hidden="true"><path fill="#fff" d="M16 .4C7.4.4.5 7.3.5 15.9c0 2.8.7 5.4 2 7.8L.4 31.6l8.1-2.1c2.3 1.2 4.8 1.9 7.5 1.9 8.6 0 15.5-6.9 15.5-15.5S24.6.4 16 .4zm0 28.4c-2.4 0-4.7-.6-6.7-1.8l-.5-.3-5 1.3 1.3-4.9-.3-.5c-1.3-2.1-2-4.5-2-7 0-7.2 5.9-13.1 13.1-13.1S29.1 8.7 29.1 15.9 23.2 28.8 16 28.8z"/><path fill="#fff" d="M23.2 19.3c-.4-.2-2.3-1.1-2.7-1.3-.4-.1-.6-.2-.9.2-.3.4-1 1.3-1.2 1.5-.2.2-.4.3-.8.1-.4-.2-1.7-.6-3.2-2-1.2-1-2-2.3-2.2-2.7-.2-.4 0-.6.2-.8.2-.2.4-.4.5-.7.2-.2.2-.4.4-.6.1-.2.1-.5 0-.7-.1-.2-.9-2.1-1.2-2.9-.3-.7-.6-.6-.9-.6h-.7c-.2 0-.6.1-1 .5-.3.4-1.3 1.3-1.3 3.1s1.3 3.6 1.5 3.9c.2.2 2.6 4 6.3 5.6.9.4 1.6.6 2.1.8.9.3 1.7.2 2.3.2.7-.1 2.3-.9 2.6-1.8.3-.9.3-1.7.2-1.8-.1-.2-.3-.3-.7-.5z"/></svg>';
+    var ml = document.createElement("a");
+    ml.className = "fc-btn fc-mail"; ml.href = "mailto:" + SITE_EMAIL;
+    ml.setAttribute("aria-label", "אימייל"); ml.title = "שליחת אימייל";
+    ml.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="M3 7l9 6 9-6"/></svg>';
+    wrap.appendChild(wa); wrap.appendChild(ml);
+    (document.body || document.documentElement).appendChild(wrap);
+  })();
+
   /* זיהוי מגדר מתוך השם: "… בת …" = נקבה, "… בן …" = זכר. ריק = לא ידוע. */
   function nameGender(s) {
     s = " " + String(s || "").replace(/[׳'״"]/g, "") + " ";
