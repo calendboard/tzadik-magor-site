@@ -763,84 +763,60 @@
     }
 
     function newsCard(a) {
-      var c = document.createElement("article");
+      var c = document.createElement("a");
       c.className = "news-card";
+      c.href = "article.html?id=" + encodeURIComponent(a.id);
       c.innerHTML =
         '<div class="nc-img"></div>' +
         '<div class="nc-body">' +
           '<div class="nc-meta"><span class="nc-cat"></span><span class="nc-date"></span></div>' +
           '<h3 class="nc-title"></h3>' +
           '<p class="nc-excerpt"></p>' +
-          '<button class="nc-more" type="button">קרא עוד ›</button>' +
+          '<span class="nc-more">קרא עוד ›</span>' +
         '</div>';
-      if (a.img) c.querySelector(".nc-img").style.backgroundImage = "url('" + a.img + "')";
+      var ncImg = c.querySelector(".nc-img");
+      var thumb = a.img || (ytId(a.video) ? "https://img.youtube.com/vi/" + ytId(a.video) + "/hqdefault.jpg" : "");
+      if (thumb) { ncImg.style.backgroundImage = "url('" + thumb + "')"; }
+      else if (a.video) {
+        var vt = document.createElement("video"); vt.className = "nc-vthumb";
+        vt.src = a.video + "#t=0.1"; vt.muted = true; vt.preload = "metadata"; vt.setAttribute("playsinline", "");
+        ncImg.appendChild(vt);
+      }
       c.querySelector(".nc-cat").textContent = a.cat;
       c.querySelector(".nc-date").textContent = a.date;
       c.querySelector(".nc-title").textContent = a.title;
       c.querySelector(".nc-excerpt").textContent = a.excerpt;
-      if (a.video) { var pb = document.createElement("span"); pb.className = "nc-play"; pb.setAttribute("aria-hidden", "true"); pb.textContent = "▶"; c.querySelector(".nc-img").appendChild(pb); }
-      c.querySelector(".nc-more").addEventListener("click", function () { newsOpen(a); });
+      if (a.video) { var pb = document.createElement("span"); pb.className = "nc-play"; pb.setAttribute("aria-hidden", "true"); pb.textContent = "▶"; ncImg.appendChild(pb); }
       return c;
     }
-
-    var nm = document.createElement("div");
-    nm.className = "ysh-modal";
-    nm.innerHTML =
-      '<div class="ysh-modal-ov"></div>' +
-      '<div class="ysh-panel" role="dialog" aria-modal="true" aria-label="כתבה">' +
-        '<button class="ysh-close" type="button" aria-label="סגירה">×</button>' +
-        '<img class="ym-img nm-img" alt="" />' +
-        '<div class="nm-video"></div>' +
-        '<span class="ym-tag nm-tag"></span>' +
-        '<h3 class="ym-t nm-t"></h3>' +
-        '<div class="ym-body nm-body"></div>' +
-      '</div>';
-    document.body.appendChild(nm);
-    var nmImg = nm.querySelector(".nm-img"), nmTag = nm.querySelector(".nm-tag"),
-        nmT = nm.querySelector(".nm-t"), nmBody = nm.querySelector(".nm-body"),
-        nmVideo = nm.querySelector(".nm-video");
-    function newsOpen(a) {
-      if (a.img) { nmImg.src = a.img; nmImg.style.display = ""; } else { nmImg.style.display = "none"; }
-      nmVideo.innerHTML = "";
-      if (a.video) {
-        var yt = ytId(a.video);
-        if (yt) {
-          var wrap = document.createElement("div"); wrap.className = "nm-video-wrap";
-          var ifr = document.createElement("iframe");
-          ifr.src = "https://www.youtube-nocookie.com/embed/" + yt;
-          ifr.title = "סרטון"; ifr.setAttribute("frameborder", "0"); ifr.allowFullscreen = true;
-          ifr.setAttribute("allow", "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture");
-          wrap.appendChild(ifr); nmVideo.appendChild(wrap);
-        } else {
-          var v = document.createElement("video"); v.className = "nm-video-el";
-          v.controls = true; v.preload = "metadata"; v.src = a.video; nmVideo.appendChild(v);
-        }
-      }
-      nmTag.textContent = (a.cat ? a.cat + " · " : "") + a.date;
-      nmT.textContent = a.title;
-      nmBody.innerHTML = "";
-      a.body.forEach(function (p) { var el = document.createElement("p"); el.textContent = p; nmBody.appendChild(el); });
-      nm.classList.add("open"); document.body.style.overflow = "hidden";
-    }
-    function newsClose() { nm.classList.remove("open"); nmVideo.innerHTML = ""; document.body.style.overflow = ""; }
-    nm.querySelector(".ysh-close").addEventListener("click", newsClose);
-    nm.querySelector(".ysh-modal-ov").addEventListener("click", newsClose);
-    document.addEventListener("keydown", function (e) { if (e.key === "Escape") newsClose(); });
 
     function renderNews(NEWS) {
       if (newsGrid) { newsGrid.innerHTML = ""; NEWS.forEach(function (a) { newsGrid.appendChild(newsCard(a)); }); }
       if (newsTeaser) { newsTeaser.innerHTML = ""; NEWS.slice(0, 3).forEach(function (a) { newsTeaser.appendChild(newsCard(a)); }); }
     }
 
+    var activeTag = new URLSearchParams(location.search).get("tag");
+
     fetch(SB_URL + "/rest/v1/articles?select=*&order=sort.desc", { headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY } })
       .then(function (r) { return r.json(); })
       .then(function (rows) {
         var NEWS = (rows || []).map(function (a) {
-          return { date: a.date || "", cat: a.cat || "", img: a.image_url || "", video: a.video_url || "",
-            title: a.title || "", excerpt: a.excerpt || "",
-            body: String(a.body || "").split(/\n{2,}/).map(function (s) { return s.trim(); }).filter(Boolean) };
+          return { id: a.id, date: a.date || "", cat: a.cat || "", img: a.image_url || "", video: a.video_url || "",
+            title: a.title || "", excerpt: a.excerpt || "", tags: a.tags || "" };
         });
+        if (activeTag && newsGrid) {
+          NEWS = NEWS.filter(function (a) { return String(a.tags).toLowerCase().indexOf(String(activeTag).toLowerCase()) > -1; });
+          var hero = document.querySelector(".stories-hero .section-title");
+          if (hero) hero.textContent = "כתבות בנושא: " + activeTag;
+          var lead = document.querySelector(".stories-hero .section-lead");
+          if (lead) {
+            lead.textContent = 'מציג כתבות המתויגות “' + activeTag + '”. ';
+            var bk = document.createElement("a"); bk.href = "news.html"; bk.textContent = "‹ לכל הכתבות"; bk.style.color = "var(--gold-2)";
+            lead.appendChild(bk);
+          }
+        }
         renderNews(NEWS);
+        if (activeTag && newsGrid && !NEWS.length) newsGrid.innerHTML = '<p style="color:var(--muted);text-align:center;grid-column:1/-1">אין עדיין כתבות בנושא זה.</p>';
       })
       .catch(function () {
         if (newsGrid) newsGrid.innerHTML = '<p style="color:var(--muted);text-align:center;grid-column:1/-1">לא ניתן לטעון כעת את הכתבות. נסו לרענן.</p>';

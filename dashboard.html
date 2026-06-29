@@ -142,6 +142,10 @@
         <label for="fBody">גוף הכתבה <span style="color:var(--g)">*</span> <span class="hint">(שורה ריקה בין פסקה לפסקה)</span></label>
         <textarea id="fBody" rows="8" placeholder="כתבו כאן את הכתבה המלאה…&#10;&#10;להפרדת פסקה — השאירו שורה ריקה."></textarea>
       </div>
+      <div class="field">
+        <label for="fTags">תיוגים קשורים <span class="hint">(מופרדים בפסיק — יופיעו בתחתית הכתבה)</span></label>
+        <input id="fTags" type="text" placeholder="לדוגמה: הילולא, רבי אריה גברא, עג׳ור, תפילה" />
+      </div>
       <div class="editor-actions">
         <p id="editMsg" class="muted"></p>
         <button id="cancelBtn" class="btn btn-ghost" type="button">ביטול</button>
@@ -235,6 +239,7 @@
       $("fExcerpt").value = a ? (a.excerpt || "") : "";
       $("fBody").value = a ? (a.body || "") : "";
       $("fVideo").value = a ? (a.video_url || "") : "";
+      $("fTags").value = a ? (a.tags || "") : "";
       updateVidStatus();
       setPreview(pendingImageUrl);
       $("editMsg").textContent = "";
@@ -335,7 +340,8 @@
         excerpt: $("fExcerpt").value.trim(),
         body: body,
         image_url: pendingImageUrl || null,
-        video_url: $("fVideo").value.trim() || null
+        video_url: $("fVideo").value.trim() || null,
+        tags: $("fTags").value.trim() || null
       };
       var btn = $("saveBtn"); btn.disabled = true;
       $("editMsg").textContent = "שומר…"; $("editMsg").style.color = "var(--muted)";
