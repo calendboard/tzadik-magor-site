@@ -65,6 +65,12 @@
     .hidden{ display:none !important; }
     .spin{ display:inline-block; width:15px; height:15px; border:2px solid #fff; border-top-color:transparent; border-radius:50%; animation:sp .7s linear infinite; vertical-align:-2px; margin-inline-start:6px; }
     @keyframes sp{ to{ transform:rotate(360deg); } }
+    .gal-grid{ display:flex; flex-wrap:wrap; gap:10px; }
+    .gal-grid:empty{ display:none; }
+    .gal-item{ position:relative; width:96px; height:74px; border-radius:9px; overflow:hidden; border:1px solid var(--line); background:#eee center/cover no-repeat; }
+    .gal-item video{ width:100%; height:100%; object-fit:cover; }
+    .gal-item .gal-vid{ position:absolute; inset:0; display:grid; place-items:center; color:#fff; font-size:1.1rem; background:rgba(0,0,0,.25); pointer-events:none; }
+    .gal-item .gal-del{ position:absolute; top:3px; inset-inline-start:3px; width:22px; height:22px; border:0; border-radius:50%; background:rgba(178,59,59,.92); color:#fff; font-size:.8rem; cursor:pointer; line-height:1; display:grid; place-items:center; }
   </style>
 </head>
 <body>
@@ -118,6 +124,15 @@
         <p class="hint" style="margin:6px 0 0">העלאת קובץ — עד ~50MB (לסרטונים ארוכים עדיף קישור יוטיוב).</p>
       </div>
       <div class="field">
+        <label>גלריה — תמונות וסרטונים נוספים <span class="hint">(ללא הגבלה · יוצגו כגלריה בתוך הכתבה)</span></label>
+        <div id="galGrid" class="gal-grid"></div>
+        <div style="display:flex;gap:10px;align-items:center;margin-top:8px;flex-wrap:wrap">
+          <button type="button" id="galAddBtn" class="btn btn-ghost btn-sm">➕ הוספת תמונות / סרטונים</button>
+          <span id="galStatus" class="hint"></span>
+        </div>
+        <input id="galFiles" type="file" accept="image/*,video/*" multiple class="hidden" />
+      </div>
+      <div class="field">
         <label for="fTitle">כותרת <span style="color:var(--g)">*</span></label>
         <input id="fTitle" type="text" placeholder="כותרת הכתבה" />
       </div>
@@ -169,7 +184,8 @@
     var $ = function (id) { return document.getElementById(id); };
     var loginBox = $("login"), app = $("app");
     var editing = null;      // מזהה כתבה בעריכה (null = חדשה)
-    var pendingImageUrl = ""; // url התמונה הנוכחית בעורך
+    var pendingImageUrl = ""; // url התמונה הראשית בעורך
+    var pendingGallery = [];  // [{type:'image'|'video', url}] — גלריה
 
     /* ---------- כניסה ---------- */
     $("loginForm").addEventListener("submit", function (e) {
@@ -265,6 +281,9 @@
       $("fBody").value = a ? (a.body || "") : "";
       $("fVideo").value = a ? (a.video_url || "") : "";
       $("fTags").value = a ? (a.tags || "") : "";
+      pendingGallery = [];
+      if (a && a.gallery) { try { pendingGallery = JSON.parse(a.gallery) || []; } catch (e) { pendingGallery = []; } }
+      renderGallery();
       updateVidStatus();
       setPreview(pendingImageUrl);
       $("editMsg").textContent = "";
@@ -350,6 +369,46 @@
         });
     });
 
+    /* ---------- גלריה (תמונות + סרטונים, ללא הגבלה) ---------- */
+    function renderGallery() {
+      var g = $("galGrid"); if (!g) return; g.innerHTML = "";
+      pendingGallery.forEach(function (it, i) {
+        var cell = document.createElement("div"); cell.className = "gal-item";
+        if (it.type === "video") {
+          var v = document.createElement("video"); v.src = it.url + "#t=0.1"; v.muted = true; v.preload = "metadata"; cell.appendChild(v);
+          var pl = document.createElement("span"); pl.className = "gal-vid"; pl.textContent = "▶"; cell.appendChild(pl);
+        } else { cell.style.backgroundImage = "url('" + it.url + "')"; }
+        var del = document.createElement("button"); del.type = "button"; del.className = "gal-del"; del.textContent = "✕";
+        del.onclick = function () { pendingGallery.splice(i, 1); renderGallery(); };
+        cell.appendChild(del); g.appendChild(cell);
+      });
+    }
+    $("galAddBtn").addEventListener("click", function () { $("galFiles").click(); });
+    $("galFiles").addEventListener("change", function () {
+      var files = Array.prototype.slice.call(this.files || []);
+      if (!files.length) return;
+      this.value = "";
+      var total = files.length, done = 0;
+      $("galStatus").textContent = "מעלה " + total + " קבצים…"; $("galStatus").style.color = "var(--muted)";
+      function tick() { done++; if (done === total) { $("galStatus").textContent = "הועלו ✓"; $("galStatus").style.color = "#167a3a"; } }
+      files.forEach(function (file) {
+        var isVid = /^video\//.test(file.type);
+        var ext = isVid ? (file.name.split(".").pop() || "mp4").toLowerCase() : "jpg";
+        var name = (isVid ? "gvid-" : "gimg-") + Date.now() + "-" + Math.random().toString(36).slice(2, 7) + "." + ext;
+        function up(blob, ct) {
+          sb.storage.from("news-images").upload(name, blob, { contentType: ct, upsert: true }).then(function (res) {
+            if (!res.error) {
+              pendingGallery.push({ type: isVid ? "video" : "image", url: sb.storage.from("news-images").getPublicUrl(name).data.publicUrl });
+              renderGallery();
+            } else { $("galStatus").textContent = "שגיאה בהעלאת קובץ (אולי גדול מדי)."; $("galStatus").style.color = "#b23b3b"; }
+            tick();
+          });
+        }
+        if (isVid) up(file, file.type || "video/mp4");
+        else resizeImage(file, 1400, 0.82).then(function (b) { up(b, "image/jpeg"); }).catch(tick);
+      });
+    });
+
     /* ---------- שמירה ---------- */
     $("saveBtn").addEventListener("click", function () {
       var title = $("fTitle").value.trim();
@@ -366,7 +425,8 @@
         body: body,
         image_url: pendingImageUrl || null,
         video_url: $("fVideo").value.trim() || null,
-        tags: $("fTags").value.trim() || null
+        tags: $("fTags").value.trim() || null,
+        gallery: pendingGallery.length ? JSON.stringify(pendingGallery) : null
       };
       var btn = $("saveBtn"); btn.disabled = true;
       $("editMsg").textContent = "שומר…"; $("editMsg").style.color = "var(--muted)";

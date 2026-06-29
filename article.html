@@ -21,7 +21,7 @@
   <meta property="og:locale" content="he_IL" />
   <link rel="stylesheet" href="css/fonts.css" />
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="css/styles.css?v=679" />
+  <link rel="stylesheet" href="css/styles.css?v=680" />
   <style>
     .art-page{ max-width:760px; margin:0 auto; padding:118px 20px 60px; }
     .art-back{ display:inline-block; color:var(--gold-2); text-decoration:none; font-weight:600; margin-bottom:18px; }
@@ -40,6 +40,16 @@
       padding:6px 14px; border-radius:999px; font-size:.92rem; text-decoration:none; transition:background .15s; }
     .art-tag:hover{ background:rgba(247,231,163,.18); }
     .art-loading{ text-align:center; color:var(--muted); padding:80px 0; }
+    .art-gallery{ display:grid; grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); gap:10px; margin:30px 0 0; }
+    .ag-item{ position:relative; aspect-ratio:1/1; border-radius:12px; overflow:hidden; border:1px solid var(--line-2); background:#000 center/cover no-repeat; cursor:pointer; padding:0; }
+    .ag-item video{ width:100%; height:100%; object-fit:cover; }
+    .ag-play{ position:absolute; inset:0; margin:auto; width:40px; height:40px; display:grid; place-items:center; background:rgba(0,0,0,.5); color:#fff; border-radius:50%; border:2px solid rgba(255,255,255,.8); pointer-events:none; }
+    .ag-lightbox{ position:fixed; inset:0; z-index:2000; background:rgba(5,4,2,.94); display:flex; align-items:center; justify-content:center; padding:30px; }
+    .ag-lb-content{ display:flex; }
+    .ag-lb-content img, .ag-lb-content video{ max-width:94vw; max-height:86vh; border-radius:10px; display:block; }
+    .ag-lb-close{ position:fixed; top:16px; left:18px; width:42px; height:42px; border-radius:50%; background:rgba(255,255,255,.14); color:#fff; border:0; font-size:1.3rem; cursor:pointer; }
+    .ag-lb-nav{ position:fixed; top:50%; transform:translateY(-50%); width:48px; height:48px; border-radius:50%; background:rgba(255,255,255,.16); color:#fff; border:0; font-size:1.9rem; line-height:1; cursor:pointer; }
+    .ag-lb-prev{ right:16px; } .ag-lb-next{ left:16px; }
   </style>
 </head>
 
@@ -51,7 +61,7 @@
     <div class="container nav-wrap">
       <a class="brand" href="index.html#hero" aria-label="הצדיק מעג׳ור – לדף הבית">
         <span class="brand-mark" aria-hidden="true">
-          <img src="assets/logo-emblem.png?v=679" width="46" height="46" alt="" class="brand-logo" />
+          <img src="assets/logo-emblem.png?v=680" width="46" height="46" alt="" class="brand-logo" />
         </span>
         <span class="brand-text">הצדיק <b>מעג׳ור</b></span>
       </a>
@@ -149,6 +159,35 @@
 
     function el(tag, cls) { var e = document.createElement(tag); if (cls) e.className = cls; return e; }
 
+    function openLightbox(items, start) {
+      var i = start;
+      var ov = el("div", "ag-lightbox");
+      var content = el("div", "ag-lb-content");
+      var closeBtn = el("button", "ag-lb-close"); closeBtn.textContent = "✕"; closeBtn.setAttribute("aria-label", "סגירה");
+      ov.appendChild(content); ov.appendChild(closeBtn);
+      var prev, next;
+      if (items.length > 1) {
+        prev = el("button", "ag-lb-nav ag-lb-prev"); prev.textContent = "‹";
+        next = el("button", "ag-lb-nav ag-lb-next"); next.textContent = "›";
+        ov.appendChild(prev); ov.appendChild(next);
+        prev.onclick = function () { go(-1); }; next.onclick = function () { go(1); };
+      }
+      function show() {
+        content.innerHTML = "";
+        var it = items[i];
+        if (it.type === "video") { var v = el("video"); v.src = it.url; v.controls = true; v.autoplay = true; v.playsInline = true; content.appendChild(v); }
+        else { var img = el("img"); img.src = it.url; img.alt = ""; content.appendChild(img); }
+      }
+      function go(d) { i = (i + d + items.length) % items.length; show(); }
+      function close() { ov.remove(); document.body.style.overflow = ""; document.removeEventListener("keydown", onKey); }
+      function onKey(e) { if (e.key === "Escape") close(); else if (e.key === "ArrowLeft" && items.length > 1) go(1); else if (e.key === "ArrowRight" && items.length > 1) go(-1); }
+      closeBtn.onclick = close;
+      ov.onclick = function (e) { if (e.target === ov) close(); };
+      document.addEventListener("keydown", onKey);
+      document.body.appendChild(ov); document.body.style.overflow = "hidden";
+      show();
+    }
+
     function render(a) {
       document.title = (a.title || "כתבה") + " · הצדיק מעג׳ור";
       view.innerHTML = "";
@@ -186,6 +225,23 @@
         .forEach(function (p) { var pp = el("p"); pp.textContent = p; body.appendChild(pp); });
       view.appendChild(body);
 
+      // גלריה — תמונות וסרטונים נוספים
+      var gal = [];
+      if (a.gallery) { try { gal = JSON.parse(a.gallery) || []; } catch (e) { gal = []; } }
+      if (gal.length) {
+        var gwrap = el("div", "art-gallery");
+        gal.forEach(function (it, idx) {
+          var cell = el("button", "ag-item"); cell.type = "button";
+          if (it.type === "video") {
+            var gv = el("video"); gv.src = it.url + "#t=0.1"; gv.muted = true; gv.preload = "metadata"; cell.appendChild(gv);
+            var pl = el("span", "ag-play"); pl.textContent = "▶"; cell.appendChild(pl);
+          } else { cell.style.backgroundImage = "url('" + it.url + "')"; }
+          cell.onclick = function () { openLightbox(gal, idx); };
+          gwrap.appendChild(cell);
+        });
+        view.appendChild(gwrap);
+      }
+
       // שיתוף
       var share = el("div", "art-share");
       var lbl = el("span", "lbl"); lbl.textContent = "שיתוף:"; share.appendChild(lbl);
@@ -216,6 +272,6 @@
     }
   })();
   </script>
-  <script src="js/main.js?v=679" defer></script>
+  <script src="js/main.js?v=680" defer></script>
 </body>
 </html>
