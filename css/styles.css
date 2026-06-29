@@ -421,15 +421,17 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
   .footer-grid{ grid-template-columns:1fr 1fr; }
 }
 @media (max-width:760px){
+  /* תיקון: backdrop-filter בכותרת יוצר "containing block" שלוכד את התפריט הקבוע — מבטלים במובייל */
+  .site-header.scrolled{ backdrop-filter:none; -webkit-backdrop-filter:none; background:rgba(22,16,11,.98); }
   .main-nav{
-    position:fixed; inset:0 0 0 30%; flex-direction:column; gap:6px; padding:90px 22px 22px;
-    background:rgba(10,8,6,.97); backdrop-filter:blur(16px);
-    opacity:0; visibility:hidden; transform:translateY(-10px); pointer-events:none;
-    transition:opacity .3s ease, transform .3s ease, visibility .3s ease; border-left:1px solid var(--line);
+    position:fixed; top:0; left:0; right:0; bottom:0; z-index:1100;
+    flex-direction:column; align-items:stretch; gap:2px; padding:84px 20px 28px;
+    background:#15100b; opacity:0; visibility:hidden; transform:translateY(-10px); pointer-events:none;
+    overflow-y:auto; transition:opacity .3s ease, transform .3s ease, visibility .3s ease;
   }
   .main-nav.open{ opacity:1; visibility:visible; transform:none; pointer-events:auto; }
-  .main-nav a{ font-size:1.15rem; padding:12px 14px; }
-  .nav-toggle{ display:flex; }
+  .main-nav a{ font-size:1.25rem; padding:15px 14px; text-align:center; border-bottom:1px solid rgba(216,179,73,.1); }
+  .nav-toggle{ display:flex; position:relative; z-index:1200; }
   .nav-cta .btn-gold, .nav-cta-2{ display:none; }
   .section{ padding:72px 0; }
   .hero-stats{ gap:16px; }
