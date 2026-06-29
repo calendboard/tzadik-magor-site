@@ -190,9 +190,13 @@
       var share = el("div", "art-share");
       var lbl = el("span", "lbl"); lbl.textContent = "שיתוף:"; share.appendChild(lbl);
       var url = location.href;
+      var msg = "🕯️ *" + (a.title || "") + "*\n\n" +
+        (a.excerpt ? a.excerpt + "\n\n" : "") +
+        "👈 לכתבה המלאה:\n" + url + "\n\n" +
+        "— מתוך אתר הצדיק מעג׳ור · רבי יצחק גברא זצ״ל";
       var wa = el("a", "btn btn-ghost btn-sm");
-      wa.href = "https://wa.me/?text=" + encodeURIComponent((a.title || "") + "\n" + url);
-      wa.target = "_blank"; wa.rel = "noopener"; wa.textContent = "📲 וואטסאפ"; share.appendChild(wa);
+      wa.href = "https://wa.me/?text=" + encodeURIComponent(msg);
+      wa.target = "_blank"; wa.rel = "noopener"; wa.textContent = "📲 שיתוף בוואטסאפ"; share.appendChild(wa);
       var cp = el("button", "btn btn-ghost btn-sm"); cp.type = "button"; cp.textContent = "🔗 העתקת קישור";
       cp.onclick = function () { navigator.clipboard && navigator.clipboard.writeText(url); cp.textContent = "✓ הועתק"; };
       share.appendChild(cp);
