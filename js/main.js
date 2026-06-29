@@ -800,7 +800,7 @@
     fetch(SB_URL + "/rest/v1/articles?select=*&order=sort.desc", { headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY } })
       .then(function (r) { return r.json(); })
       .then(function (rows) {
-        var NEWS = (rows || []).map(function (a) {
+        var NEWS = (rows || []).filter(function (a) { return !a.deleted; }).map(function (a) {
           return { id: a.id, date: a.date || "", cat: a.cat || "", img: a.image_url || "", video: a.video_url || "",
             title: a.title || "", excerpt: a.excerpt || "", tags: a.tags || "" };
         });

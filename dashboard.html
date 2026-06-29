@@ -85,11 +85,12 @@
   <div id="app" class="wrap hidden">
     <div class="top">
       <div>
-        <h1>📰 ניהול כתבות</h1>
+        <h1 id="pageTitle">📰 ניהול כתבות</h1>
         <div class="who">מחובר/ת · <a href="index.html" target="_blank">צפייה באתר »</a></div>
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
         <button id="newBtn" class="btn">➕ כתבה חדשה</button>
+        <button id="trashBtn" class="btn btn-ghost btn-sm">🗑️ סל מיחזור</button>
         <button id="logoutBtn" class="btn btn-ghost btn-sm">יציאה</button>
       </div>
     </div>
@@ -195,14 +196,21 @@
     // אם כבר מחוברים (session שמור)
     sb.auth.getSession().then(function (r) { if (r.data && r.data.session) showApp(); });
 
-    /* ---------- טעינת הרשימה ---------- */
+    /* ---------- טעינת הרשימה (כתבות / סל מיחזור) ---------- */
+    var viewMode = "active";
     function loadArticles() {
       var list = $("list");
+      var isTrash = viewMode === "trash";
       list.innerHTML = '<p class="empty">טוען…</p>';
-      sb.from("articles").select("*").order("sort", { ascending: false }).then(function (res) {
+      sb.from("articles").select("*").eq("deleted", isTrash).order("sort", { ascending: false }).then(function (res) {
         if (res.error) { list.innerHTML = '<p class="empty">שגיאה בטעינה.</p>'; return; }
         var rows = res.data || [];
-        if (!rows.length) { list.innerHTML = '<p class="empty">אין עדיין כתבות. לחצו "כתבה חדשה" ➕</p>'; return; }
+        if (!rows.length) {
+          list.innerHTML = isTrash
+            ? '<p class="empty">סל המיחזור ריק 🗑️</p>'
+            : '<p class="empty">אין עדיין כתבות. לחצו "כתבה חדשה" ➕</p>';
+          return;
+        }
         list.innerHTML = "";
         rows.forEach(function (a) {
           var row = document.createElement("div");
@@ -217,16 +225,33 @@
           meta.textContent = [a.cat, a.date].filter(Boolean).join(" · ");
           info.appendChild(b); info.appendChild(meta);
           var acts = document.createElement("div"); acts.className = "acts";
-          var ed = document.createElement("button"); ed.className = "btn btn-ghost btn-sm"; ed.textContent = "✏️ עריכה";
-          ed.onclick = function () { openEditor(a); };
-          var del = document.createElement("button"); del.className = "btn btn-danger btn-sm"; del.textContent = "🗑️ מחיקה";
-          del.onclick = function () { deleteArticle(a); };
-          acts.appendChild(ed); acts.appendChild(del);
+          if (isTrash) {
+            var rs = document.createElement("button"); rs.className = "btn btn-ghost btn-sm"; rs.textContent = "↩️ שחזור";
+            rs.onclick = function () { restoreArticle(a); };
+            var pd = document.createElement("button"); pd.className = "btn btn-danger btn-sm"; pd.textContent = "❌ מחיקה לצמיתות";
+            pd.onclick = function () { purgeArticle(a); };
+            acts.appendChild(rs); acts.appendChild(pd);
+          } else {
+            var ed = document.createElement("button"); ed.className = "btn btn-ghost btn-sm"; ed.textContent = "✏️ עריכה";
+            ed.onclick = function () { openEditor(a); };
+            var del = document.createElement("button"); del.className = "btn btn-danger btn-sm"; del.textContent = "🗑️ מחיקה";
+            del.onclick = function () { trashArticle(a); };
+            acts.appendChild(ed); acts.appendChild(del);
+          }
           row.appendChild(thumb); row.appendChild(info); row.appendChild(acts);
           list.appendChild(row);
         });
       });
     }
+    $("trashBtn").addEventListener("click", function () {
+      viewMode = (viewMode === "trash") ? "active" : "trash";
+      var isTrash = viewMode === "trash";
+      $("trashBtn").textContent = isTrash ? "‹ חזרה לכתבות" : "🗑️ סל מיחזור";
+      $("pageTitle").textContent = isTrash ? "🗑️ סל מיחזור" : "📰 ניהול כתבות";
+      $("newBtn").style.display = isTrash ? "none" : "";
+      $("editor").classList.add("hidden");
+      loadArticles();
+    });
 
     /* ---------- עורך ---------- */
     function openEditor(a) {
@@ -357,8 +382,22 @@
     });
 
     /* ---------- מחיקה ---------- */
-    function deleteArticle(a) {
-      if (!confirm('למחוק את הכתבה "' + (a.title || "") + '"? פעולה זו אינה הפיכה.')) return;
+    /* ---------- מחיקה רכה / שחזור / מחיקה לצמיתות ---------- */
+    function trashArticle(a) {
+      if (!confirm('להעביר את הכתבה "' + (a.title || "") + '" לסל המיחזור?')) return;
+      sb.from("articles").update({ deleted: true }).eq("id", a.id).then(function (res) {
+        if (res.error) { alert("שגיאה: " + res.error.message); return; }
+        loadArticles();
+      });
+    }
+    function restoreArticle(a) {
+      sb.from("articles").update({ deleted: false }).eq("id", a.id).then(function (res) {
+        if (res.error) { alert("שגיאה בשחזור: " + res.error.message); return; }
+        loadArticles();
+      });
+    }
+    function purgeArticle(a) {
+      if (!confirm('למחוק לצמיתות את "' + (a.title || "") + '"?\nפעולה זו אינה הפיכה!')) return;
       sb.from("articles").delete().eq("id", a.id).then(function (res) {
         if (res.error) { alert("שגיאה במחיקה: " + res.error.message); return; }
         loadArticles();
