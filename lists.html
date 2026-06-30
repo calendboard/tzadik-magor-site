@@ -68,6 +68,13 @@
     .adm-cname{ font-weight:700; }
     .adm-ctopic{ color:var(--g2); }
     .adm-cmsg{ color:#3a3526; font-size:.97rem; margin:3px 0 2px; white-space:pre-wrap; word-break:break-word; }
+    /* ישועות — תגית סטטוס + כפתור אישור */
+    .adm-status{ font-size:.78rem; font-weight:700; padding:2px 9px; border-radius:999px; margin-inline-start:6px; white-space:nowrap; }
+    .adm-status.st-pending{ background:#fff4d6; color:#9a6b00; border:1px solid #e8cf86; }
+    .adm-status.st-approved{ background:#e3f6e8; color:#167a3a; border:1px solid #b6e0c2; }
+    .adm-approve{ background:#167a3a; color:#fff; border-color:#167a3a; }
+    .adm-approve:hover{ background:#10602e; }
+    .adm-cmsg{ margin-top:5px; }
     @media print{
       .adm-acts{ display:none; }
       .actions, .note, .filterbar, .codebar{ display:none; }
@@ -117,6 +124,11 @@
     </div>
 
     <div class="contacts-sec">
+      <h2>📜 ישועות אישיות — ממתינות לאישור (<span id="storyAdminCount">0</span>)</h2>
+      <ol id="storyAdminList"><li class="adm-empty">טוען…</li></ol>
+    </div>
+
+    <div class="contacts-sec">
       <h2>✉️ פניות מצור קשר (<span id="contactCount">0</span>)</h2>
       <ol id="contactList"><li class="adm-empty">טוען…</li></ol>
     </div>
@@ -124,6 +136,6 @@
     <p class="note">דף פנימי — אינו מקושר באתר ואינו מופיע בחיפוש. הנתונים מתעדכנים בזמן אמת מהמערכת.</p>
   </div>
 
-  <script src="js/main.js?v=697" defer></script>
+  <script src="js/main.js?v=698" defer></script>
 </body>
 </html>

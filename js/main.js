@@ -223,6 +223,7 @@
         if (!Array.isArray(rec.candles)) rec.candles = [];
         if (!Array.isArray(rec.prayers)) rec.prayers = [];
         if (!Array.isArray(rec.contacts)) rec.contacts = [];
+        if (!Array.isArray(rec.stories)) rec.stories = [];
         var exists = rec[key].some(function (x) { return x && x._id === item._id; });
         if (!exists) rec[key].push(item);
         return fetch(CANDLE_API, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(rec) });
@@ -262,6 +263,22 @@
         request: String(p.request || "").substring(0, 40),
         date: new Date().toISOString().slice(0, 10),
         enc: enc
+      });
+    });
+  }
+  /* שמירת ישועה אישית לדשבורד — ממתינה לאישור. פרטי המוסר (שם/טלפון) מוצפנים;
+     שדות הפרסום (סוג, שם לפרסום, הסיפור) גלויים כי הם מיועדים לפרסום לאחר אישור. */
+  function appendStory(s) {
+    s = s || {};
+    encryptBig({ name: s.name || "", phone: s.phone || "" }).then(function (encb) {
+      appendToBin("stories", {
+        type: String(s.type || "").substring(0, 40),
+        public_name: String(s.public_name || "").substring(0, 60),
+        story: String(s.story || "").substring(0, 1500),
+        status: "pending",
+        date: new Date().toISOString().slice(0, 10),
+        ts: new Date().toISOString(),
+        encb: encb
       });
     });
   }
@@ -363,6 +380,31 @@
   }
   loadCandleWall();
 
+  /* ---------- ישועות מהקהל (מאושרות) בדף הישועות ---------- */
+  function loadUserStories() {
+    var box = document.getElementById("userStories");
+    if (!box) return;
+    fetch(CANDLE_API + "/latest", { headers: { "X-Bin-Meta": "false" } })
+      .then(function (r) { return r.json(); })
+      .then(function (rec) {
+        var list = (((rec && rec.stories) || []).filter(function (s) { return s && s.status === "approved"; })).reverse();
+        var head = document.getElementById("userStoriesHead");
+        if (!list.length) { box.style.display = "none"; if (head) head.style.display = "none"; return; }
+        box.style.display = ""; if (head) head.style.display = "";
+        box.innerHTML = "";
+        list.slice(0, 200).forEach(function (s) {
+          var f = document.createElement("figure"); f.className = "testimony-card";
+          f.innerHTML = '<span class="tc-tag"></span><blockquote class="tc-body"></blockquote><figcaption class="tc-by"><b></b></figcaption>';
+          f.querySelector(".tc-tag").textContent = s.type || "ישועה";
+          f.querySelector(".tc-body").textContent = s.story || "";
+          f.querySelector(".tc-by b").textContent = s.public_name || "מתפלל/ת (בעילום שם)";
+          box.appendChild(f);
+        });
+      })
+      .catch(function () { box.style.display = "none"; });
+  }
+  loadUserStories();
+
   /* ---------- דף הרשימות (admin): שמות לתפילה + נרות, עם תאריך וסינון ---------- */
   var _admData = null, _admDays = null, _admDate = "";
   function withinDays(dateStr, days) {
@@ -438,9 +480,20 @@
       var inp = document.createElement("input"); inp.type = "text"; inp.value = val || ""; inp.setAttribute("data-key", key);
       w.appendChild(s); w.appendChild(inp); return w;
     }
+    function area(label, key, val) {
+      var w = document.createElement("label"); w.className = "adm-fld";
+      var s = document.createElement("span"); s.textContent = label;
+      var inp = document.createElement("textarea"); inp.rows = 5; inp.value = val || ""; inp.setAttribute("data-key", key);
+      w.appendChild(s); w.appendChild(inp); return w;
+    }
     if (kind === "prayers") {
       form.appendChild(fld("שם לתפילה", "name", item.name));
       form.appendChild(fld("בקשה", "request", item.request));
+      form.appendChild(fld("תאריך (YYYY-MM-DD)", "date", item.date));
+    } else if (kind === "stories") {
+      form.appendChild(fld("סוג הישועה", "type", item.type));
+      form.appendChild(fld("שם לפרסום", "public_name", item.public_name));
+      form.appendChild(area("הסיפור", "story", item.story));
       form.appendChild(fld("תאריך (YYYY-MM-DD)", "date", item.date));
     } else {
       form.appendChild(fld("שם הנפטר/ת", "name", item.name));
@@ -454,8 +507,9 @@
     var cancel = document.createElement("button"); cancel.type = "button"; cancel.className = "adm-btn"; cancel.textContent = "ביטול";
     save.onclick = function () {
       var fields = {};
-      form.querySelectorAll("input[data-key]").forEach(function (inp) { fields[inp.getAttribute("data-key")] = inp.value.trim(); });
-      if (!fields.name) { alert("חובה למלא שם 🙏"); return; }
+      form.querySelectorAll("[data-key]").forEach(function (inp) { fields[inp.getAttribute("data-key")] = inp.value.trim(); });
+      if (kind === "stories") { if (!fields.story) { alert("חובה למלא את הסיפור 🙏"); return; } }
+      else if (!fields.name) { alert("חובה למלא שם 🙏"); return; }
       save.disabled = true; save.textContent = "שומר…";
       onSave(fields);
     };
@@ -496,6 +550,7 @@
         if (!Array.isArray(rec.candles)) rec.candles = [];
         if (!Array.isArray(rec.prayers)) rec.prayers = [];
         if (!Array.isArray(rec.contacts)) rec.contacts = [];
+        if (!Array.isArray(rec.stories)) rec.stories = [];
         mutator(rec);
         return fetch(CANDLE_API, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(rec) })
           .then(function () { return fetch(CANDLE_API + "/latest", { headers: { "X-Bin-Meta": "false" }, cache: "no-store" }); })
@@ -545,17 +600,56 @@
     li.appendChild(wrap);
     return li;
   }
+  /* שורת ישועה אישית בדשבורד — עם אישור/הסתרה/עריכה/מחיקה */
+  function admStoryRow(item) {
+    var li = document.createElement("li");
+    var wrap = document.createElement("div"); wrap.className = "adm-rowwrap";
+    var approved = item.status === "approved";
+    var view = document.createElement("span"); view.className = "adm-view";
+    view.innerHTML = '<b class="adm-cname"></b><span class="adm-status"></span><span class="adm-ctopic"></span><div class="adm-cmsg"></div><span class="adm-cphone adm-contact"></span><span class="adm-date"></span>';
+    view.querySelector(".adm-cname").textContent = item.public_name || "(ללא שם פרסום)";
+    var st = view.querySelector(".adm-status"); st.textContent = approved ? "✓ מפורסם" : "⏳ ממתין"; st.className = "adm-status " + (approved ? "st-approved" : "st-pending");
+    view.querySelector(".adm-ctopic").textContent = item.type ? (" · " + item.type) : "";
+    view.querySelector(".adm-cmsg").textContent = item.story || "";
+    view.querySelector(".adm-date").textContent = item.date ? fmtFullDate(item.date) : "";
+    if (_admKey) { decryptBig(item.encb).then(function (o) { if (o) view.querySelector(".adm-cphone").textContent = "  (" + (o.name || "") + (o.phone ? " · 📞 " + o.phone : "") + ")"; }); }
+    wrap.appendChild(view);
+    if (_admKey) {
+      var acts = document.createElement("span"); acts.className = "adm-acts";
+      var ap = document.createElement("button"); ap.type = "button"; ap.className = "adm-btn adm-approve"; ap.textContent = approved ? "↩️ הסתרה" : "✓ אישור";
+      ap.onclick = function () { admSetStoryStatus(item._id, approved ? "pending" : "approved"); };
+      var ed = document.createElement("button"); ed.type = "button"; ed.className = "adm-btn"; ed.textContent = "✏️"; ed.title = "עריכה";
+      ed.onclick = function () { admOpenEdit(wrap, "stories", item); };
+      var del = document.createElement("button"); del.type = "button"; del.className = "adm-btn adm-del"; del.textContent = "🗑️"; del.title = "מחיקה";
+      del.onclick = function () { if (confirm("למחוק את הישועה?")) admDelete("stories", item._id); };
+      acts.appendChild(ap); acts.appendChild(ed); acts.appendChild(del);
+      wrap.appendChild(acts);
+    }
+    li.appendChild(wrap);
+    return li;
+  }
+  function admSetStoryStatus(id, status) {
+    admPersist(function (rec) { (rec.stories || []).forEach(function (it) { if (it && it._id === id) it.status = status; }); },
+      function (ok) { if (!ok) alert("הפעולה נכשלה, נסו שוב 🙏"); });
+  }
   function renderAdmin() {
     if (!_admData) return;
     var pWrap = document.getElementById("prayerList");
     var cWrap = document.getElementById("candleList");
     var ctWrap = document.getElementById("contactList");
+    var saWrap = document.getElementById("storyAdminList");
     var prayers = (_admData.prayers || []).slice().reverse().filter(function (p) { return admPass(p.date); });
     var candles = (_admData.candles || []).slice().reverse().filter(function (c) { return admPass(c.date); });
     var contacts = (_admData.contacts || []).slice().reverse().filter(function (c) { return admPass(c.date); });
+    var stories = (_admData.stories || []).slice().reverse().filter(function (s) { return admPass(s.date); });
     var pc = document.getElementById("prayerCount"); if (pc) pc.textContent = prayers.length;
     var clc = document.getElementById("candleListCount"); if (clc) clc.textContent = candles.length;
     var ctc = document.getElementById("contactCount"); if (ctc) ctc.textContent = contacts.length;
+    var sac = document.getElementById("storyAdminCount"); if (sac) sac.textContent = stories.filter(function (s) { return s.status !== "approved"; }).length;
+    if (saWrap) {
+      saWrap.innerHTML = stories.length ? "" : '<li class="adm-empty">אין ישועות בטווח זה.</li>';
+      stories.forEach(function (s) { saWrap.appendChild(admStoryRow(s)); });
+    }
     if (pWrap) {
       pWrap.innerHTML = prayers.length ? "" : '<li class="adm-empty">אין רשומות בטווח זה.</li>';
       prayers.forEach(function (p) { pWrap.appendChild(admRow("prayers", p)); });
@@ -591,7 +685,7 @@
         .then(function (rec) {
           rec = rec || {};
           var changed = false;
-          ["candles", "prayers", "contacts"].forEach(function (k) {
+          ["candles", "prayers", "contacts", "stories"].forEach(function (k) {
             if (!Array.isArray(rec[k])) rec[k] = [];
             rec[k].forEach(function (it) { if (it && !it._id) { it._id = uid(); changed = true; } });
           });
@@ -1260,6 +1354,9 @@
         "הסיפור": aVal("#aStory"),
         "אישור פרסום": "כן"
       };
+
+      /* שמירה לדשבורד כ"ממתין לאישור" — בנוסף למייל */
+      appendStory({ name: aVal("#aName"), phone: aVal("#aPhone"), type: aVal("#aType"), public_name: aVal("#aPublic"), story: aVal("#aStory") });
 
       sendLead(data).then(function (j) {
         if (j && (j.success === "true" || j.success === true)) {
