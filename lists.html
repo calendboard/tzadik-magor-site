@@ -50,8 +50,9 @@
     .adm-edit{ width:100%; display:grid; gap:9px; padding:6px 0 4px; }
     .adm-fld{ display:grid; gap:3px; }
     .adm-fld span{ font-size:.8rem; color:#8a8270; font-weight:600; }
-    .adm-fld input{ padding:8px 11px; border:1px solid #d8d2c4; border-radius:8px; font-family:inherit; font-size:.97rem; background:#fff; }
-    .adm-fld input:focus{ outline:none; border-color:var(--g); }
+    .adm-fld input, .adm-fld textarea{ padding:8px 11px; border:1px solid #d8d2c4; border-radius:8px; font-family:inherit; font-size:.97rem; background:#fff; width:100%; }
+    .adm-fld textarea{ resize:vertical; line-height:1.6; }
+    .adm-fld input:focus, .adm-fld textarea:focus{ outline:none; border-color:var(--g); }
     .adm-editbar{ display:flex; gap:8px; margin-top:2px; }
     .adm-save{ background:var(--g); color:#fff; border-color:var(--g); }
     .adm-save:hover{ background:var(--g2); }
@@ -124,7 +125,7 @@
     </div>
 
     <div class="contacts-sec">
-      <h2>📜 ישועות אישיות — ממתינות לאישור (<span id="storyAdminCount">0</span>)</h2>
+      <h2>📜 ישועות אישיות — ממתינות לאישור (<span id="storyAdminCount">0</span>) <button type="button" id="addStory" class="adm-add hidden">➕ הוספת ישועה</button></h2>
       <ol id="storyAdminList"><li class="adm-empty">טוען…</li></ol>
     </div>
 
@@ -136,6 +137,6 @@
     <p class="note">דף פנימי — אינו מקושר באתר ואינו מופיע בחיפוש. הנתונים מתעדכנים בזמן אמת מהמערכת.</p>
   </div>
 
-  <script src="js/main.js?v=698" defer></script>
+  <script src="js/main.js?v=699" defer></script>
 </body>
 </html>

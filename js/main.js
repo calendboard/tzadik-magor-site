@@ -524,10 +524,11 @@
     wrap.innerHTML = ""; wrap.appendChild(form);
     var f0 = form.querySelector("input"); if (f0) f0.focus();
   }
-  /* הוספת רשומה חדשה (נר/תפילה) ידנית מהדשבורד */
+  /* הוספת רשומה חדשה (נר/תפילה/ישועה) ידנית מהדשבורד */
   function admAdd(kind) {
     if (!_admKey) return;
-    var listEl = document.getElementById(kind === "prayers" ? "prayerList" : "candleList");
+    var listId = kind === "prayers" ? "prayerList" : kind === "stories" ? "storyAdminList" : "candleList";
+    var listEl = document.getElementById(listId);
     if (!listEl) return;
     if (listEl.querySelector(".adm-newrow")) return;
     var today = new Date().toISOString().slice(0, 10);
@@ -535,11 +536,12 @@
     var form = admFormEl(kind, { date: today }, function (fields) {
       fields.date = fields.date || today;
       fields._id = uid();
+      if (kind === "stories") fields.status = "approved";
       admPersist(function (rec) { rec[kind].push(fields); }, function (ok) { if (!ok) alert("ההוספה נכשלה, נסו שוב 🙏"); });
     });
     li.appendChild(form);
     listEl.insertBefore(li, listEl.firstChild);
-    var f0 = form.querySelector("input"); if (f0) f0.focus();
+    var f0 = form.querySelector("input, textarea"); if (f0) f0.focus();
   }
   /* קריאה טרייה → שינוי לפי _id → כתיבה → אימות → רענון התצוגה */
   function admPersist(mutator, after) {
@@ -676,6 +678,7 @@
     var lb = document.getElementById("admLock"); if (lb) lb.hidden = !_admKey;
     var addP = document.getElementById("addPrayer"); if (addP) addP.classList.toggle("hidden", !_admKey);
     var addC = document.getElementById("addCandle"); if (addC) addC.classList.toggle("hidden", !_admKey);
+    var addS = document.getElementById("addStory"); if (addS) addS.classList.toggle("hidden", !_admKey);
   }
   function loadAdminLists() {
     if (!document.getElementById("prayerList") && !document.getElementById("candleList")) return;
@@ -724,6 +727,8 @@
     if (addP && !addP._wired) { addP._wired = true; addP.addEventListener("click", function () { admAdd("prayers"); }); }
     var addC = document.getElementById("addCandle");
     if (addC && !addC._wired) { addC._wired = true; addC.addEventListener("click", function () { admAdd("candles"); }); }
+    var addS = document.getElementById("addStory");
+    if (addS && !addS._wired) { addS._wired = true; addS.addEventListener("click", function () { admAdd("stories"); }); }
     var fb = document.getElementById("admFilter");
     if (fb && !fb._wired) {
       fb._wired = true;
