@@ -811,7 +811,7 @@
 
     function renderNews(NEWS) {
       if (newsGrid) { newsGrid.innerHTML = ""; NEWS.forEach(function (a) { newsGrid.appendChild(newsCard(a)); }); }
-      if (newsTeaser) { newsTeaser.innerHTML = ""; NEWS.slice(0, 3).forEach(function (a) { newsTeaser.appendChild(newsCard(a)); }); }
+      if (newsTeaser) { newsTeaser.innerHTML = ""; NEWS.slice(0, 6).forEach(function (a) { newsTeaser.appendChild(newsCard(a)); }); }
     }
 
     var activeTag = new URLSearchParams(location.search).get("tag");
