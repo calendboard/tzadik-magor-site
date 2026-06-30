@@ -133,6 +133,23 @@
     var success = form.parentNode ? form.parentNode.querySelector(".lead-success") : null;
     var subject = form.getAttribute("data-subject") || "פנייה מאתר הצדיק מעג׳ור";
 
+    /* כפתור "עוד פעם" במסך ההצלחה — מאפס וחוזר לטופס */
+    if (success) {
+      var again = success.querySelector(".ls-again");
+      if (again && !again._wired) {
+        again._wired = true;
+        again.addEventListener("click", function () {
+          form.reset();
+          form.style.display = "";
+          success.hidden = true;
+          if (status) status.textContent = "";
+          if (btn) btn.disabled = false;
+          form.scrollIntoView({ behavior: "smooth", block: "center" });
+          var f0 = form.querySelector("input, textarea, select"); if (f0) f0.focus();
+        });
+      }
+    }
+
     function setStatus(msg, ok) {
       if (!status) return;
       status.innerHTML = msg;
