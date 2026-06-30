@@ -30,7 +30,11 @@
     ml.className = "fc-btn fc-mail"; ml.href = "mailto:" + SITE_EMAIL;
     ml.setAttribute("aria-label", "אימייל"); ml.title = "שליחת אימייל";
     ml.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="M3 7l9 6 9-6"/></svg>';
-    wrap.appendChild(ph); wrap.appendChild(wa); wrap.appendChild(ml);
+    var dn = document.createElement("a");
+    dn.className = "fc-btn fc-donate"; dn.href = "donate.html";
+    dn.setAttribute("aria-label", "תרומה"); dn.title = "לתרומה והקדשה";
+    dn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="#fff"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>';
+    wrap.appendChild(ph); wrap.appendChild(wa); wrap.appendChild(dn); wrap.appendChild(ml);
     (document.body || document.documentElement).appendChild(wrap);
   })();
 
