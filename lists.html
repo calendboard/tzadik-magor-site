@@ -55,6 +55,10 @@
     .adm-editbar{ display:flex; gap:8px; margin-top:2px; }
     .adm-save{ background:var(--g); color:#fff; border-color:var(--g); }
     .adm-save:hover{ background:var(--g2); }
+    .adm-add{ background:var(--g); color:#fff; border:0; border-radius:7px; padding:5px 12px; font-size:.85rem; font-weight:600; cursor:pointer; font-family:inherit; vertical-align:middle; margin-inline-start:6px; }
+    .adm-add:hover{ background:var(--g2); }
+    .adm-add.hidden{ display:none; }
+    .adm-newrow{ background:#fbf8f1; border:1px solid #e3ddcd; border-radius:10px; padding:10px 12px; margin:6px 0 12px; list-style:none; }
     @media print{
       .adm-acts{ display:none; }
       .actions, .note, .filterbar, .codebar{ display:none; }
@@ -92,11 +96,11 @@
 
     <div class="cols">
       <div class="col">
-        <h2>🙏 שמות לתפילה (<span id="prayerCount">0</span>)</h2>
+        <h2>🙏 שמות לתפילה (<span id="prayerCount">0</span>) <button type="button" id="addPrayer" class="adm-add hidden">➕ הוספת שם</button></h2>
         <ol id="prayerList"><li class="adm-empty">טוען…</li></ol>
       </div>
       <div class="col">
-        <h2>🕯️ נרות נשמה (<span id="candleListCount">0</span>)</h2>
+        <h2>🕯️ נרות נשמה (<span id="candleListCount">0</span>) <button type="button" id="addCandle" class="adm-add hidden">➕ הוספת נר</button></h2>
         <ol id="candleList"><li class="adm-empty">טוען…</li></ol>
       </div>
     </div>
@@ -104,6 +108,6 @@
     <p class="note">דף פנימי — אינו מקושר באתר ואינו מופיע בחיפוש. הנתונים מתעדכנים בזמן אמת מהמערכת.</p>
   </div>
 
-  <script src="js/main.js?v=691" defer></script>
+  <script src="js/main.js?v=692" defer></script>
 </body>
 </html>

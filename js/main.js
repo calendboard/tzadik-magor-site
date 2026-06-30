@@ -340,8 +340,8 @@
     li.appendChild(wrap);
     return li;
   }
-  /* טופס עריכה inline בתוך השורה */
-  function admOpenEdit(wrap, kind, item) {
+  /* בונה טופס עם השדות המתאימים (משמש גם לעריכה וגם להוספה) */
+  function admFormEl(kind, item, onSave) {
     var form = document.createElement("div"); form.className = "adm-edit";
     function fld(label, key, val) {
       var w = document.createElement("label"); w.className = "adm-fld";
@@ -366,13 +366,36 @@
     save.onclick = function () {
       var fields = {};
       form.querySelectorAll("input[data-key]").forEach(function (inp) { fields[inp.getAttribute("data-key")] = inp.value.trim(); });
+      if (!fields.name) { alert("חובה למלא שם 🙏"); return; }
       save.disabled = true; save.textContent = "שומר…";
-      admEdit(kind, item._id, fields);
+      onSave(fields);
     };
     cancel.onclick = function () { renderAdmin(); };
     bar.appendChild(save); bar.appendChild(cancel);
     form.appendChild(bar);
+    return form;
+  }
+  /* טופס עריכה inline בתוך השורה */
+  function admOpenEdit(wrap, kind, item) {
+    var form = admFormEl(kind, item, function (fields) { admEdit(kind, item._id, fields); });
     wrap.innerHTML = ""; wrap.appendChild(form);
+    var f0 = form.querySelector("input"); if (f0) f0.focus();
+  }
+  /* הוספת רשומה חדשה (נר/תפילה) ידנית מהדשבורד */
+  function admAdd(kind) {
+    if (!_admKey) return;
+    var listEl = document.getElementById(kind === "prayers" ? "prayerList" : "candleList");
+    if (!listEl) return;
+    if (listEl.querySelector(".adm-newrow")) return;
+    var today = new Date().toISOString().slice(0, 10);
+    var li = document.createElement("li"); li.className = "adm-newrow";
+    var form = admFormEl(kind, { date: today }, function (fields) {
+      fields.date = fields.date || today;
+      fields._id = uid();
+      admPersist(function (rec) { rec[kind].push(fields); }, function (ok) { if (!ok) alert("ההוספה נכשלה, נסו שוב 🙏"); });
+    });
+    li.appendChild(form);
+    listEl.insertBefore(li, listEl.firstChild);
     var f0 = form.querySelector("input"); if (f0) f0.focus();
   }
   /* קריאה טרייה → שינוי לפי _id → כתיבה → אימות → רענון התצוגה */
@@ -427,8 +450,10 @@
   }
   function admUpdLock() {
     var lk = document.getElementById("admLockState");
-    if (lk) lk.textContent = _admKey ? "🔓 פרטי הקשר גלויים" : "🔒 הזינו את הקוד הסודי כדי לראות פרטי קשר";
+    if (lk) lk.textContent = _admKey ? "🔓 פתוח — אפשר לערוך, להוסיף ולראות פרטי קשר" : "🔒 הזינו את הקוד הסודי כדי לערוך ולהוסיף";
     var lb = document.getElementById("admLock"); if (lb) lb.hidden = !_admKey;
+    var addP = document.getElementById("addPrayer"); if (addP) addP.classList.toggle("hidden", !_admKey);
+    var addC = document.getElementById("addCandle"); if (addC) addC.classList.toggle("hidden", !_admKey);
   }
   function loadAdminLists() {
     if (!document.getElementById("prayerList") && !document.getElementById("candleList")) return;
@@ -473,6 +498,10 @@
         admUpdLock(); renderAdmin();
       });
     }
+    var addP = document.getElementById("addPrayer");
+    if (addP && !addP._wired) { addP._wired = true; addP.addEventListener("click", function () { admAdd("prayers"); }); }
+    var addC = document.getElementById("addCandle");
+    if (addC && !addC._wired) { addC._wired = true; addC.addEventListener("click", function () { admAdd("candles"); }); }
     var fb = document.getElementById("admFilter");
     if (fb && !fb._wired) {
       fb._wired = true;
