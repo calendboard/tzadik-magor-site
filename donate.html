@@ -29,8 +29,8 @@
   <!-- פונטים מקומיים – ללא תלות חיצונית (ידידותי לסינון) -->
   <link rel="stylesheet" href="css/fonts.css" />
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="css/styles.css?v=685" />
-  <link rel="stylesheet" href="css/donate.css?v=685" />
+  <link rel="stylesheet" href="css/styles.css?v=686" />
+  <link rel="stylesheet" href="css/donate.css?v=686" />
 
   <script type="application/ld+json">
   {
@@ -50,7 +50,7 @@
     <div class="container nav-wrap">
       <a class="brand" href="index.html" aria-label="הצדיק מעג׳ור – לדף הבית">
         <span class="brand-mark" aria-hidden="true">
-          <img src="assets/logo-emblem.png?v=685" width="46" height="46" alt="" class="brand-logo" />
+          <img src="assets/logo-emblem.png?v=686" width="46" height="46" alt="" class="brand-logo" />
         </span>
         <span class="brand-text">הצדיק <b>מעג׳ור</b></span>
       </a>
@@ -93,7 +93,7 @@
             <p class="track-perk">✓ כל סכום שתבחרו · בחירת מטרה והקדשה · קבלה רשמית</p>
             <div class="track-foot">
               <span class="track-amt">חד-פעמי</span>
-              <button type="button" class="btn btn-gold btn-sm track-pick" data-purpose="תרומה כללית" data-amount="100" data-freq="once">לתרומה »</button>
+              <a class="btn btn-gold btn-sm" href="https://nedar.im/cwwQ">לתרומה »</a>
             </div>
           </article>
           <article class="track-card">
@@ -103,7 +103,7 @@
             <p class="track-perk">✓ פדיון נפש נמסר על הציון בשמכם · חד-פעמי</p>
             <div class="track-foot">
               <span class="track-amt">₪180</span>
-              <button type="button" class="btn btn-gold btn-sm track-pick" data-purpose="פדיון נפש" data-amount="180" data-freq="once">לבחירה »</button>
+              <a class="btn btn-gold btn-sm" href="https://nedar.im/cwwQ">לבחירה »</a>
             </div>
           </article>
         </div>
@@ -119,7 +119,7 @@
             <p class="track-perk">✓ שותפות חודשית ל-24 חודשים · הזכרת שמכם על הציון</p>
             <div class="track-foot">
               <span class="track-amt">₪52<small>/חודש</small></span>
-              <button type="button" class="btn btn-gold btn-sm track-pick" data-purpose="שומרי ארבע אמות (24 ח׳)" data-amount="52" data-freq="monthly">לבחירה »</button>
+              <a class="btn btn-gold btn-sm" href="https://nedar.im/cwwQ">לבחירה »</a>
             </div>
           </article>
           <article class="track-card">
@@ -129,7 +129,7 @@
             <p class="track-perk">✓ נר תמיד לזכותכם · ל-24 חודשים</p>
             <div class="track-foot">
               <span class="track-amt">₪26<small>/חודש</small></span>
-              <button type="button" class="btn btn-gold btn-sm track-pick" data-purpose="נר תמיד תחת החרוב (24 ח׳)" data-amount="26" data-freq="monthly">לבחירה »</button>
+              <a class="btn btn-gold btn-sm" href="https://nedar.im/cwwQ">לבחירה »</a>
             </div>
           </article>
           <article class="track-card">
@@ -139,7 +139,7 @@
             <p class="track-perk">✓ סיומי תהילים על הציון מדי חודש · ל-24 חודשים</p>
             <div class="track-foot">
               <span class="track-amt">₪36<small>/חודש</small></span>
-              <button type="button" class="btn btn-gold btn-sm track-pick" data-purpose="כ״ו תהילים (24 ח׳)" data-amount="36" data-freq="monthly">לבחירה »</button>
+              <a class="btn btn-gold btn-sm" href="https://nedar.im/cwwQ">לבחירה »</a>
             </div>
           </article>
           <article class="track-card">
@@ -149,125 +149,14 @@
             <p class="track-perk">✓ כיבוד למבקרי הציון בזכותכם · ל-24 חודשים</p>
             <div class="track-foot">
               <span class="track-amt">₪52<small>/חודש</small></span>
-              <button type="button" class="btn btn-gold btn-sm track-pick" data-purpose="הכנסת אורחים עץ החרוב (24 ח׳)" data-amount="52" data-freq="monthly">לבחירה »</button>
+              <a class="btn btn-gold btn-sm" href="https://nedar.im/cwwQ">לבחירה »</a>
             </div>
           </article>
         </div>
+        <p class="secure-note" style="text-align:center;margin-top:34px">🔒 הסליקה מאובטחת בנדרים פלוס · קבלה רשמית לכל תורם · שמכם נמסר לתפילה על הציון</p>
       </div>
     </section>
 
-    <!-- טופס התרומה -->
-    <section class="section donate-section">
-      <div class="container donate-layout">
-
-        <form class="donate-form" id="donateForm" novalidate>
-          <!-- סוג התרומה -->
-          <fieldset class="d-block">
-            <legend class="d-legend">1 · מטרת התרומה</legend>
-            <div class="seg-tabs" role="tablist">
-              <button type="button" class="seg-tab active" data-purpose="הדלקת נר נשמה">🕯️ הדלקת נר</button>
-              <button type="button" class="seg-tab" data-purpose="פדיון נפש">✡️ פדיון נפש</button>
-              <button type="button" class="seg-tab" data-purpose="תרומה כללית">❤️ תרומה כללית</button>
-              <button type="button" class="seg-tab" data-purpose="השתתפות בהילולא">🔥 הילולא</button>
-            </div>
-          </fieldset>
-
-          <!-- סכום -->
-          <fieldset class="d-block">
-            <legend class="d-legend">2 · סכום התרומה</legend>
-            <div class="amount-grid">
-              <button type="button" class="amount" data-amount="18">₪18<small>חי</small></button>
-              <button type="button" class="amount" data-amount="52">₪52</button>
-              <button type="button" class="amount active" data-amount="100">₪100</button>
-              <button type="button" class="amount" data-amount="180">₪180<small>חי×10</small></button>
-              <button type="button" class="amount" data-amount="360">₪360</button>
-              <button type="button" class="amount" data-amount="1000">₪1,000</button>
-            </div>
-            <div class="custom-amount">
-              <label for="customAmount">או סכום אחר (₪)</label>
-              <input id="customAmount" type="number" min="1" inputmode="numeric" placeholder="הקלידו סכום" />
-            </div>
-
-            <div class="freq-toggle" role="group" aria-label="תדירות תרומה">
-              <button type="button" class="freq active" data-freq="once">תרומה חד־פעמית</button>
-              <button type="button" class="freq" data-freq="monthly">הוראת קבע חודשית</button>
-            </div>
-          </fieldset>
-
-          <!-- הקדשה -->
-          <fieldset class="d-block">
-            <legend class="d-legend">3 · הקדשה ושם לתפילה <span class="optional">(רשות)</span></legend>
-            <div class="ded-row">
-              <select id="dedType" class="ded-type">
-                <option value="">ללא הקדשה</option>
-                <option>לעילוי נשמת</option>
-                <option>לרפואת</option>
-                <option>להצלחת</option>
-                <option>לזיווג הגון של</option>
-                <option>לזרע של קיימא ל</option>
-              </select>
-              <input id="dedName" type="text" placeholder="שם (ושם האם/האב)" />
-            </div>
-            <p class="ded-hint">השם יימסר לתפילה על ציון הצדיק 🙏</p>
-          </fieldset>
-
-          <!-- פרטי התורם -->
-          <fieldset class="d-block">
-            <legend class="d-legend">4 · הפרטים שלכם</legend>
-            <div class="d-fields">
-              <div class="field">
-                <label for="donorName">שם מלא</label>
-                <input id="donorName" type="text" autocomplete="name" required />
-              </div>
-              <div class="field">
-                <label for="donorPhone">טלפון</label>
-                <input id="donorPhone" type="tel" autocomplete="tel" inputmode="tel" required />
-              </div>
-              <div class="field">
-                <label for="donorEmail">אימייל <span class="optional">(לקבלה)</span></label>
-                <input id="donorEmail" type="email" autocomplete="email" />
-              </div>
-            </div>
-          </fieldset>
-
-          <button type="submit" class="btn btn-gold btn-lg btn-block d-submit">
-            המשך לתשלום מאובטח · <span id="submitAmount">₪100</span>
-          </button>
-          <p class="secure-note">🔒 התשלום מתבצע בעמוד סליקה מאובטח של נדרים פלוס (מוצפן SSL). פרטי האשראי אינם נשמרים אצלנו.</p>
-          <p class="form-status" id="donateStatus" role="status" aria-live="polite"></p>
-        </form>
-
-        <!-- סיכום + אמון -->
-        <aside class="donate-aside">
-          <div class="summary-card">
-            <h3>סיכום התרומה</h3>
-            <ul class="summary-list">
-              <li><span>מטרה</span><b id="sumPurpose">הדלקת נר נשמה</b></li>
-              <li><span>תדירות</span><b id="sumFreq">חד־פעמית</b></li>
-              <li><span>הקדשה</span><b id="sumDed">—</b></li>
-              <li class="summary-total"><span>סכום</span><b id="sumAmount">₪100</b></li>
-            </ul>
-            <div class="candle small" aria-hidden="true" style="margin:18px auto 0">
-              <div class="flame"><div class="flame-glow"></div></div>
-              <div class="wick"></div>
-              <div class="candle-body"></div>
-            </div>
-          </div>
-
-          <div class="trust-card">
-            <div class="trust-item"><span>🔒</span> סליקה מאובטחת בנדרים פלוס</div>
-            <div class="trust-item"><span>🧾</span> קבלה רשמית לכל תורם</div>
-            <div class="trust-item"><span>🕯️</span> שמכם נמסר לתפילה על הציון</div>
-            <div class="trust-item"><span>💳</span> אשראי · ביט · הוראת קבע</div>
-          </div>
-
-          <blockquote class="aside-quote">
-            “כל הנותן פרוטה לעני מתברך בשש ברכות"
-            <cite>זכות הצדיק תעמוד לכם ולכל משפחתכם</cite>
-          </blockquote>
-        </aside>
-      </div>
-    </section>
   </main>
 
   <footer class="site-footer">
@@ -295,7 +184,6 @@
     <button class="hb-close" id="hilulaClose" type="button" aria-label="סגירת הבאנר">×</button>
   </div>
 
-  <script src="js/main.js?v=685" defer></script>
-  <script src="js/donate.js?v=685" defer></script>
+  <script src="js/main.js?v=686" defer></script>
 </body>
 </html>
