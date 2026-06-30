@@ -777,7 +777,8 @@ a.news-card{ text-decoration:none; color:inherit; cursor:pointer; }
 .nc-vthumb{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
 
 /* ---------- כפתורי צף ליצירת קשר ---------- */
-.float-contact{ position:fixed; left:14px; top:50%; transform:translateY(-50%); z-index:950; display:flex; flex-direction:column; align-items:flex-end; gap:7px; }
+.float-contact{ position:fixed; left:14px; top:50%; transform:translateY(-50%); z-index:950; display:flex; flex-direction:row; align-items:center; gap:8px; direction:ltr; }
+.fc-col{ display:flex; flex-direction:column; gap:7px; }
 .fc-btn{ width:50px; height:50px; border-radius:50%; display:grid; place-items:center; box-shadow:0 6px 18px rgba(0,0,0,.38); transition:transform .15s ease, filter .15s ease; }
 .fc-btn:hover{ transform:scale(1.09); filter:brightness(1.06); }
 .fc-btn svg{ width:28px; height:28px; display:block; }
@@ -785,16 +786,14 @@ a.news-card{ text-decoration:none; color:inherit; cursor:pointer; }
 .fc-mail{ background:linear-gradient(135deg,#e0b94a,#c9952f); }
 .fc-phone{ background:linear-gradient(135deg,#2f86d6,#1f63ad); }
 .fc-phone svg{ width:25px; height:25px; }
-.fc-donate{ width:64px; height:64px; background:linear-gradient(135deg,#ef4056,#bf1b30); box-shadow:0 8px 22px rgba(191,27,48,.5); animation:fcheart 2.4s ease-in-out infinite; }
-.fc-donate svg{ width:36px; height:36px; }
-.fc-donate:hover{ transform:scale(1.08); }
-@keyframes fcheart{ 0%,100%{ transform:scale(1);} 50%{ transform:scale(1.07);} }
+.fc-donate{ background:linear-gradient(135deg,#ef4056,#bf1b30); box-shadow:0 8px 22px rgba(191,27,48,.5); animation:fcheart 2.4s ease-in-out infinite; }
+.fc-donate:hover{ transform:scale(1.09); }
+@keyframes fcheart{ 0%,100%{ transform:scale(1);} 50%{ transform:scale(1.06);} }
 .ci-hotline a{ color:var(--gold-2); font-weight:700; }
 @media (max-width:760px){
-  .float-contact{ left:10px; gap:6px; }
+  .float-contact{ left:10px; gap:7px; }
+  .fc-col{ gap:6px; }
   .fc-btn{ width:46px; height:46px; }
   .fc-btn svg{ width:25px; height:25px; }
-  .fc-donate{ width:58px; height:58px; }
-  .fc-donate svg{ width:32px; height:32px; }
 }
 @media print{ .float-contact{ display:none !important; } }
