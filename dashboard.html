@@ -339,6 +339,32 @@
       });
     }
 
+    /* תפיסת פריים מסרטון שהועלה — כתמונה ראשית (poster) */
+    function videoPoster(file) {
+      return new Promise(function (resolve) {
+        var v = document.createElement("video");
+        v.preload = "metadata"; v.muted = true; v.setAttribute("playsinline", "");
+        var done = false;
+        function finish(b) { if (!done) { done = true; resolve(b); } }
+        v.addEventListener("loadeddata", function () {
+          try { v.currentTime = Math.min(1, (v.duration || 2) / 3); } catch (e) { finish(null); }
+        });
+        v.addEventListener("seeked", function () {
+          try {
+            var w = v.videoWidth, h = v.videoHeight;
+            if (!w || !h) return finish(null);
+            var scale = Math.min(1, 1280 / w);
+            var c = document.createElement("canvas"); c.width = Math.round(w * scale); c.height = Math.round(h * scale);
+            c.getContext("2d").drawImage(v, 0, 0, c.width, c.height);
+            c.toBlob(function (b) { finish(b); }, "image/jpeg", 0.82);
+          } catch (e) { finish(null); }
+        });
+        v.addEventListener("error", function () { finish(null); });
+        setTimeout(function () { finish(null); }, 9000);
+        v.src = URL.createObjectURL(file);
+      });
+    }
+
     /* ---------- וידאו (קישור יוטיוב או העלאת קובץ) ---------- */
     function updateVidStatus() {
       var url = $("fVideo").value.trim();
@@ -366,6 +392,21 @@
           }
           $("fVideo").value = sb.storage.from("news-images").getPublicUrl(name).data.publicUrl;
           updateVidStatus();
+          /* תפיסת פריים אוטומטית כתמונה ראשית (רק אם עדיין אין תמונה) */
+          if (!pendingImageUrl) {
+            $("vidStatus").textContent = "תופס תמונה מהסרטון…"; $("vidStatus").style.color = "var(--muted)";
+            videoPoster(file).then(function (pb) {
+              if (!pb || pendingImageUrl) { updateVidStatus(); return; }
+              var pn = "poster-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7) + ".jpg";
+              sb.storage.from("news-images").upload(pn, pb, { contentType: "image/jpeg", upsert: true }).then(function (r2) {
+                if (!r2.error && !pendingImageUrl) {
+                  pendingImageUrl = sb.storage.from("news-images").getPublicUrl(pn).data.publicUrl;
+                  setPreview(pendingImageUrl);
+                  $("vidStatus").textContent = "קובץ וידאו מצורף ✓ · תמונה נתפסה אוטומטית ✓"; $("vidStatus").style.color = "#167a3a";
+                } else { updateVidStatus(); }
+              });
+            });
+          }
         });
     });
 
