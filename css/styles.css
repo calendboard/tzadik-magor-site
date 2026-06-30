@@ -601,6 +601,9 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
 .ysh-photo img{ width:100%; height:100%; object-fit:cover; display:block; transition:transform .55s ease; }
 .ysh-photo::after{ content:""; position:absolute; inset:0;
   background:linear-gradient(180deg,rgba(0,0,0,0) 58%,rgba(20,14,6,.4) 100%); }
+.ysh-photo-ph{ display:grid; place-items:center; font-size:2.6rem;
+  background:radial-gradient(circle at 50% 36%, #3c2d15, #20170c); color:#e9cf73; }
+.ysh-photo-ph::after{ display:none; }
 .ysh-cap{ position:relative; flex:0 0 auto; background:linear-gradient(180deg,#2b2014,#20160a);
   border-top:1px solid rgba(247,231,163,.22); padding:11px 14px 13px; text-align:center;
   display:flex; flex-direction:column; align-items:center; gap:3px; }
@@ -804,7 +807,6 @@ a.news-card{ text-decoration:none; color:inherit; cursor:pointer; }
 /* חלונית "שתפו ישועה" בדף הישועות */
 .story-cta{ max-width:600px; margin:28px auto 0; padding:24px 26px; border-radius:16px; text-align:center;
   border:1px solid var(--gold); background:radial-gradient(360px 160px at 50% -10%, rgba(216,179,73,.14), transparent 70%), linear-gradient(180deg,var(--panel),#100d09); box-shadow:var(--shadow); }
-.user-stories{ max-width:900px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px; }
 .story-cta .sc-ic{ font-size:1.7rem; line-height:1; }
 .story-cta p{ color:var(--cream); font-size:1.05rem; line-height:1.6; margin:8px auto 16px; max-width:460px; }
 .ci-hotline a{ color:var(--gold-2); font-weight:700; }

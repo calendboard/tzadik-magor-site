@@ -380,30 +380,6 @@
   }
   loadCandleWall();
 
-  /* ---------- ישועות מהקהל (מאושרות) בדף הישועות ---------- */
-  function loadUserStories() {
-    var box = document.getElementById("userStories");
-    if (!box) return;
-    fetch(CANDLE_API + "/latest", { headers: { "X-Bin-Meta": "false" } })
-      .then(function (r) { return r.json(); })
-      .then(function (rec) {
-        var list = (((rec && rec.stories) || []).filter(function (s) { return s && s.status === "approved"; })).reverse();
-        var head = document.getElementById("userStoriesHead");
-        if (!list.length) { box.style.display = "none"; if (head) head.style.display = "none"; return; }
-        box.style.display = ""; if (head) head.style.display = "";
-        box.innerHTML = "";
-        list.slice(0, 200).forEach(function (s) {
-          var f = document.createElement("figure"); f.className = "testimony-card";
-          f.innerHTML = '<span class="tc-tag"></span><blockquote class="tc-body"></blockquote><figcaption class="tc-by"><b></b></figcaption>';
-          f.querySelector(".tc-tag").textContent = s.type || "ישועה";
-          f.querySelector(".tc-body").textContent = s.story || "";
-          f.querySelector(".tc-by b").textContent = s.public_name || "מתפלל/ת (בעילום שם)";
-          box.appendChild(f);
-        });
-      })
-      .catch(function () { box.style.display = "none"; });
-  }
-  loadUserStories();
 
   /* ---------- דף הרשימות (admin): שמות לתפילה + נרות, עם תאריך וסינון ---------- */
   var _admData = null, _admDays = null, _admDate = "";
@@ -1106,13 +1082,20 @@
       var b = document.createElement("button");
       b.className = "ysh-ball";
       b.type = "button";
-      b.setAttribute("aria-label", s.title + " — לחצו לקריאת הסיפור");
-      b.innerHTML =
-        '<span class="ysh-photo"><img src="' + s.img + '?v=665" alt="" loading="lazy"></span>' +
-        '<span class="ysh-cap">' +
-          '<span class="ysh-tag">' + s.tag + '</span>' +
-          '<span class="ysh-t">' + s.title + '</span>' +
-        '</span>';
+      b.setAttribute("aria-label", (s.title || "") + " — לחצו לקריאת הסיפור");
+      var photo = document.createElement("span");
+      if (s.img) {
+        photo.className = "ysh-photo";
+        var im = document.createElement("img"); im.src = s.img + "?v=665"; im.alt = ""; im.loading = "lazy";
+        photo.appendChild(im);
+      } else {
+        photo.className = "ysh-photo ysh-photo-ph"; photo.setAttribute("aria-hidden", "true"); photo.textContent = "✨";
+      }
+      var cap = document.createElement("span"); cap.className = "ysh-cap";
+      var tag = document.createElement("span"); tag.className = "ysh-tag"; tag.textContent = s.tag || "ישועה";
+      var t = document.createElement("span"); t.className = "ysh-t"; t.textContent = s.title || "";
+      cap.appendChild(tag); cap.appendChild(t);
+      b.appendChild(photo); b.appendChild(cap);
       b.addEventListener("click", function () { yshOpen(s); });
       return b;
     }
@@ -1123,6 +1106,16 @@
     }
     if (storyGrid) {
       STORIES.forEach(function (s) { storyGrid.appendChild(yshBall(s)); });
+      /* ישועות מהקהל (מאושרות) — מתווספות כרטיסים זהים בראש הרשת */
+      fetch(CANDLE_API + "/latest", { headers: { "X-Bin-Meta": "false" } })
+        .then(function (r) { return r.json(); })
+        .then(function (rec) {
+          var list = (((rec && rec.stories) || []).filter(function (x) { return x && x.status === "approved"; })).reverse();
+          list.forEach(function (us) {
+            var s = { tag: us.type || "ישועה", title: us.public_name || "מתפלל/ת (בעילום שם)", full: us.story || "", img: null };
+            storyGrid.insertBefore(yshBall(s), storyGrid.firstChild);
+          });
+        }).catch(function () {});
     }
 
     // מודאל
@@ -1143,8 +1136,10 @@
         ymT = ym.querySelector(".ym-t"),
         ymBody = ym.querySelector(".ym-body");
     function yshOpen(s) {
-      ymPhoto.src = s.img + "?v=665"; ymTag.textContent = s.tag; ymT.textContent = s.title;
-      ymBody.textContent = s.full;
+      if (s.img) { ymPhoto.src = s.img + "?v=665"; ymPhoto.style.display = ""; }
+      else { ymPhoto.removeAttribute("src"); ymPhoto.style.display = "none"; }
+      ymTag.textContent = s.tag || "ישועה"; ymT.textContent = s.title || "";
+      ymBody.textContent = s.full || "";
       ym.classList.add("open"); document.body.style.overflow = "hidden";
     }
     function yshClose() { ym.classList.remove("open"); document.body.style.overflow = ""; }
