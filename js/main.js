@@ -167,19 +167,37 @@
 
   /* ---------- קיר הנרות (זיכרון משותף ציבורי דרך JSONBin) ---------- */
   var CANDLE_API = "https://api.jsonbin.io/v3/b/6a40f90fda38895dfe0b10e7";
-  /* מוסיף פריט למערך בקופסה (candles/prayers) תוך שמירה על שאר המבנה */
-  function appendToBin(key, item, after) {
-    fetch(CANDLE_API + "/latest", { headers: { "X-Bin-Meta": "false" } })
+  /* מזהה ייחודי לכל פריט — מאפשר זיהוי כפילויות ואימות אחרי כתיבה */
+  function uid() { return Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 9); }
+  /* מוסיף פריט למערך בקופסה (candles/prayers) תוך שמירה על שאר המבנה.
+     עמיד ל"lost update": קורא טרי לפני כל כתיבה, מאמת שהפריט נשמר,
+     ואם נדרס ע"י כתיבה מקבילה — מנסה שוב עם השהיה אקראית (עד 5 פעמים). */
+  function appendToBin(key, item, after, _try) {
+    _try = _try || 0;
+    if (!item._id) item._id = uid();
+    fetch(CANDLE_API + "/latest", { headers: { "X-Bin-Meta": "false" }, cache: "no-store" })
       .then(function (r) { return r.json(); })
       .then(function (rec) {
         rec = rec || {};
         if (!Array.isArray(rec.candles)) rec.candles = [];
         if (!Array.isArray(rec.prayers)) rec.prayers = [];
-        rec[key].push(item);
+        var exists = rec[key].some(function (x) { return x && x._id === item._id; });
+        if (!exists) rec[key].push(item);
         return fetch(CANDLE_API, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(rec) });
       })
-      .then(function () { if (after) after(); })
-      .catch(function () {});
+      .then(function () {
+        /* אימות: לקרוא שוב ולוודא שהפריט באמת שם */
+        return fetch(CANDLE_API + "/latest", { headers: { "X-Bin-Meta": "false" }, cache: "no-store" }).then(function (r) { return r.json(); });
+      })
+      .then(function (rec) {
+        var ok = rec && Array.isArray(rec[key]) && rec[key].some(function (x) { return x && x._id === item._id; });
+        if (ok) { if (after) after(); return; }
+        if (_try < 5) { setTimeout(function () { appendToBin(key, item, after, _try + 1); }, 250 + Math.floor(Math.random() * 600)); }
+        else if (after) after();
+      })
+      .catch(function () {
+        if (_try < 5) { setTimeout(function () { appendToBin(key, item, after, _try + 1); }, 250 + Math.floor(Math.random() * 600)); }
+      });
   }
   function appendCandle(c) {
     c = c || {};
