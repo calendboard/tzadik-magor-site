@@ -143,3 +143,23 @@
 .track-featured{ background:linear-gradient(160deg,#4a3a22,#332512); border-color:var(--gold); box-shadow:0 16px 40px rgba(0,0,0,.4), 0 0 0 1px rgba(247,231,163,.18); }
 .track-featured .track-amt{ font-size:1.15rem; }
 .tracks-divider{ text-align:center; color:var(--gold-2); font-size:1.02rem; font-weight:600; letter-spacing:.02em; margin:38px auto 4px; max-width:1040px; opacity:.92; }
+
+/* ===== שקיפות · עמותה ===== */
+.amuta-section{ padding-top:18px; padding-bottom:54px; }
+.amuta-card{
+  max-width:780px; margin:0 auto; text-align:center;
+  border:1px solid var(--line-2); border-radius:18px; padding:34px 30px 30px;
+  background:
+    radial-gradient(420px 200px at 50% -20%, rgba(216,179,73,.10), transparent 70%),
+    linear-gradient(180deg,var(--panel),#100d09);
+  box-shadow:var(--shadow);
+}
+.amuta-ic{ font-size:2rem; line-height:1; }
+.amuta-title{ font-family:var(--ff-serif); color:var(--gold-2); font-size:1.5rem; font-weight:800; margin:12px 0 16px; }
+.amuta-text{ color:var(--cream); font-size:1.02rem; line-height:1.7; margin:0 auto 14px; max-width:640px; opacity:.95; }
+.amuta-text b{ color:var(--gold-2); font-weight:700; }
+.amuta-badge{
+  display:inline-block; margin:8px 0 0; padding:10px 20px; border-radius:999px;
+  background:rgba(216,179,73,.12); border:1px solid var(--gold); color:var(--gold-2);
+  font-size:.96rem; font-weight:600;
+}
