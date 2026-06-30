@@ -718,6 +718,13 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
 .lead-success .ls-name{ color:var(--gold-2); font-weight:700; }
 .lead-success .ls-again{ display:inline-block; margin-top:22px; color:var(--gold-2); font-weight:600; text-decoration:underline; cursor:pointer; background:none; border:0; font-family:inherit; font-size:1rem; }
 
+/* חלונית תרומה במסך ההצלחה (נר / תפילה) */
+.lead-donate{ margin:30px auto 0; max-width:480px; padding:24px 26px; border-radius:16px; border:1px solid var(--gold);
+  background:radial-gradient(360px 160px at 50% -10%, rgba(216,179,73,.14), transparent 70%), linear-gradient(180deg,#2a2113,#1a140d); }
+.lead-donate .ld-ic{ font-size:1.9rem; line-height:1; }
+.lead-donate h4{ font-family:var(--ff-serif); color:var(--gold-2); font-size:1.3rem; font-weight:800; margin:8px 0 10px; }
+.lead-donate p{ color:var(--cream); font-size:1rem; line-height:1.65; margin:0 auto 18px; max-width:430px; opacity:.95; }
+
 /* ====================== קיר הנרות (פרימיום) ====================== */
 .candle-wall-head{ text-align:center; margin:0 0 6px; }
 .candle-wall-head .cw-count{ color:var(--gold-2); font-weight:800; }
