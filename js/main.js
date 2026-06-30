@@ -84,6 +84,33 @@
     var data = new TextEncoder().encode(JSON.stringify(obj));
     return _pubKeyP.then(function (k) { return crypto.subtle.encrypt({ name: "RSA-OAEP" }, k, data); }).then(_b64).catch(function () { return ""; });
   }
+  /* הצפנה היברידית (AES-GCM + RSA) — לטקסט ארוך כמו הודעת צור-קשר.
+     פורמט: "rsa(aesKey).iv.aes(data)" (base64, מופרד בנקודות). מחזיר "" בכישלון. */
+  function encryptBig(obj) {
+    if (!_cryptoOk()) return Promise.resolve("");
+    if (!_pubKeyP) _pubKeyP = crypto.subtle.importKey("jwk", PUBKEY_JWK, { name: "RSA-OAEP", hash: "SHA-256" }, false, ["encrypt"]);
+    var data = new TextEncoder().encode(JSON.stringify(obj));
+    var iv = crypto.getRandomValues(new Uint8Array(12)), aesKey;
+    return crypto.subtle.generateKey({ name: "AES-GCM", length: 256 }, true, ["encrypt", "decrypt"])
+      .then(function (k) { aesKey = k; return crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, k, data); })
+      .then(function (ct) {
+        return crypto.subtle.exportKey("raw", aesKey).then(function (rawKey) {
+          return _pubKeyP.then(function (pub) { return crypto.subtle.encrypt({ name: "RSA-OAEP" }, pub, rawKey); })
+            .then(function (encKey) { return _b64(encKey) + "." + _b64(iv) + "." + _b64(ct); });
+        });
+      }).catch(function () { return ""; });
+  }
+  /* פענוח היברידי — דורש שמפתח הפיענוח (_admKey) טעון. מחזיר אובייקט או null. */
+  function decryptBig(blob) {
+    if (!_admKey || !blob || typeof blob !== "string" || blob.split(".").length !== 3) return Promise.resolve(null);
+    var p = blob.split("."), encKey, iv, ct;
+    try { encKey = _unb64(p[0]); iv = _unb64(p[1]); ct = _unb64(p[2]); } catch (e) { return Promise.resolve(null); }
+    return crypto.subtle.decrypt({ name: "RSA-OAEP" }, _admKey, encKey)
+      .then(function (rawKey) { return crypto.subtle.importKey("raw", rawKey, { name: "AES-GCM" }, false, ["decrypt"]); })
+      .then(function (aesKey) { return crypto.subtle.decrypt({ name: "AES-GCM", iv: iv }, aesKey, ct); })
+      .then(function (buf) { return JSON.parse(new TextDecoder().decode(buf)); })
+      .catch(function () { return null; });
+  }
 
   /* שליחת פנייה דרך FormSubmit; מחזיר Promise. */
   function sendLead(data) {
@@ -181,6 +208,7 @@
         rec = rec || {};
         if (!Array.isArray(rec.candles)) rec.candles = [];
         if (!Array.isArray(rec.prayers)) rec.prayers = [];
+        if (!Array.isArray(rec.contacts)) rec.contacts = [];
         var exists = rec[key].some(function (x) { return x && x._id === item._id; });
         if (!exists) rec[key].push(item);
         return fetch(CANDLE_API, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(rec) });
@@ -223,11 +251,53 @@
       });
     });
   }
+  /* שמירת פניית "צור קשר" לדשבורד — מוצפן היברידי (כל הפרטים + הודעה מלאה) */
+  function appendContact(c) {
+    c = c || {};
+    encryptBig({ name: c.name || "", phone: c.phone || "", topic: c.topic || "", message: c.message || "" }).then(function (encb) {
+      appendToBin("contacts", {
+        topic: String(c.topic || "").substring(0, 60),
+        date: new Date().toISOString().slice(0, 10),
+        ts: new Date().toISOString(),
+        encb: encb
+      });
+    });
+  }
   var _candles = [];
   function fmtDate(d) {
     if (!d) return "";
     var p = String(d).slice(0, 10).split("-");
     return p.length === 3 ? p[2] + "." + p[1] + "." + p[0] : "";
+  }
+  /* המרת מספר לגימטריה עברית (עם גרש/גרשיים, וטיפול ב-ט״ו/ט״ז) */
+  function _gem(num) {
+    var L = [[400, "ת"], [300, "ש"], [200, "ר"], [100, "ק"], [90, "צ"], [80, "פ"], [70, "ע"], [60, "ס"], [50, "נ"], [40, "מ"], [30, "ל"], [20, "כ"], [10, "י"], [9, "ט"], [8, "ח"], [7, "ז"], [6, "ו"], [5, "ה"], [4, "ד"], [3, "ג"], [2, "ב"], [1, "א"]];
+    var n = num, s = "";
+    for (var i = 0; i < L.length; i++) { while (n >= L[i][0]) { s += L[i][1]; n -= L[i][0]; } }
+    s = s.replace("יה", "טו").replace("יו", "טז");
+    if (s.length === 1) return s + "׳";
+    return s.slice(0, -1) + "״" + s.slice(-1);
+  }
+  /* תאריך עברי בגימטריה: ט״ו בתמוז תשפ״ו */
+  function _hebDate(dt) {
+    try {
+      var parts = new Intl.DateTimeFormat("he-u-ca-hebrew-nu-latn", { day: "numeric", month: "long", year: "numeric" }).formatToParts(dt);
+      var day, month, year;
+      parts.forEach(function (p) { if (p.type === "day") day = parseInt(p.value, 10); else if (p.type === "month") month = p.value; else if (p.type === "year") year = parseInt(p.value, 10); });
+      if (!day || !month || !year) return "";
+      return _gem(day) + " ב" + month.replace(/^ב/, "") + " " + _gem(year % 1000);
+    } catch (e) { return ""; }
+  }
+  /* תאריך מלא לדשבורד: יום בשבוע · לועזי · עברי */
+  function fmtFullDate(d) {
+    if (!d) return "";
+    var dt = new Date(String(d).slice(0, 10) + "T12:00:00");
+    if (isNaN(dt)) return fmtDate(d);
+    var parts = [];
+    try { parts.push(new Intl.DateTimeFormat("he-IL", { weekday: "long" }).format(dt)); } catch (e) {}
+    var g = fmtDate(d); if (g) parts.push(g);
+    var h = _hebDate(dt); if (h) parts.push(h);
+    return parts.join(" · ");
   }
   function renderWall(filter) {
     var wall = document.getElementById("candleWall");
@@ -280,7 +350,7 @@
   loadCandleWall();
 
   /* ---------- דף הרשימות (admin): שמות לתפילה + נרות, עם תאריך וסינון ---------- */
-  var _admData = null, _admDays = null;
+  var _admData = null, _admDays = null, _admDate = "";
   function withinDays(dateStr, days) {
     if (days == null) return true;
     var d = new Date(String(dateStr).slice(0, 10) + "T00:00:00");
@@ -288,6 +358,11 @@
     var t = new Date(); t.setHours(0, 0, 0, 0);
     var diff = Math.floor((t - d) / 86400000);
     return diff >= 0 && diff <= days;
+  }
+  /* מסנן רשומה: אם נבחר יום מהלוח — בדיוק היום הזה; אחרת לפי טווח הימים */
+  function admPass(dateStr) {
+    if (_admDate) return String(dateStr || "").slice(0, 10) === _admDate;
+    return withinDays(dateStr, _admDays);
   }
   function admLine(c) {
     var t = c.name || "";
@@ -319,12 +394,12 @@
       view.innerHTML = '<b></b><span class="adm-req"></span><span class="adm-date"></span><span class="adm-contact"></span>';
       view.querySelector("b").textContent = item.name || "";
       view.querySelector(".adm-req").textContent = item.request ? " — " + item.request : "";
-      view.querySelector(".adm-date").textContent = item.date ? "  " + fmtDate(item.date) : "";
+      view.querySelector(".adm-date").textContent = item.date ? fmtFullDate(item.date) : "";
       admContact(view.querySelector(".adm-contact"), item.enc);
     } else {
       view.innerHTML = '<span class="adm-main"></span><span class="adm-date"></span><span class="adm-contact"></span>';
       view.querySelector(".adm-main").textContent = admLine(item);
-      view.querySelector(".adm-date").textContent = item.date ? "  " + fmtDate(item.date) : "";
+      view.querySelector(".adm-date").textContent = item.date ? fmtFullDate(item.date) : "";
       admContact(view.querySelector(".adm-contact"), item.enc);
     }
     wrap.appendChild(view);
@@ -406,6 +481,7 @@
         rec = rec || {};
         if (!Array.isArray(rec.candles)) rec.candles = [];
         if (!Array.isArray(rec.prayers)) rec.prayers = [];
+        if (!Array.isArray(rec.contacts)) rec.contacts = [];
         mutator(rec);
         return fetch(CANDLE_API, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(rec) })
           .then(function () { return fetch(CANDLE_API + "/latest", { headers: { "X-Bin-Meta": "false" }, cache: "no-store" }); })
@@ -424,14 +500,48 @@
       rec[kind] = (rec[kind] || []).filter(function (x) { return !(x && x._id === id); });
     }, function (ok) { if (!ok) alert("המחיקה נכשלה, נסו שוב 🙏"); });
   }
+  /* שורת פניית "צור קשר" — מפוענחת רק כשהקוד מוזן */
+  function admContactRow(item) {
+    var li = document.createElement("li");
+    var wrap = document.createElement("div"); wrap.className = "adm-rowwrap";
+    var view = document.createElement("span"); view.className = "adm-view";
+    view.innerHTML = '<b class="adm-cname"></b><span class="adm-cphone adm-contact"></span><span class="adm-ctopic"></span><div class="adm-cmsg"></div><span class="adm-date"></span>';
+    view.querySelector(".adm-ctopic").textContent = item.topic ? (" · " + item.topic) : "";
+    view.querySelector(".adm-date").textContent = item.date ? fmtFullDate(item.date) : "";
+    if (_admKey) {
+      view.querySelector(".adm-cname").textContent = "מפענח…";
+      decryptBig(item.encb).then(function (o) {
+        if (o) {
+          view.querySelector(".adm-cname").textContent = o.name || "(ללא שם)";
+          view.querySelector(".adm-cphone").textContent = o.phone ? ("  📞 " + o.phone) : "";
+          view.querySelector(".adm-cmsg").textContent = o.message || "";
+        } else { view.querySelector(".adm-cname").textContent = "(שגיאת פענוח)"; }
+      });
+    } else {
+      view.querySelector(".adm-cname").textContent = "🔒 פנייה";
+      view.querySelector(".adm-cmsg").textContent = "הזינו את הקוד לצפייה בפרטים";
+    }
+    wrap.appendChild(view);
+    if (_admKey) {
+      var acts = document.createElement("span"); acts.className = "adm-acts";
+      var del = document.createElement("button"); del.type = "button"; del.className = "adm-btn adm-del"; del.textContent = "🗑️"; del.title = "מחיקה";
+      del.onclick = function () { if (confirm("למחוק את הפנייה?")) admDelete("contacts", item._id); };
+      acts.appendChild(del); wrap.appendChild(acts);
+    }
+    li.appendChild(wrap);
+    return li;
+  }
   function renderAdmin() {
     if (!_admData) return;
     var pWrap = document.getElementById("prayerList");
     var cWrap = document.getElementById("candleList");
-    var prayers = (_admData.prayers || []).slice().reverse().filter(function (p) { return withinDays(p.date, _admDays); });
-    var candles = (_admData.candles || []).slice().reverse().filter(function (c) { return withinDays(c.date, _admDays); });
+    var ctWrap = document.getElementById("contactList");
+    var prayers = (_admData.prayers || []).slice().reverse().filter(function (p) { return admPass(p.date); });
+    var candles = (_admData.candles || []).slice().reverse().filter(function (c) { return admPass(c.date); });
+    var contacts = (_admData.contacts || []).slice().reverse().filter(function (c) { return admPass(c.date); });
     var pc = document.getElementById("prayerCount"); if (pc) pc.textContent = prayers.length;
     var clc = document.getElementById("candleListCount"); if (clc) clc.textContent = candles.length;
+    var ctc = document.getElementById("contactCount"); if (ctc) ctc.textContent = contacts.length;
     if (pWrap) {
       pWrap.innerHTML = prayers.length ? "" : '<li class="adm-empty">אין רשומות בטווח זה.</li>';
       prayers.forEach(function (p) { pWrap.appendChild(admRow("prayers", p)); });
@@ -439,6 +549,10 @@
     if (cWrap) {
       cWrap.innerHTML = candles.length ? "" : '<li class="adm-empty">אין רשומות בטווח זה.</li>';
       candles.forEach(function (c) { cWrap.appendChild(admRow("candles", c)); });
+    }
+    if (ctWrap) {
+      ctWrap.innerHTML = contacts.length ? "" : '<li class="adm-empty">אין פניות בטווח זה.</li>';
+      contacts.forEach(function (c) { ctWrap.appendChild(admContactRow(c)); });
     }
   }
   function admSetKey(jwkStr, after) {
@@ -463,7 +577,7 @@
         .then(function (rec) {
           rec = rec || {};
           var changed = false;
-          ["candles", "prayers"].forEach(function (k) {
+          ["candles", "prayers", "contacts"].forEach(function (k) {
             if (!Array.isArray(rec[k])) rec[k] = [];
             rec[k].forEach(function (it) { if (it && !it._id) { it._id = uid(); changed = true; } });
           });
@@ -509,7 +623,18 @@
         var b = e.target.closest("[data-days]"); if (!b) return;
         var v = b.getAttribute("data-days");
         _admDays = (v === "" || v == null) ? null : parseInt(v, 10);
+        _admDate = "";
+        var dp = document.getElementById("admDatePick"); if (dp) dp.value = "";
         fb.querySelectorAll("[data-days]").forEach(function (x) { x.classList.toggle("active", x === b); });
+        renderAdmin();
+      });
+    }
+    var dpick = document.getElementById("admDatePick");
+    if (dpick && !dpick._wired) {
+      dpick._wired = true;
+      dpick.addEventListener("change", function () {
+        _admDate = dpick.value || "";
+        if (_admDate && fb) fb.querySelectorAll("[data-days]").forEach(function (x) { x.classList.remove("active"); });
         renderAdmin();
       });
     }
@@ -669,6 +794,9 @@
       var btn = form.querySelector('button[type="submit"]');
       if (btn) { btn.disabled = true; }
       if (status) { status.style.color = "var(--gold-2)"; status.textContent = "שולח… 🕯️"; }
+
+      /* שמירה לדשבורד (מוצפן) — בנוסף למייל */
+      appendContact({ name: name.value.trim(), phone: phone.value.trim(), topic: (topic || {}).value || "", message: (msg || {}).value.trim() });
 
       function contactWaFallback() {
         if (btn) { btn.disabled = false; }

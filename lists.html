@@ -59,6 +59,15 @@
     .adm-add:hover{ background:var(--g2); }
     .adm-add.hidden{ display:none; }
     .adm-newrow{ background:#fbf8f1; border:1px solid #e3ddcd; border-radius:10px; padding:10px 12px; margin:6px 0 12px; list-style:none; }
+    /* בורר יום מהלוח */
+    .adm-datepick{ flex:0 0 auto; width:auto; padding:7px 11px; border:1px solid #d8d2c4; border-radius:999px; font-family:inherit; font-size:.95rem; color:#5a4a20; background:#fff; }
+    .adm-datepick:focus{ outline:none; border-color:var(--g); }
+    /* פניות צור קשר */
+    .contacts-sec{ margin-top:36px; }
+    .contacts-sec h2{ font-size:1.3rem; color:var(--g2); border-bottom:1px solid #d8d2c4; padding-bottom:8px; }
+    .adm-cname{ font-weight:700; }
+    .adm-ctopic{ color:var(--g2); }
+    .adm-cmsg{ color:#3a3526; font-size:.97rem; margin:3px 0 2px; white-space:pre-wrap; word-break:break-word; }
     @media print{
       .adm-acts{ display:none; }
       .actions, .note, .filterbar, .codebar{ display:none; }
@@ -92,6 +101,8 @@
       <button type="button" data-days="7">שבוע</button>
       <button type="button" data-days="30">חודש</button>
       <button type="button" data-days="" class="active">הכל</button>
+      <span class="fl-lbl" style="margin-inline-start:12px">או יום מהלוח:</span>
+      <input type="date" id="admDatePick" class="adm-datepick" />
     </div>
 
     <div class="cols">
@@ -105,9 +116,14 @@
       </div>
     </div>
 
+    <div class="contacts-sec">
+      <h2>✉️ פניות מצור קשר (<span id="contactCount">0</span>)</h2>
+      <ol id="contactList"><li class="adm-empty">טוען…</li></ol>
+    </div>
+
     <p class="note">דף פנימי — אינו מקושר באתר ואינו מופיע בחיפוש. הנתונים מתעדכנים בזמן אמת מהמערכת.</p>
   </div>
 
-  <script src="js/main.js?v=692" defer></script>
+  <script src="js/main.js?v=694" defer></script>
 </body>
 </html>
