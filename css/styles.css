@@ -631,21 +631,21 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
 .ysh-close:hover{ background:rgba(255,255,255,.12); }
 
 /* ===== חדשות ועדכוני המרכז ===== */
-.news-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:26px; max-width:1040px; margin:0 auto; }
+.news-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(235px,1fr)); gap:18px; max-width:1100px; margin:0 auto; }
 .news-teaser{ display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:24px; max-width:1000px; margin:0 auto; }
 .news-card{ background:linear-gradient(160deg,#372b19,#2a2113); border:1px solid var(--line-2); border-radius:18px;
   overflow:hidden; display:flex; flex-direction:column; box-shadow:0 12px 34px rgba(0,0,0,.32);
   transition:transform .22s ease, box-shadow .22s ease, border-color .22s ease; }
 .news-card:hover{ transform:translateY(-5px); border-color:rgba(247,231,163,.5); box-shadow:0 20px 50px rgba(0,0,0,.45); }
-.nc-img{ height:172px; background-size:cover; background-position:center; position:relative; }
+.nc-img{ height:148px; background-size:cover; background-position:center; position:relative; }
 .nc-img::after{ content:""; position:absolute; inset:0; background:linear-gradient(180deg,rgba(10,8,4,.05),rgba(10,8,4,.5)); }
-.nc-body{ padding:20px 22px 22px; display:flex; flex-direction:column; flex:1; }
+.nc-body{ padding:15px 17px 17px; display:flex; flex-direction:column; flex:1; }
 .nc-meta{ display:flex; align-items:center; gap:10px; margin-bottom:9px; }
 .nc-cat{ font-size:.72rem; font-weight:800; letter-spacing:.04em; color:#1a1206;
   background:linear-gradient(180deg,#f3d98b,#d3ad55); border-radius:999px; padding:3px 11px; }
 .nc-date{ font-size:.82rem; color:var(--muted); }
-.nc-title{ font-family:var(--ff-serif); font-weight:800; color:var(--gold-2); font-size:1.3rem; line-height:1.3; margin:0 0 9px; }
-.nc-excerpt{ color:#d8cbac; font-size:1.02rem; line-height:1.6; margin:0 0 16px; flex:1; }
+.nc-title{ font-family:var(--ff-serif); font-weight:800; color:var(--gold-2); font-size:1.1rem; line-height:1.28; margin:0 0 8px; }
+.nc-excerpt{ color:#d8cbac; font-size:.9rem; line-height:1.55; margin:0 0 13px; flex:1; }
 .nc-more{ align-self:flex-start; font-family:inherit; font-size:.9rem; font-weight:800; color:var(--gold-2);
   background:none; border:1px solid var(--line-2); border-radius:999px; padding:7px 18px; cursor:pointer; transition:background .2s ease; }
 .nc-more:hover{ background:rgba(247,231,163,.08); }
