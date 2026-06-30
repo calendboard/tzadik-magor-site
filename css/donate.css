@@ -5,10 +5,10 @@
 .donate-page{ padding-top:64px; }
 
 .donate-hero{
-  position:relative; text-align:center; padding:46px 0 10px; overflow:hidden;
+  position:relative; text-align:center; padding:46px 0 6px; overflow:hidden;
   background:radial-gradient(900px 460px at 50% -20%, #2a1e10, var(--bg) 70%);
 }
-.donate-hero .hero-sub{ margin-bottom:6px; }
+.donate-hero .hero-sub{ margin-bottom:0; }
 .donate-hero .candle.small{ transform:scale(.82); margin-bottom:-6px; }
 .donate-hero .orb{ opacity:.4; }
 .donate-hero .container{ position:relative; z-index:2; }
@@ -126,7 +126,7 @@
 
 
 /* ===== מסלולי התרמה ===== */
-.tracks-section{ padding-top:12px; padding-bottom:30px; }
+.tracks-section{ padding-top:2px; padding-bottom:30px; }
 .tracks-section .section-head{ margin-bottom:24px; }
 .tracks-section .section-head .hero-sub{ margin-bottom:0; }
 .tracks-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(290px,1fr)); gap:22px; max-width:1040px; margin:26px auto 0; }
