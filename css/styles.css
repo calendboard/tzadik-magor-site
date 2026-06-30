@@ -783,6 +783,9 @@ a.news-card{ text-decoration:none; color:inherit; cursor:pointer; }
 .fc-btn svg{ width:28px; height:28px; display:block; }
 .fc-wa{ background:#25d366; }
 .fc-mail{ background:linear-gradient(135deg,#e0b94a,#c9952f); }
+.fc-phone{ background:linear-gradient(135deg,#2f86d6,#1f63ad); }
+.fc-phone svg{ width:25px; height:25px; }
+.ci-hotline a{ color:var(--gold-2); font-weight:700; }
 @media (max-width:760px){
   .float-contact{ left:10px; gap:10px; }
   .fc-btn{ width:46px; height:46px; }

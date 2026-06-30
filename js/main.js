@@ -13,11 +13,15 @@
   var SITE_EMAIL = "hatzadikmagor@gmail.com";
   var SITE_WA = "97226597098";
 
-  /* ---------- כפתורי צף ליצירת קשר (וואטסאפ + מייל) ---------- */
+  /* ---------- כפתורי צף ליצירת קשר (מוקד + וואטסאפ + מייל) ---------- */
   (function () {
     if (document.querySelector(".float-contact")) return;
     var wrap = document.createElement("div");
     wrap.className = "float-contact";
+    var ph = document.createElement("a");
+    ph.className = "fc-btn fc-phone"; ph.href = "tel:+" + SITE_WA;
+    ph.setAttribute("aria-label", "מוקד הצדיק"); ph.title = "מוקד הצדיק — חיוג";
+    ph.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="#fff"><path d="M6.62 10.79c1.44 2.83 3.76 5.15 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1.02l-2.2 2.2z"/></svg>';
     var wa = document.createElement("a");
     wa.className = "fc-btn fc-wa"; wa.href = "https://wa.me/" + SITE_WA;
     wa.target = "_blank"; wa.rel = "noopener"; wa.setAttribute("aria-label", "וואטסאפ"); wa.title = "וואטסאפ";
@@ -26,7 +30,7 @@
     ml.className = "fc-btn fc-mail"; ml.href = "mailto:" + SITE_EMAIL;
     ml.setAttribute("aria-label", "אימייל"); ml.title = "שליחת אימייל";
     ml.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="M3 7l9 6 9-6"/></svg>';
-    wrap.appendChild(wa); wrap.appendChild(ml);
+    wrap.appendChild(ph); wrap.appendChild(wa); wrap.appendChild(ml);
     (document.body || document.documentElement).appendChild(wrap);
   })();
 
