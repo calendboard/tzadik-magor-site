@@ -631,10 +631,9 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
 .ysh-close:hover{ background:rgba(255,255,255,.12); }
 
 /* ===== חדשות ועדכוני המרכז ===== */
-.news-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:16px; max-width:1120px; margin:0 auto; }
-@media (max-width:960px){ .news-grid{ grid-template-columns:repeat(3,1fr); } }
-@media (max-width:680px){ .news-grid{ grid-template-columns:repeat(2,1fr); gap:12px; } }
-@media (max-width:440px){ .news-grid{ grid-template-columns:1fr; } }
+.news-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; max-width:1120px; margin:0 auto; }
+@media (max-width:640px){ .news-grid{ grid-template-columns:repeat(2,1fr); gap:11px; } }
+@media (max-width:400px){ .news-grid{ grid-template-columns:1fr; } }
 .news-teaser{ display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:24px; max-width:1000px; margin:0 auto; }
 .news-card{ background:linear-gradient(160deg,#372b19,#2a2113); border:1px solid var(--line-2); border-radius:18px;
   overflow:hidden; display:flex; flex-direction:column; box-shadow:0 12px 34px rgba(0,0,0,.32);
