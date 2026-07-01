@@ -162,6 +162,13 @@
         <label for="fTags">תיוגים קשורים <span class="hint">(מופרדים בפסיק — יופיעו בתחתית הכתבה)</span></label>
         <input id="fTags" type="text" placeholder="לדוגמה: הילולא, רבי אריה גברא, עג׳ור, תפילה" />
       </div>
+      <div class="field">
+        <label style="display:flex;align-items:center;gap:9px;cursor:pointer;font-weight:600">
+          <input id="fFeatured" type="checkbox" style="width:auto;margin:0" />
+          ⭐ כתבה ראשית — מוצמדת לראש דף הבית
+        </label>
+        <span class="hint">רק כתבה אחת ראשית בכל רגע. סימון כאן יבטל אוטומטית את הכתבה הראשית הקודמת.</span>
+      </div>
       <div class="editor-actions">
         <p id="editMsg" class="muted"></p>
         <button id="cancelBtn" class="btn btn-ghost" type="button">ביטול</button>
@@ -281,6 +288,7 @@
       $("fBody").value = a ? (a.body || "") : "";
       $("fVideo").value = a ? (a.video_url || "") : "";
       $("fTags").value = a ? (a.tags || "") : "";
+      $("fFeatured").checked = a ? !!a.featured : false;
       pendingGallery = [];
       if (a && a.gallery) { try { pendingGallery = JSON.parse(a.gallery) || []; } catch (e) { pendingGallery = []; } }
       renderGallery();
@@ -467,19 +475,26 @@
         image_url: pendingImageUrl || null,
         video_url: $("fVideo").value.trim() || null,
         tags: $("fTags").value.trim() || null,
-        gallery: pendingGallery.length ? JSON.stringify(pendingGallery) : null
+        gallery: pendingGallery.length ? JSON.stringify(pendingGallery) : null,
+        featured: $("fFeatured").checked
       };
       var btn = $("saveBtn"); btn.disabled = true;
       $("editMsg").textContent = "שומר…"; $("editMsg").style.color = "var(--muted)";
-      var op;
-      if (editing) { op = sb.from("articles").update(rec).eq("id", editing); }
-      else { rec.sort = Date.now(); op = sb.from("articles").insert(rec); }
-      op.then(function (res) {
-        btn.disabled = false;
-        if (res.error) { $("editMsg").textContent = "שגיאה בשמירה: " + res.error.message; $("editMsg").style.color = "#b23b3b"; return; }
-        closeEditor();
-        loadArticles();
-      });
+      function doSave() {
+        var op;
+        if (editing) { op = sb.from("articles").update(rec).eq("id", editing); }
+        else { rec.sort = Date.now(); op = sb.from("articles").insert(rec); }
+        op.then(function (res) {
+          btn.disabled = false;
+          if (res.error) { $("editMsg").textContent = "שגיאה בשמירה: " + res.error.message; $("editMsg").style.color = "#b23b3b"; return; }
+          closeEditor();
+          loadArticles();
+        });
+      }
+      /* רק כתבה אחת ראשית: מבטלים את הקודמת לפני שמירה */
+      if (rec.featured) {
+        sb.from("articles").update({ featured: false }).eq("featured", true).then(function () { doSave(); });
+      } else { doSave(); }
     });
 
     /* ---------- מחיקה ---------- */

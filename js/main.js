@@ -1213,7 +1213,7 @@
       .then(function (rows) {
         var NEWS = (rows || []).filter(function (a) { return !a.deleted; }).map(function (a) {
           return { id: a.id, date: a.date || "", cat: a.cat || "", img: a.image_url || "", video: a.video_url || "",
-            title: a.title || "", excerpt: a.excerpt || "", tags: a.tags || "" };
+            title: a.title || "", excerpt: a.excerpt || "", tags: a.tags || "", featured: !!a.featured };
         });
         if (activeTag && newsGrid) {
           NEWS = NEWS.filter(function (a) { return String(a.tags).toLowerCase().indexOf(String(activeTag).toLowerCase()) > -1; });
