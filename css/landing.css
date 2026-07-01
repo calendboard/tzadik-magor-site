@@ -152,17 +152,30 @@
 
 /* מלל מודגש ומוגדל — מניין תלמידי חכמים וגדולי וצדיקי הדור */
 .lp-copy .lp-emph {
+  text-align: center;
+  margin: 32px 0;
+  padding: 4px 18px;
+}
+.lp-copy .lp-emph::before,
+.lp-copy .lp-emph::after {
+  content: "";
+  display: block;
+  width: 140px;
+  height: 1px;
+  margin: 0 auto;
+  background: var(--line-2);
+}
+.lp-copy .lp-emph::before { margin-bottom: 22px; }
+.lp-copy .lp-emph::after { margin-top: 20px; }
+.lp-copy .lp-emph .big {
   font-family: var(--ff-serif);
   font-size: clamp(1.4rem, 5vw, 2.05rem);
   line-height: 1.55;
   color: var(--gold-2);
-  text-align: center;
-  margin: 32px 0;
-  padding: 24px 18px;
-  border-top: 1px solid var(--line-2);
-  border-bottom: 1px solid var(--line-2);
+  margin: 0;
 }
-.lp-copy .lp-emph b { color: var(--cream); font-weight: 700; }
+.lp-copy .lp-emph .big b { color: var(--cream); font-weight: 700; }
+.lp-copy .lp-emph .soft { margin: 14px 0 0; }
 
 /* פאנל הבטחה בולט */
 .lp-promise {
