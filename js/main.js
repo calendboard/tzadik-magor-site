@@ -1089,7 +1089,8 @@
         var im = document.createElement("img"); im.src = s.img + "?v=665"; im.alt = ""; im.loading = "lazy";
         photo.appendChild(im);
       } else {
-        photo.className = "ysh-photo ysh-photo-ph"; photo.setAttribute("aria-hidden", "true"); photo.textContent = "✨";
+        photo.className = "ysh-photo ysh-photo-ph"; photo.setAttribute("aria-hidden", "true");
+        photo.innerHTML = '<span class="php-ic">🕯️</span><span class="php-sub">ישועה בזכות הצדיק</span>';
       }
       var cap = document.createElement("span"); cap.className = "ysh-cap";
       var tag = document.createElement("span"); tag.className = "ysh-tag"; tag.textContent = s.tag || "ישועה";
