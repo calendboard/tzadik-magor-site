@@ -261,7 +261,7 @@
 }
 .lp-price-amount span {
   font-size: .48em;
-  margin-inline-start: 5px;
+  margin-right: 6px;
   color: var(--gold);
 }
 .lp-price-note {
