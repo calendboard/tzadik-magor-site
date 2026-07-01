@@ -47,6 +47,7 @@
     .art-row .info{ flex:1; min-width:0; }
     .art-row .info b{ display:block; font-size:1.05rem; }
     .art-row .info .meta{ color:var(--muted); font-size:.82rem; }
+    .feat-badge{ display:inline-block; margin-inline-start:8px; background:#fff3cd; color:#8a6d00; border:1px solid #ffe08a; border-radius:999px; padding:1px 9px; font-size:.72rem; font-weight:700; vertical-align:middle; }
     .art-row .acts{ display:flex; gap:8px; flex:0 0 auto; }
     .empty{ text-align:center; color:var(--muted); padding:40px 0; }
 
@@ -244,6 +245,10 @@
           var info = document.createElement("div");
           info.className = "info";
           var b = document.createElement("b"); b.textContent = a.title || "(ללא כותרת)";
+          if (a.featured && !isTrash) {
+            var star = document.createElement("span"); star.className = "feat-badge"; star.textContent = "⭐ ראשית";
+            b.appendChild(star);
+          }
           var meta = document.createElement("div"); meta.className = "meta";
           meta.textContent = [a.cat, a.date].filter(Boolean).join(" · ");
           info.appendChild(b); info.appendChild(meta);
