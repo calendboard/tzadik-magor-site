@@ -1,0 +1,49 @@
+name: Sync news
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-news
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch news from Supabase
+        env:
+          SB_URL: https://wfhgenhmoofyegysysac.supabase.co
+          SB_KEY: sb_publishable_XbSp3aL_Y_O3m8yzZ_qmOQ_vp5W3EYn
+        run: |
+          curl -sf "$SB_URL/rest/v1/articles?select=*&order=sort.desc" \
+            -H "apikey: $SB_KEY" \
+            -H "Authorization: Bearer $SB_KEY" \
+            -o data/news.new.json
+
+      - name: Validate JSON (must be an array)
+        run: |
+          python3 -c "import json,sys; d=json.load(open('data/news.new.json')); sys.exit(0 if isinstance(d,list) else 1)"
+
+      - name: Update file if changed
+        run: |
+          mkdir -p data
+          if ! cmp -s data/news.new.json data/news.json; then
+            mv data/news.new.json data/news.json
+            git config user.name "news-sync-bot"
+            git config user.email "actions@users.noreply.github.com"
+            git add data/news.json
+            git commit -m "auto: sync news.json from dashboard"
+            git push
+            echo "news.json updated"
+          else
+            rm -f data/news.new.json
+            echo "no changes"
+          fi
