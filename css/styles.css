@@ -663,7 +663,7 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
 /* ===== רשת סיפורים (עמוד הסיפורים) — אותם כרטיסים בפריסת רשת ===== */
 .ysh-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(258px,1fr)); gap:24px; max-width:1040px; margin:0 auto; }
 .ysh-grid .ysh-ball{ width:100%; height:auto; aspect-ratio:1/1; }
-@media (max-width:600px){ .ysh-grid{ grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px; } .ysh-grid .ysh-ball{ width:100%; } }
+@media (max-width:600px){ .ysh-grid{ grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; } .ysh-grid .ysh-ball{ width:100%; } .ysh-photo-ph{ font-size:3.4rem; } }
 
 /* ===== גדולי הרבנים על הצדיק ===== */
 .rabbis{ background:linear-gradient(180deg,var(--bg),var(--bg-2)); }
