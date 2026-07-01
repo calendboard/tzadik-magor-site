@@ -150,6 +150,20 @@
 .lp-copy .lead { color: var(--cream); }
 .lp-copy .soft { color: var(--muted); font-size: 1.02rem; }
 
+/* מלל מודגש ומוגדל — מניין תלמידי חכמים וגדולי וצדיקי הדור */
+.lp-copy .lp-emph {
+  font-family: var(--ff-serif);
+  font-size: clamp(1.4rem, 5vw, 2.05rem);
+  line-height: 1.55;
+  color: var(--gold-2);
+  text-align: center;
+  margin: 32px 0;
+  padding: 24px 18px;
+  border-top: 1px solid var(--line-2);
+  border-bottom: 1px solid var(--line-2);
+}
+.lp-copy .lp-emph b { color: var(--cream); font-weight: 700; }
+
 /* פאנל הבטחה בולט */
 .lp-promise {
   margin: 34px 0;
