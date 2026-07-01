@@ -638,11 +638,25 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
 .news-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; max-width:1120px; margin:0 auto; }
 @media (max-width:640px){ .news-grid{ grid-template-columns:repeat(2,1fr); gap:11px; } }
 @media (max-width:400px){ .news-grid{ grid-template-columns:1fr; } }
-.news-teaser{ display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:24px; max-width:1000px; margin:0 auto; }
+.news-teaser{ display:grid; grid-template-columns:repeat(2,1fr); gap:20px; max-width:1000px; margin:0 auto; }
+@media (max-width:600px){ .news-teaser{ grid-template-columns:1fr; gap:14px; } }
 .news-card{ background:linear-gradient(160deg,#372b19,#2a2113); border:1px solid var(--line-2); border-radius:18px;
   overflow:hidden; display:flex; flex-direction:column; box-shadow:0 12px 34px rgba(0,0,0,.32);
   transition:transform .22s ease, box-shadow .22s ease, border-color .22s ease; }
 .news-card:hover{ transform:translateY(-5px); border-color:rgba(247,231,163,.5); box-shadow:0 20px 50px rgba(0,0,0,.45); }
+/* כתבה ראשית (מוצמדת) — גדולה ברוחב מלא, תמונה לצד טקסט */
+.news-card.featured{ grid-column:1 / -1; flex-direction:row; align-items:stretch; border-color:rgba(247,231,163,.4); }
+.news-card.featured .nc-img{ flex:0 0 44%; height:auto; min-height:250px; }
+.news-card.featured .nc-body{ justify-content:center; padding:26px 30px; }
+.news-card.featured .nc-title{ font-size:1.7rem; margin-bottom:12px; }
+.news-card.featured .nc-excerpt{ font-size:1.03rem; line-height:1.65; }
+@media (max-width:640px){
+  .news-card.featured{ flex-direction:column; }
+  .news-card.featured .nc-img{ flex:none; width:100%; height:200px; min-height:0; }
+  .news-card.featured .nc-body{ padding:16px 18px 18px; }
+  .news-card.featured .nc-title{ font-size:1.3rem; }
+  .news-card.featured .nc-excerpt{ font-size:.95rem; }
+}
 .nc-img{ height:148px; background-size:cover; background-position:center; position:relative; }
 .nc-img::after{ content:""; position:absolute; inset:0; background:linear-gradient(180deg,rgba(10,8,4,.05),rgba(10,8,4,.5)); }
 .nc-body{ padding:15px 17px 17px; display:flex; flex-direction:column; flex:1; }

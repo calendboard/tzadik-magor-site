@@ -1160,9 +1160,9 @@
       return m ? m[1] : null;
     }
 
-    function newsCard(a) {
+    function newsCard(a, isFeatured) {
       var c = document.createElement("a");
-      c.className = "news-card";
+      c.className = "news-card" + (isFeatured ? " featured" : "");
       c.href = "article.html?id=" + encodeURIComponent(a.id);
       c.innerHTML =
         '<div class="nc-img"></div>' +
@@ -1189,8 +1189,21 @@
     }
 
     function renderNews(NEWS) {
-      if (newsGrid) { newsGrid.innerHTML = ""; NEWS.forEach(function (a) { newsGrid.appendChild(newsCard(a)); }); }
-      if (newsTeaser) { newsTeaser.innerHTML = ""; NEWS.slice(0, 6).forEach(function (a) { newsTeaser.appendChild(newsCard(a)); }); }
+      var featured = null, rest = NEWS;
+      if (NEWS && NEWS.length) {
+        featured = NEWS.filter(function (a) { return a.featured; })[0] || NEWS[0];
+        rest = NEWS.filter(function (a) { return a !== featured; });
+      }
+      if (newsGrid) {
+        newsGrid.innerHTML = "";
+        if (featured) newsGrid.appendChild(newsCard(featured, true));
+        rest.forEach(function (a) { newsGrid.appendChild(newsCard(a)); });
+      }
+      if (newsTeaser) {
+        newsTeaser.innerHTML = "";
+        if (featured) newsTeaser.appendChild(newsCard(featured, true));
+        rest.slice(0, 4).forEach(function (a) { newsTeaser.appendChild(newsCard(a)); });
+      }
     }
 
     var activeTag = new URLSearchParams(location.search).get("tag");
