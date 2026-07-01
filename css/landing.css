@@ -165,17 +165,18 @@
   margin: 0 auto;
   background: var(--line-2);
 }
-.lp-copy .lp-emph::before { margin-bottom: 22px; }
-.lp-copy .lp-emph::after { margin-top: 20px; }
+.lp-copy .lp-emph::before { margin-bottom: 10px; }
+.lp-copy .lp-emph::after { margin-top: 10px; }
 .lp-copy .lp-emph .big {
   font-family: var(--ff-serif);
-  font-size: clamp(1.4rem, 5vw, 2.05rem);
-  line-height: 1.55;
+  font-size: clamp(1.1rem, 3vw, 1.3rem);
+  line-height: 1.6;
   color: var(--gold-2);
-  margin: 0;
+  max-width: 42ch;
+  margin: 0 auto;
 }
 .lp-copy .lp-emph .big b { color: var(--cream); font-weight: 700; }
-.lp-copy .lp-emph .soft { margin: 14px 0 0; }
+.lp-copy .lp-emph .soft { margin: 8px 0 0; }
 
 /* פאנל הבטחה בולט */
 .lp-promise {
