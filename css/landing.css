@@ -169,10 +169,9 @@
 .lp-copy .lp-emph::after { margin-top: 10px; }
 .lp-copy .lp-emph .big {
   font-family: var(--ff-serif);
-  font-size: clamp(1.1rem, 3vw, 1.3rem);
-  line-height: 1.6;
+  font-size: clamp(1.55rem, 5.6vw, 2.25rem);
+  line-height: 1.45;
   color: var(--gold-2);
-  max-width: 42ch;
   margin: 0 auto;
 }
 .lp-copy .lp-emph .big b { color: var(--cream); font-weight: 700; }
