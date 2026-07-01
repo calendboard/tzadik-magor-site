@@ -68,10 +68,13 @@
     @keyframes sp{ to{ transform:rotate(360deg); } }
     .gal-grid{ display:flex; flex-wrap:wrap; gap:10px; }
     .gal-grid:empty{ display:none; }
+    .gal-cell{ width:96px; }
     .gal-item{ position:relative; width:96px; height:74px; border-radius:9px; overflow:hidden; border:1px solid var(--line); background:#eee center/cover no-repeat; }
     .gal-item video{ width:100%; height:100%; object-fit:cover; }
     .gal-item .gal-vid{ position:absolute; inset:0; display:grid; place-items:center; color:#fff; font-size:1.1rem; background:rgba(0,0,0,.25); pointer-events:none; }
     .gal-item .gal-del{ position:absolute; top:3px; inset-inline-start:3px; width:22px; height:22px; border:0; border-radius:50%; background:rgba(178,59,59,.92); color:#fff; font-size:.8rem; cursor:pointer; line-height:1; display:grid; place-items:center; }
+    .gal-cap{ width:96px; margin-top:5px; padding:4px 6px; border:1px solid var(--line); border-radius:7px; font-size:.72rem; font-family:inherit; box-sizing:border-box; }
+    .img-cap{ margin-top:8px; }
   </style>
 </head>
 <body>
@@ -112,6 +115,7 @@
           <img id="imgPreview" class="hidden" alt="" />
         </div>
         <input id="imgFile" type="file" accept="image/*" class="hidden" />
+        <input id="fImgCaption" type="text" class="img-cap" placeholder="כיתוב לתמונה (רשות) — מי בתמונה / איפה צולם…" />
       </div>
       <div class="field">
         <label>סרטון <span class="hint">(רשות — קישור יוטיוב או העלאת קובץ)</span></label>
@@ -292,6 +296,7 @@
       $("fExcerpt").value = a ? (a.excerpt || "") : "";
       $("fBody").value = a ? (a.body || "") : "";
       $("fVideo").value = a ? (a.video_url || "") : "";
+      $("fImgCaption").value = a ? (a.image_caption || "") : "";
       $("fTags").value = a ? (a.tags || "") : "";
       $("fFeatured").checked = a ? !!a.featured : false;
       pendingGallery = [];
@@ -427,6 +432,7 @@
     function renderGallery() {
       var g = $("galGrid"); if (!g) return; g.innerHTML = "";
       pendingGallery.forEach(function (it, i) {
+        var wrap = document.createElement("div"); wrap.className = "gal-cell";
         var cell = document.createElement("div"); cell.className = "gal-item";
         if (it.type === "video") {
           var v = document.createElement("video"); v.src = it.url + "#t=0.1"; v.muted = true; v.preload = "metadata"; cell.appendChild(v);
@@ -434,7 +440,11 @@
         } else { cell.style.backgroundImage = "url('" + it.url + "')"; }
         var del = document.createElement("button"); del.type = "button"; del.className = "gal-del"; del.textContent = "✕";
         del.onclick = function () { pendingGallery.splice(i, 1); renderGallery(); };
-        cell.appendChild(del); g.appendChild(cell);
+        cell.appendChild(del); wrap.appendChild(cell);
+        var cap = document.createElement("input"); cap.type = "text"; cap.className = "gal-cap";
+        cap.placeholder = "כיתוב (רשות)"; cap.value = it.caption || "";
+        cap.oninput = function () { it.caption = cap.value; };
+        wrap.appendChild(cap); g.appendChild(wrap);
       });
     }
     $("galAddBtn").addEventListener("click", function () { $("galFiles").click(); });
@@ -478,6 +488,7 @@
         excerpt: $("fExcerpt").value.trim(),
         body: body,
         image_url: pendingImageUrl || null,
+        image_caption: $("fImgCaption").value.trim() || null,
         video_url: $("fVideo").value.trim() || null,
         tags: $("fTags").value.trim() || null,
         gallery: pendingGallery.length ? JSON.stringify(pendingGallery) : null,
@@ -490,8 +501,17 @@
         if (editing) { op = sb.from("articles").update(rec).eq("id", editing); }
         else { rec.sort = Date.now(); op = sb.from("articles").insert(rec); }
         op.then(function (res) {
+          if (res.error) {
+            /* אם עמודת image_caption עדיין לא קיימת ב-Supabase — שומרים בלעדיה, כדי לא לחסום את השמירה */
+            if (/image_caption/.test(res.error.message || "") && ("image_caption" in rec)) {
+              delete rec.image_caption;
+              doSave();
+              return;
+            }
+            btn.disabled = false;
+            $("editMsg").textContent = "שגיאה בשמירה: " + res.error.message; $("editMsg").style.color = "#b23b3b"; return;
+          }
           btn.disabled = false;
-          if (res.error) { $("editMsg").textContent = "שגיאה בשמירה: " + res.error.message; $("editMsg").style.color = "#b23b3b"; return; }
           closeEditor();
           loadArticles();
         });
