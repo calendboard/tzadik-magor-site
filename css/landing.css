@@ -220,6 +220,46 @@
   margin: 0 0 20px;
 }
 
+/* תג מחיר — 414 ₪ בגימטרייא של שם הצדיק */
+.lp-price {
+  max-width: 430px;
+  margin: 8px auto 4px;
+  text-align: center;
+  padding: 22px 22px 20px;
+  border-radius: var(--radius);
+  border: 1px solid var(--line-2);
+  background:
+    radial-gradient(120% 120% at 50% 0%, rgba(216, 179, 73, .16), transparent 65%),
+    var(--bg-2);
+}
+.lp-price-label {
+  color: var(--gold);
+  font-weight: 700;
+  letter-spacing: .04em;
+  font-size: .95rem;
+}
+.lp-price-amount {
+  font-family: var(--ff-serif);
+  font-weight: 700;
+  font-size: clamp(2.6rem, 10vw, 3.6rem);
+  line-height: 1.05;
+  color: var(--gold-2);
+  margin: 6px 0 2px;
+}
+.lp-price-amount span {
+  font-size: .48em;
+  margin-inline-start: 5px;
+  color: var(--gold);
+}
+.lp-price-note {
+  margin: 8px auto 0;
+  max-width: 34ch;
+  color: var(--muted);
+  font-size: .96rem;
+  line-height: 1.7;
+}
+.lp-price-note b { color: var(--gold-2); font-weight: 700; }
+
 /* CTA */
 .lp-cta-wrap {
   text-align: center;
