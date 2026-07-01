@@ -1196,7 +1196,7 @@
 
     var activeTag = new URLSearchParams(location.search).get("tag");
 
-    fetch(SB_URL + "/rest/v1/articles?select=*&order=sort.desc", { headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY } })
+    fetch("data/news.json")
       .then(function (r) { return r.json(); })
       .then(function (rows) {
         var NEWS = (rows || []).filter(function (a) { return !a.deleted; }).map(function (a) {
