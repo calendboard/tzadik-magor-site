@@ -37,15 +37,26 @@ jobs:
       - name: Update file if changed
         run: |
           mkdir -p data
-          if ! cmp -s data/news.new.json data/news.json; then
-            mv data/news.new.json data/news.json
-            git config user.name "news-sync-bot"
-            git config user.email "actions@users.noreply.github.com"
-            git add data/news.json
-            git commit -m "auto: sync news.json from dashboard"
-            git push
-            echo "news.json updated"
-          else
+          if cmp -s data/news.new.json data/news.json; then
             rm -f data/news.new.json
             echo "no changes"
+            exit 0
           fi
+          mv data/news.new.json data/news.json
+          git config user.name "news-sync-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/news.json
+          git commit -m "auto: sync news.json from dashboard"
+          # דחיפה עם ניסיונות חוזרים — אם ריצה/דחיפה אחרת הקדימה אותנו,
+          # מושכים את העדכון האחרון, משלבים מעליו את הגרסה הטרייה, ומנסים שוב.
+          for attempt in 1 2 3 4 5; do
+            if git push; then
+              echo "news.json updated (attempt $attempt)"
+              exit 0
+            fi
+            echo "push rejected — syncing with latest main (attempt $attempt)"
+            git pull --rebase -X theirs origin main || true
+            sleep 3
+          done
+          echo "push failed after retries"
+          exit 1
