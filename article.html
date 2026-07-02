@@ -6,6 +6,11 @@
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
+    // ברירת מחדל: מעקב מושהה עד לאישור המבקר (Consent Mode v2)
+    gtag('consent', 'default', {
+      ad_storage: 'denied', analytics_storage: 'denied',
+      ad_user_data: 'denied', ad_personalization: 'denied'
+    });
     gtag('js', new Date());
     gtag('config', 'G-X76DGFH24J');
   </script>
@@ -59,13 +64,8 @@
     .ag-lb-prev{ right:16px; } .ag-lb-next{ left:16px; }
     .ag-lb-cap{ position:fixed; bottom:20px; left:0; right:0; text-align:center; color:#f3ead2; font-size:.92rem; line-height:1.5; padding:0 60px; pointer-events:none; text-shadow:0 1px 4px rgba(0,0,0,.85); }
   </style>
-  <!-- Meta Pixel -->
-  <script>
-  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
-  fbq('init','1744112086942113');fbq('track','PageView');
-  </script>
-  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1744112086942113&ev=PageView&noscript=1"/></noscript>
-  <!-- End Meta Pixel -->
+  <!-- Meta Pixel + Google Analytics מנוהלים דרך הסכמת עוגיות (js/consent.js) -->
+  <script defer src="js/consent.js?v=1"></script>
 </head>
 
 <body>
@@ -252,7 +252,9 @@
       view.appendChild(back);
 
       var meta = el("p", "art-meta");
-      meta.textContent = [a.cat, a.date].filter(Boolean).join("  ·  ");
+      var metaBits = [a.cat, a.date];
+      if (a.author_display) metaBits.push("מאת " + a.author_display);
+      meta.textContent = metaBits.filter(Boolean).join("  ·  ");
       view.appendChild(meta);
 
       var h1 = el("h1", "art-title"); h1.textContent = a.title || ""; view.appendChild(h1);
