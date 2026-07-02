@@ -6,6 +6,11 @@
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
+    // ברירת מחדל: מעקב מושהה עד לאישור המבקר (Consent Mode v2)
+    gtag('consent', 'default', {
+      ad_storage: 'denied', analytics_storage: 'denied',
+      ad_user_data: 'denied', ad_personalization: 'denied'
+    });
     gtag('js', new Date());
     gtag('config', 'G-X76DGFH24J');
   </script>
@@ -31,13 +36,8 @@
     .stories-hero .candle{ margin:0 auto 22px; }
     .stories-page{ padding:30px 0 70px; }
   </style>
-  <!-- Meta Pixel -->
-  <script>
-  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
-  fbq('init','1744112086942113');fbq('track','PageView');
-  </script>
-  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1744112086942113&ev=PageView&noscript=1"/></noscript>
-  <!-- End Meta Pixel -->
+  <!-- Meta Pixel + Google Analytics מנוהלים דרך הסכמת עוגיות (js/consent.js) -->
+  <script defer src="js/consent.js?v=1"></script>
 </head>
 
 <body>
@@ -130,9 +130,15 @@
               <label for="tEmail">אימייל <span style="color:var(--gold)">*</span></label>
               <input id="tEmail" name="email" data-label="אימייל" type="email" autocomplete="email" required />
             </div>
+            <div class="field">
+              <label style="display:flex;align-items:flex-start;gap:9px;font-weight:400;cursor:pointer;margin:0;">
+                <input type="checkbox" name="marketing_consent" data-label="אישור דיוור" value="" style="width:auto;margin-top:5px;flex:0 0 auto;accent-color:var(--gold);" onchange="this.value=this.checked?'כן':''" />
+                <span style="color:var(--muted);font-size:.92rem;line-height:1.55;">אשמח לקבל עדכונים, ברכות והודעות מהמרכז בטלפון, במייל או ב‑SMS. אפשר להסיר בכל עת.</span>
+              </label>
+            </div>
             <button type="submit" class="btn btn-gold btn-block">מסירת השם לתפילה 🙏</button>
             <p class="form-status" role="status" aria-live="polite"></p>
-            <p class="arch-note" style="text-align:center">המסירה ללא עלות. פרטיכם נשמרים אצלנו לצורך התפילה בלבד ואינם מתפרסמים.</p>
+            <p class="arch-note" style="text-align:center">המסירה ללא עלות. פרטיכם אינם מתפרסמים באתר; ייתכן שניצור עמכם קשר. לפרטים — <a href="privacy.html" style="color:var(--gold-2)">מדיניות הפרטיות</a>.</p>
           </form>
 
           <!-- אישור: השם נמסר -->

@@ -6,6 +6,11 @@
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
+    // ברירת מחדל: מעקב מושהה עד לאישור המבקר (Consent Mode v2)
+    gtag('consent', 'default', {
+      ad_storage: 'denied', analytics_storage: 'denied',
+      ad_user_data: 'denied', ad_personalization: 'denied'
+    });
     gtag('js', new Date());
     gtag('config', 'G-X76DGFH24J');
   </script>
@@ -34,13 +39,8 @@
       font-size:clamp(1.7rem,4.6vw,2.6rem); line-height:1.3; text-align:center;
       margin:18px auto 0; letter-spacing:.02em; text-shadow:0 0 26px rgba(247,215,120,.28); }
   </style>
-  <!-- Meta Pixel -->
-  <script>
-  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
-  fbq('init','1744112086942113');fbq('track','PageView');
-  </script>
-  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1744112086942113&ev=PageView&noscript=1"/></noscript>
-  <!-- End Meta Pixel -->
+  <!-- Meta Pixel + Google Analytics מנוהלים דרך הסכמת עוגיות (js/consent.js) -->
+  <script defer src="js/consent.js?v=1"></script>
 </head>
 
 <body>
@@ -136,9 +136,15 @@
               <label for="nerEmail">אימייל <span style="color:var(--gold)">*</span></label>
               <input id="nerEmail" name="email" data-label="אימייל" type="email" autocomplete="email" required />
             </div>
+            <div class="field">
+              <label style="display:flex;align-items:flex-start;gap:9px;font-weight:400;cursor:pointer;margin:0;">
+                <input type="checkbox" name="marketing_consent" data-label="אישור דיוור" value="" style="width:auto;margin-top:5px;flex:0 0 auto;accent-color:var(--gold);" onchange="this.value=this.checked?'כן':''" />
+                <span style="color:var(--muted);font-size:.92rem;line-height:1.55;">אשמח לקבל עדכונים, ברכות והודעות מהמרכז בטלפון, במייל או ב‑SMS. אפשר להסיר בכל עת.</span>
+              </label>
+            </div>
             <button type="submit" class="btn btn-gold btn-block">הדלקת הנר 🕯️</button>
             <p class="form-status" role="status" aria-live="polite"></p>
-            <p class="arch-note" style="text-align:center">ההדלקה ללא עלות. פרטיכם נשמרים אצלנו לצורך ההזכרה בלבד ואינם מתפרסמים.</p>
+            <p class="arch-note" style="text-align:center">ההדלקה ללא עלות. פרטיכם אינם מתפרסמים באתר; ייתכן שניצור עמכם קשר. לפרטים — <a href="privacy.html" style="color:var(--gold-2)">מדיניות הפרטיות</a>.</p>
           </form>
 
           <!-- אישור: נר נדלק -->

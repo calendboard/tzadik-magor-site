@@ -6,6 +6,11 @@
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
+    // ברירת מחדל: מעקב מושהה עד לאישור המבקר (Consent Mode v2)
+    gtag('consent', 'default', {
+      ad_storage: 'denied', analytics_storage: 'denied',
+      ad_user_data: 'denied', ad_personalization: 'denied'
+    });
     gtag('js', new Date());
     gtag('config', 'G-X76DGFH24J');
   </script>
@@ -51,6 +56,8 @@
     .filters{ display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
     .filters span{ background:#fff; border:1px solid var(--line); border-radius:999px; padding:5px 14px; font-size:.9rem; }
   </style>
+  <!-- Meta Pixel + Google Analytics מנוהלים דרך הסכמת עוגיות (js/consent.js) -->
+  <script defer src="js/consent.js?v=1"></script>
 </head>
 <body>
 

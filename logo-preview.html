@@ -6,6 +6,11 @@
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
+    // ברירת מחדל: מעקב מושהה עד לאישור המבקר (Consent Mode v2)
+    gtag('consent', 'default', {
+      ad_storage: 'denied', analytics_storage: 'denied',
+      ad_user_data: 'denied', ad_personalization: 'denied'
+    });
     gtag('js', new Date());
     gtag('config', 'G-X76DGFH24J');
   </script>
@@ -41,6 +46,8 @@
     .hdr nav{ display:flex; gap:20px; color:#d8cba8; font-size:.95rem; }
     .note{ color:#b9a878; font-size:.92rem; text-align:center; margin-top:10px; }
   </style>
+  <!-- Meta Pixel + Google Analytics מנוהלים דרך הסכמת עוגיות (js/consent.js) -->
+  <script defer src="js/consent.js?v=1"></script>
 </head>
 <body>
   <div class="wrap">
