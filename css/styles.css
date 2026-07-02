@@ -89,6 +89,7 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
 .main-nav a:hover{ color:var(--gold-2); background:rgba(216,179,73,.1); }
 .main-nav a.nav-home{ color:var(--gold-2); font-weight:700; }
 .nav-cta{ display:flex; align-items:center; gap:12px; }
+.nav-cta-2 .ncta-sm{ display:none; }
 .nav-toggle{ display:none; flex-direction:column; gap:5px; background:none; border:0; cursor:pointer; padding:6px; }
 .nav-toggle span{ width:26px; height:2px; background:var(--gold-2); border-radius:2px; transition:.3s; }
 .nav-toggle.open span:nth-child(1){ transform:translateY(7px) rotate(45deg); }
@@ -433,7 +434,10 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
   .main-nav.open{ opacity:1; visibility:visible; transform:none; pointer-events:auto; }
   .main-nav a{ font-size:1.25rem; padding:15px 14px; text-align:center; border-bottom:1px solid rgba(216,179,73,.1); }
   .nav-toggle{ display:flex; position:relative; z-index:1200; }
-  .nav-cta .btn-gold, .nav-cta-2{ display:none; }
+  .nav-cta .btn-gold{ display:none; }
+  .nav-cta-2{ display:inline-flex; padding:8px 12px; font-size:.8rem; }
+  .nav-cta-2 .ncta-lg{ display:none; }
+  .nav-cta-2 .ncta-sm{ display:inline; }
   .section{ padding:72px 0; }
   .hero-stats{ gap:16px; }
   .stat-sep{ display:none; }
@@ -454,6 +458,7 @@ h1,h2,h3,h4{ font-family:var(--ff-serif); line-height:1.2; font-weight:700; }
   .brand-text{ white-space:nowrap; }
   .brand-mark img,.brand-logo{ width:38px!important; height:38px!important; }
   .nav-cta{ flex-shrink:0; }
+  .nav-cta-2{ font-size:.74rem; padding:7px 10px; }
   .hero-actions .btn{ font-size:.92rem; padding:14px 12px; }
 }
 
