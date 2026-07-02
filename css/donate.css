@@ -5,11 +5,11 @@
 .donate-page{ padding-top:64px; }
 
 .donate-hero{
-  position:relative; text-align:center; padding:46px 0 6px; overflow:hidden;
+  position:relative; text-align:center; padding:22px 0 4px; overflow:hidden;
   background:radial-gradient(900px 460px at 50% -20%, #2a1e10, var(--bg) 70%);
 }
 .donate-hero .hero-sub{ margin-bottom:0; }
-.donate-hero .candle.small{ transform:scale(.82); margin-bottom:-6px; }
+.donate-hero .candle.small{ transform:scale(.62); margin-bottom:-14px; }
 .donate-hero .orb{ opacity:.4; }
 .donate-hero .container{ position:relative; z-index:2; }
 
