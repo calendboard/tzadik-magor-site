@@ -376,7 +376,7 @@
           $("pushSend").disabled = false;
           if (res.j && res.j.ok) {
             m.style.color = "#1e7d34";
-            m.textContent = "✅ נשלח בהצלחה! הגיע ל-" + (res.j.recipients != null ? res.j.recipients : "?") + " נרשמים.";
+            m.textContent = (res.j.recipients != null) ? ("✅ נשלח בהצלחה! הגיע ל-" + res.j.recipients + " נרשמים.") : "✅ נשלח בהצלחה לכל הנרשמים! 🎉";
             if ($("pushRemember").checked) { try { localStorage.setItem("push_token", token); } catch (e) {} } else { try { localStorage.removeItem("push_token"); } catch (e) {} }
           } else if (res.status === 401 || (res.j && res.j.error === "unauthorized")) {
             m.style.color = "#c0392b"; m.textContent = "❌ סיסמת השליחה שגויה. בדקו שהזנתם בדיוק כמו PUSH_TOKEN ב-Cloudflare.";
