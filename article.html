@@ -28,15 +28,21 @@
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="css/styles.css?v=708" />
   <style>
-    .art-page{ max-width:760px; margin:0 auto; padding:118px 20px 60px; }
+    .art-page{ max-width:680px; margin:0 auto; padding:118px 20px 60px; }
     .art-back{ display:inline-block; color:var(--gold-2); text-decoration:none; font-weight:600; margin-bottom:18px; }
     .art-back:hover{ text-decoration:underline; }
     .art-meta{ color:var(--gold-2); font-size:.9rem; letter-spacing:.04em; margin:0 0 8px; }
     .art-title{ font-family:var(--ff-serif); font-weight:800; color:#fbe8b0; font-size:clamp(1.8rem,4.6vw,2.6rem); line-height:1.25; margin:0 0 24px; }
     .art-media{ margin:0 0 26px; }
     .art-media img{ width:100%; border-radius:16px; display:block; border:1px solid var(--line-2); }
-    .art-body{ color:var(--cream); font-size:1.16rem; line-height:1.95; }
-    .art-body p{ margin:0 0 16px; }
+    .art-body{ color:var(--cream); font-size:1.18rem; line-height:1.8;
+      background:#322616; border:1px solid rgba(216,179,73,.15); border-radius:16px;
+      padding:30px 34px; box-shadow:0 12px 34px rgba(0,0,0,.25); }
+    .art-body p{ margin:0 0 20px; }
+    .art-body p:last-child{ margin-bottom:0; }
+    .art-h{ font-family:var(--ff-serif); color:#f2db8a; font-weight:700; font-size:1.42rem; line-height:1.4; margin:28px 0 12px; }
+    .art-h:first-child{ margin-top:0; }
+    @media(max-width:560px){ .art-body{ padding:22px 20px; } .art-h{ font-size:1.3rem; } }
     .art-link{ color:var(--gold-2); text-decoration:underline; text-underline-offset:3px; word-break:break-word; }
     .art-cta{ margin:22px 0 12px; text-align:center; }
     .art-ner-btn{ display:inline-flex; align-items:center; gap:10px; font-size:1.12rem; padding:14px 34px; }
@@ -188,8 +194,26 @@
     function appendBody(text, container) {
       var LINK = /\[([^\]]*?)\]\(\s*([^)\s]+)\s*\)/g;
       var CANDLE = /(?:ner|wall)\.html/i;
+      function isHeading(b) {
+        if (/^##\s+/.test(b)) return true;                 // סימון ידני: "## כותרת"
+        if (/\]\(/.test(b)) return false;                  // מכיל קישור
+        if (b.split(/\s+/).length > 6 || b.length > 42) return false;
+        if (/[0-9]/.test(b)) return false;                 // טלפונים / תאריכים
+        if (/[:]/.test(b)) return false;                   // "קרדיט לתמונות:"
+        if (/קרדיט|צילום/.test(b)) return false;
+        if (/[.!?,;]\s*$/.test(b)) return false;           // משפט שמסתיים בפיסוק
+        return true;
+      }
+      function headingText(b) {
+        return b.replace(/^##\s+/, "").replace(/^[׳״"'’]+|[׳״"'’]+$/g, "").trim();
+      }
       String(text || "").split(/\n{2,}/).map(function (s) { return s.trim(); }).filter(Boolean)
         .forEach(function (block) {
+          if (isHeading(block)) {
+            var h = el("h2", "art-h"); h.textContent = headingText(block);
+            if (h.textContent) container.appendChild(h);
+            return;
+          }
           var p = el("p"), ctas = 0, last = 0, m;
           LINK.lastIndex = 0;
           while ((m = LINK.exec(block))) {
