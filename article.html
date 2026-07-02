@@ -69,6 +69,11 @@
     .ag-lb-nav{ position:fixed; top:50%; transform:translateY(-50%); width:48px; height:48px; border-radius:50%; background:rgba(255,255,255,.16); color:#fff; border:0; font-size:1.9rem; line-height:1; cursor:pointer; }
     .ag-lb-prev{ right:16px; } .ag-lb-next{ left:16px; }
     .ag-lb-cap{ position:fixed; bottom:20px; left:0; right:0; text-align:center; color:#f3ead2; font-size:.92rem; line-height:1.5; padding:0 60px; pointer-events:none; text-shadow:0 1px 4px rgba(0,0,0,.85); }
+    .art-cta{ margin:38px 0 0; padding:26px 22px; text-align:center; border:1px solid rgba(212,175,90,.4); border-radius:18px; background:radial-gradient(700px 240px at 50% -50%, rgba(120,90,20,.28), rgba(247,231,163,.04)); }
+    .art-cta-eyebrow{ color:var(--gold-2); font-size:.85rem; letter-spacing:.06em; margin:0 0 6px; }
+    .art-cta-title{ font-size:clamp(1.15rem,3vw,1.4rem); font-weight:700; color:#f3ead2; margin:0 0 8px; line-height:1.4; }
+    .art-cta-sub{ color:var(--muted); font-size:.96rem; margin:0 auto 18px; line-height:1.6; max-width:440px; }
+    .art-cta .btn{ font-size:1.05rem; }
   </style>
   <!-- Meta Pixel + Google Analytics מנוהלים דרך הסכמת עוגיות (js/consent.js) -->
   <script defer src="js/consent.js?v=1"></script>
@@ -328,6 +333,22 @@
         });
         view.appendChild(gwrap);
       }
+
+      // באנר קריאה לפעולה — מתחלף בין ישועה לדף חדש לפי הכתבה
+      var ctaVariants = [
+        { href: "yeshua.html", icon: "🕯️", text: "גם אני רוצה ישועה בכ״א תמוז", sub: "מסירת שם לתפילה לרפואה, לזיווג ולכל ישועה — על ציון הצדיק ביום ההילולא." },
+        { href: "daf-chadash.html", icon: "📖", text: "גם אני רוצה לפתוח דף חדש בכ״א תמוז", sub: "תפילה לפרנסה בשפע ולפתיחת מקורות חדשים — על ציון הצדיק ביום ההילולא." }
+      ];
+      var _h = 0, _sid = String(a.id || "");
+      for (var _hi = 0; _hi < _sid.length; _hi++) _h += _sid.charCodeAt(_hi);
+      var cv = ctaVariants[_h % 2];
+      var cta = el("div", "art-cta");
+      var ceb = el("p", "art-cta-eyebrow"); ceb.textContent = "✦ לזכות ההילולא הקדושה · כ״א בתמוז ✦";
+      var ctt = el("p", "art-cta-title"); ctt.textContent = cv.icon + " " + cv.text;
+      var cst = el("p", "art-cta-sub"); cst.textContent = cv.sub;
+      var cbt = el("a", "btn btn-gold btn-lg"); cbt.href = cv.href; cbt.textContent = cv.text + " »";
+      cta.appendChild(ceb); cta.appendChild(ctt); cta.appendChild(cst); cta.appendChild(cbt);
+      view.appendChild(cta);
 
       // שיתוף
       var share = el("div", "art-share");
