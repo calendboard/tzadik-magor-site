@@ -1382,3 +1382,21 @@
     });
   }
 })();
+
+/* ===== Push notifications (OneSignal) =====
+   TEST MODE: initializes ONLY when the URL contains ?push=1
+   so no regular visitor sees a prompt until we go live.
+   To launch for everyone: set PUSH_LIVE = true below. */
+(function () {
+  var PUSH_LIVE = false;
+  var PUSH_TEST = /[?&]push=1(&|$)/.test(location.search);
+  if (!PUSH_LIVE && !PUSH_TEST) return;
+  var s = document.createElement("script");
+  s.src = "https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js";
+  s.defer = true;
+  document.head.appendChild(s);
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  window.OneSignalDeferred.push(async function (OneSignal) {
+    await OneSignal.init({ appId: "249c32f4-8a1f-4fc7-877d-944ea4c59556" });
+  });
+})();
