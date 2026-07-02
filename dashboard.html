@@ -64,6 +64,14 @@
     .editor-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:8px; flex-wrap:wrap; }
     #editMsg{ font-size:.9rem; margin:0; align-self:center; margin-inline-end:auto; }
     .hidden{ display:none !important; }
+    .push-overlay{ position:fixed; inset:0; background:rgba(20,15,5,.55); display:flex; align-items:center; justify-content:center; z-index:1000; padding:16px; }
+    .push-box{ background:var(--card); border:1px solid var(--line); border-radius:16px; padding:24px; width:min(480px,100%); max-height:90vh; overflow:auto; box-shadow:0 20px 60px rgba(0,0,0,.25); }
+    .push-box h2{ margin:0 0 6px; font-size:1.2rem; color:var(--g2); }
+    .push-note{ color:var(--muted); font-size:.85rem; margin:0 0 14px; line-height:1.5; }
+    .push-box label{ display:block; font-weight:500; font-size:.9rem; margin:12px 0 4px; }
+    .push-box input, .push-box textarea{ width:100%; }
+    #pushKeyWrap{ margin-top:14px; padding-top:14px; border-top:1px dashed var(--line); }
+    .push-status{ min-height:20px; margin:12px 0 4px; font-size:.9rem; }
     .spin{ display:inline-block; width:15px; height:15px; border:2px solid #fff; border-top-color:transparent; border-radius:50%; animation:sp .7s linear infinite; vertical-align:-2px; margin-inline-start:6px; }
     @keyframes sp{ to{ transform:rotate(360deg); } }
     .gal-grid{ display:flex; flex-wrap:wrap; gap:10px; }
@@ -195,6 +203,32 @@
     <div id="list"><p class="empty">טוען…</p></div>
   </div>
 
+  <!-- חלון שליחת פוש -->
+  <div id="pushModal" class="push-overlay hidden">
+    <div class="push-box">
+      <h2>🔔 שליחת התראת פוש</h2>
+      <p class="push-note">ההתראה תישלח לכל הנרשמים לפושים. ⚠️ אי אפשר לבטל לאחר שליחה.</p>
+      <label>כותרת</label>
+      <input id="pushTitle" type="text" maxlength="65" placeholder="כותרת קצרה" />
+      <label>הודעה</label>
+      <textarea id="pushBody" rows="3" maxlength="180" placeholder="תוכן ההתראה"></textarea>
+      <label>קישור בלחיצה על ההתראה</label>
+      <input id="pushUrl" type="text" placeholder="https://hatzadik-magor.co.il/..." />
+      <div id="pushKeyWrap">
+        <label>🔑 מפתח OneSignal (REST API Key)</label>
+        <input id="pushKey" type="password" placeholder="מדביקים פעם אחת — נשמר רק בדפדפן שלכם" />
+        <label style="display:flex;align-items:center;gap:6px;font-weight:400;font-size:.85rem;margin-top:6px">
+          <input id="pushRemember" type="checkbox" checked style="width:auto;margin:0" /> לזכור את המפתח בדפדפן זה (עד סגירת הטאב)
+        </label>
+      </div>
+      <p id="pushMsg" class="push-status"></p>
+      <div class="editor-actions">
+        <button id="pushCancel" class="btn btn-ghost" type="button">ביטול</button>
+        <button id="pushSend" class="btn" type="button">🔔 שליחה לכולם</button>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
   (function () {
@@ -289,11 +323,14 @@
             pd.onclick = function () { purgeArticle(a); };
             acts.appendChild(rs); acts.appendChild(pd);
           } else {
+            var push = document.createElement("button"); push.className = "btn btn-ghost btn-sm"; push.textContent = "🔔 פוש";
+            push.title = "שליחת התראת פוש על הכתבה הזאת";
+            push.onclick = function () { openPushModal(a); };
             var ed = document.createElement("button"); ed.className = "btn btn-ghost btn-sm"; ed.textContent = "✏️ עריכה";
             ed.onclick = function () { openEditor(a); };
             var del = document.createElement("button"); del.className = "btn btn-danger btn-sm"; del.textContent = "🗑️ מחיקה";
             del.onclick = function () { trashArticle(a); };
-            acts.appendChild(ed); acts.appendChild(del);
+            acts.appendChild(push); acts.appendChild(ed); acts.appendChild(del);
           }
           row.appendChild(thumb); row.appendChild(info); row.appendChild(acts);
           list.appendChild(row);
@@ -309,6 +346,62 @@
       $("editor").classList.add("hidden");
       loadArticles();
     });
+
+    /* ---------- שליחת פוש (OneSignal) ---------- */
+    var ONESIGNAL_APP_ID = "249c32f4-8a1f-4fc7-877d-944ea4c59556";
+    var PUSH_SEGMENTS = ["Subscribed Users", "Total Subscriptions", "Active Subscriptions"];
+    function stripTxt(s) { var d = document.createElement("div"); d.innerHTML = String(s || ""); return (d.textContent || "").replace(/\s+/g, " ").trim(); }
+    function openPushModal(a) {
+      $("pushTitle").value = a ? (a.title || "") : "";
+      $("pushBody").value = a ? stripTxt(a.body || a.excerpt || a.content || "").slice(0, 140) : "";
+      $("pushUrl").value = a ? ("https://hatzadik-magor.co.il/article.html?id=" + encodeURIComponent(a.id)) : "https://hatzadik-magor.co.il/";
+      $("pushKey").value = sessionStorage.getItem("os_rest_key") || "";
+      var m = $("pushMsg"); m.textContent = ""; m.style.color = "";
+      $("pushSend").disabled = false;
+      $("pushModal").classList.remove("hidden");
+    }
+    function closePushModal() { $("pushModal").classList.add("hidden"); }
+    function pushSendSegment(i, base, key) {
+      var m = $("pushMsg");
+      if (i >= PUSH_SEGMENTS.length) { m.style.color = "#c0392b"; m.textContent = "❌ לא נמצאה קבוצת נמענים. בדקו ב-OneSignal → Audience → Segments."; $("pushSend").disabled = false; return; }
+      var payload = {}; for (var k in base) payload[k] = base[k];
+      payload.included_segments = [PUSH_SEGMENTS[i]];
+      fetch("https://onesignal.com/api/v1/notifications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json; charset=utf-8", "Authorization": "Basic " + key },
+        body: JSON.stringify(payload)
+      }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+        .then(function (res) {
+          var errs = res.j && res.j.errors;
+          var errStr = errs ? (Array.isArray(errs) ? errs.join(" · ") : JSON.stringify(errs)) : "";
+          if (res.ok && res.j.id && !errs) {
+            m.style.color = "#1e7d34";
+            m.textContent = "✅ נשלח בהצלחה! הגיע ל-" + (res.j.recipients != null ? res.j.recipients : "?") + " נרשמים.";
+            if ($("pushRemember").checked) { try { sessionStorage.setItem("os_rest_key", key); } catch (e) {} } else { try { sessionStorage.removeItem("os_rest_key"); } catch (e) {} }
+            $("pushSend").disabled = false;
+          } else if (/segment/i.test(errStr)) {
+            pushSendSegment(i + 1, base, key);
+          } else if (/invalid|authorization|forbidden|api key/i.test(errStr)) {
+            m.style.color = "#c0392b"; m.textContent = "❌ המפתח שגוי או חסר הרשאה. בדקו את ה-REST API Key ב-OneSignal → Settings → Keys & IDs."; $("pushSend").disabled = false;
+          } else {
+            m.style.color = "#c0392b"; m.textContent = "❌ " + (errStr || "השליחה נכשלה."); $("pushSend").disabled = false;
+          }
+        }).catch(function (e) { m.style.color = "#c0392b"; m.textContent = "❌ תקלת רשת: " + e.message; $("pushSend").disabled = false; });
+    }
+    function doSendPush() {
+      var title = $("pushTitle").value.trim(), body = $("pushBody").value.trim(), url = $("pushUrl").value.trim(), key = $("pushKey").value.trim();
+      var m = $("pushMsg");
+      if (!title || !body) { m.style.color = "#c0392b"; m.textContent = "נא למלא כותרת והודעה."; return; }
+      if (!key) { m.style.color = "#c0392b"; m.textContent = "נא להזין את מפתח OneSignal (REST API Key)."; return; }
+      if (!window.confirm("לשלוח את ההתראה לכל הנרשמים?\nאי אפשר לבטל לאחר שליחה.")) return;
+      m.style.color = "var(--muted)"; m.textContent = "שולח…"; $("pushSend").disabled = true;
+      var base = { app_id: ONESIGNAL_APP_ID, headings: { en: title }, contents: { en: body } };
+      if (url) base.url = url;
+      pushSendSegment(0, base, key);
+    }
+    $("pushCancel").addEventListener("click", closePushModal);
+    $("pushSend").addEventListener("click", doSendPush);
+    $("pushModal").addEventListener("click", function (e) { if (e.target === $("pushModal")) closePushModal(); });
 
     /* ---------- עורך ---------- */
     function openEditor(a) {
