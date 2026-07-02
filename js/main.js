@@ -1404,7 +1404,7 @@
    so no regular visitor sees a prompt until we go live.
    To launch for everyone: set PUSH_LIVE = true below. */
 (function () {
-  var PUSH_LIVE = false;
+  var PUSH_LIVE = true;
   var PUSH_TEST = /[?&]push=1(&|$)/.test(location.search);
   if (!PUSH_LIVE && !PUSH_TEST) return;
   var s = document.createElement("script");
