@@ -5,6 +5,9 @@
 (function () {
   "use strict";
 
+  /* ---------- תצוגת נסיון: ערכה בהירה (?theme=light) ---------- */
+  try { if (location.search.indexOf("theme=light") > -1) document.documentElement.classList.add("theme-light"); } catch (e) {}
+
   /* ---------- הגדרות פנייה (מקום אחד לכל הטפסים) ----------
      כתובת המייל שאליה מגיעות כל הפניות (צור-קשר + ארכיון) + מספר וואטסאפ.
      ★ כתובת לקבלת כל הפניות (להחלפה: שנו רק את SITE_EMAIL כאן) — זה משפיע על כל הטפסים.

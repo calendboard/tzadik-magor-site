@@ -23,6 +23,14 @@
   --ff-sans:   "Heebo", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
 }
 
+/* ===== תצוגת נסיון: ערכה בהירה יותר (הבהרה עדינה) — מופעלת עם ?theme=light ===== */
+html.theme-light{
+  --bg:        #3a2c1c;
+  --bg-2:      #453623;
+  --bg-3:      #52402a;
+  --panel:     #4a3a26;
+}
+
 *,*::before,*::after{ box-sizing:border-box; }
 html{ scroll-behavior:smooth; overflow-x:hidden; }
 body{
