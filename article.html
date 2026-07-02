@@ -32,6 +32,10 @@
     .art-media img{ width:100%; border-radius:16px; display:block; border:1px solid var(--line-2); }
     .art-body{ color:var(--cream); font-size:1.16rem; line-height:1.95; }
     .art-body p{ margin:0 0 16px; }
+    .art-link{ color:var(--gold-2); text-decoration:underline; text-underline-offset:3px; word-break:break-word; }
+    .art-cta{ margin:22px 0 12px; text-align:center; }
+    .art-ner-btn{ display:inline-flex; align-items:center; gap:10px; font-size:1.12rem; padding:14px 34px; }
+    .art-ner-ic{ font-size:1.35rem; line-height:1; }
     .art-share{ margin:30px 0 0; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
     .art-share .lbl{ color:var(--muted); font-size:.92rem; }
     .art-tags{ margin:26px 0 0; padding-top:24px; border-top:1px solid var(--line); display:flex; gap:9px; flex-wrap:wrap; align-items:center; }
@@ -169,6 +173,46 @@
 
     function el(tag, cls) { var e = document.createElement(tag); if (cls) e.className = cls; return e; }
 
+    // כפתור הדלקת נר — מוביל לטופס הדלקת הנר
+    function candleCta() {
+      var wrap = el("div", "art-cta");
+      var b = el("a", "btn btn-gold art-ner-btn"); b.href = "ner.html";
+      var ic = el("span", "art-ner-ic"); ic.textContent = "🕯️"; ic.setAttribute("aria-hidden", "true");
+      var tx = el("span"); tx.textContent = "להדלקת נר נשמה";
+      b.appendChild(ic); b.appendChild(tx); wrap.appendChild(b);
+      return wrap;
+    }
+
+    // רינדור גוף הכתבה: פסקאות + קישורי markdown [טקסט](כתובת);
+    // כל קישור לעמודי הנרות (ner/wall) הופך לכפתור הדלקת נר בולט.
+    function appendBody(text, container) {
+      var LINK = /\[([^\]]*?)\]\(\s*([^)\s]+)\s*\)/g;
+      var CANDLE = /(?:ner|wall)\.html/i;
+      String(text || "").split(/\n{2,}/).map(function (s) { return s.trim(); }).filter(Boolean)
+        .forEach(function (block) {
+          var p = el("p"), ctas = 0, last = 0, m;
+          LINK.lastIndex = 0;
+          while ((m = LINK.exec(block))) {
+            var before = block.slice(last, m.index);
+            if (before) p.appendChild(document.createTextNode(before));
+            var label = m[1], url = m[2];
+            if (CANDLE.test(url) || CANDLE.test(label)) {
+              ctas++;
+              if (label && !/^https?:\/\//i.test(label)) p.appendChild(document.createTextNode(label));
+            } else {
+              var a = el("a", "art-link"); a.href = url; a.textContent = label || url;
+              if (/^https?:\/\//i.test(url)) { a.target = "_blank"; a.rel = "noopener"; }
+              p.appendChild(a);
+            }
+            last = m.index + m[0].length;
+          }
+          var tail = block.slice(last).replace(/https?:\/\/\S*(?:ner|wall)\.html\S*/gi, "");
+          if (tail.trim()) p.appendChild(document.createTextNode(tail));
+          if (p.textContent.trim()) container.appendChild(p);
+          for (var i = 0; i < ctas; i++) container.appendChild(candleCta());
+        });
+    }
+
     function openLightbox(items, start) {
       var i = start;
       var ov = el("div", "ag-lightbox");
@@ -236,8 +280,7 @@
       }
 
       var body = el("div", "art-body");
-      String(a.body || "").split(/\n{2,}/).map(function (s) { return s.trim(); }).filter(Boolean)
-        .forEach(function (p) { var pp = el("p"); pp.textContent = p; body.appendChild(pp); });
+      appendBody(a.body, body);
       view.appendChild(body);
 
       // גלריה — תמונות וסרטונים נוספים
