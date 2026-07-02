@@ -9,6 +9,8 @@
   background:radial-gradient(900px 460px at 50% -20%, #2a1e10, var(--bg) 70%);
 }
 .donate-hero .hero-sub{ margin-bottom:0; }
+.hero-sub-one{ white-space:nowrap; font-size:clamp(.85rem,2.4vw,1.15rem); }
+@media(max-width:600px){ .hero-sub-one{ white-space:normal; font-size:1rem; } }
 .donate-hero .candle.small{ transform:scale(.62); margin-bottom:-14px; }
 .donate-hero .orb{ opacity:.4; }
 .donate-hero .container{ position:relative; z-index:2; }
