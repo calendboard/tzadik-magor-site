@@ -251,6 +251,7 @@
         deathdate: String(c.deathdate || "").substring(0, 40),
         dedication: String(c.dedication || "").substring(0, 60),
         date: new Date().toISOString().slice(0, 10),
+        ts: new Date().toISOString(),
         enc: enc
       }, loadCandleWall);
     });
@@ -262,6 +263,7 @@
         name: String(p.name || "").substring(0, 80),
         request: String(p.request || "").substring(0, 40),
         date: new Date().toISOString().slice(0, 10),
+        ts: new Date().toISOString(),
         enc: enc
       });
     });
@@ -318,6 +320,20 @@
       if (!day || !month || !year) return "";
       return _gem(day) + " ב" + month.replace(/^ב/, "") + " " + _gem(year % 1000);
     } catch (e) { return ""; }
+  }
+  /* שעת יצירה HH:MM (מתוך חותמת הזמן ts, בשעון המקומי) */
+  function fmtTime(ts) {
+    if (!ts) return "";
+    var d = new Date(ts); if (isNaN(d)) return "";
+    return ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
+  }
+  /* תאריך מלא + שעה לדשבורד (השעה מוצגת רק אם קיימת חותמת זמן) */
+  function fmtWhen(item) {
+    if (!item) return "";
+    var s = item.date ? fmtFullDate(item.date) : "";
+    var t = fmtTime(item.ts);
+    if (t) s += (s ? " · " : "") + "🕐 " + t;
+    return s;
   }
   /* תאריך מלא לדשבורד: יום בשבוע · לועזי · עברי */
   function fmtFullDate(d) {
@@ -426,12 +442,12 @@
       view.innerHTML = '<b></b><span class="adm-req"></span><span class="adm-date"></span><span class="adm-contact"></span>';
       view.querySelector("b").textContent = item.name || "";
       view.querySelector(".adm-req").textContent = item.request ? " — " + item.request : "";
-      view.querySelector(".adm-date").textContent = item.date ? fmtFullDate(item.date) : "";
+      view.querySelector(".adm-date").textContent = fmtWhen(item);
       admContact(view.querySelector(".adm-contact"), item.enc);
     } else {
       view.innerHTML = '<span class="adm-main"></span><span class="adm-date"></span><span class="adm-contact"></span>';
       view.querySelector(".adm-main").textContent = admLine(item);
-      view.querySelector(".adm-date").textContent = item.date ? fmtFullDate(item.date) : "";
+      view.querySelector(".adm-date").textContent = fmtWhen(item);
       admContact(view.querySelector(".adm-contact"), item.enc);
     }
     wrap.appendChild(view);
@@ -554,7 +570,7 @@
     var view = document.createElement("span"); view.className = "adm-view";
     view.innerHTML = '<b class="adm-cname"></b><span class="adm-cphone adm-contact"></span><span class="adm-ctopic"></span><div class="adm-cmsg"></div><span class="adm-date"></span>';
     view.querySelector(".adm-ctopic").textContent = item.topic ? (" · " + item.topic) : "";
-    view.querySelector(".adm-date").textContent = item.date ? fmtFullDate(item.date) : "";
+    view.querySelector(".adm-date").textContent = fmtWhen(item);
     if (_admKey) {
       view.querySelector(".adm-cname").textContent = "מפענח…";
       decryptBig(item.encb).then(function (o) {
@@ -589,7 +605,7 @@
     var st = view.querySelector(".adm-status"); st.textContent = approved ? "✓ מפורסם" : "⏳ ממתין"; st.className = "adm-status " + (approved ? "st-approved" : "st-pending");
     view.querySelector(".adm-ctopic").textContent = item.type ? (" · " + item.type) : "";
     view.querySelector(".adm-cmsg").textContent = item.story || "";
-    view.querySelector(".adm-date").textContent = item.date ? fmtFullDate(item.date) : "";
+    view.querySelector(".adm-date").textContent = fmtWhen(item);
     if (_admKey) { decryptBig(item.encb).then(function (o) { if (o) view.querySelector(".adm-cphone").textContent = "  (" + (o.name || "") + (o.phone ? " · 📞 " + o.phone : "") + ")"; }); }
     wrap.appendChild(view);
     if (_admKey) {
