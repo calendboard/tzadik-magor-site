@@ -215,10 +215,10 @@
       <label>קישור בלחיצה על ההתראה</label>
       <input id="pushUrl" type="text" placeholder="https://hatzadik-magor.co.il/..." />
       <div id="pushKeyWrap">
-        <label>🔑 מפתח OneSignal (REST API Key)</label>
-        <input id="pushKey" type="password" placeholder="מדביקים פעם אחת — נשמר רק בדפדפן שלכם" />
+        <label>🔑 סיסמת שליחה</label>
+        <input id="pushKey" type="password" placeholder="הסיסמה שהגדרת ב-Cloudflare (PUSH_TOKEN)" />
         <label style="display:flex;align-items:center;gap:6px;font-weight:400;font-size:.85rem;margin-top:6px">
-          <input id="pushRemember" type="checkbox" checked style="width:auto;margin:0" /> לזכור את המפתח בדפדפן זה (עד סגירת הטאב)
+          <input id="pushRemember" type="checkbox" checked style="width:auto;margin:0" /> לזכור בדפדפן זה (כדי לא להזין כל פעם)
         </label>
       </div>
       <p id="pushMsg" class="push-status"></p>
@@ -347,57 +347,43 @@
       loadArticles();
     });
 
-    /* ---------- שליחת פוש (OneSignal) ---------- */
-    var ONESIGNAL_APP_ID = "249c32f4-8a1f-4fc7-877d-944ea4c59556";
-    var PUSH_SEGMENTS = ["Subscribed Users", "Total Subscriptions", "Active Subscriptions"];
+    /* ---------- שליחת פוש (דרך ממסר Cloudflare) ---------- */
+    var PUSH_RELAY_URL = "https://push-relay.hatzadikmagor.workers.dev";
     function stripTxt(s) { var d = document.createElement("div"); d.innerHTML = String(s || ""); return (d.textContent || "").replace(/\s+/g, " ").trim(); }
     function openPushModal(a) {
       $("pushTitle").value = a ? (a.title || "") : "";
       $("pushBody").value = a ? stripTxt(a.body || a.excerpt || a.content || "").slice(0, 140) : "";
       $("pushUrl").value = a ? ("https://hatzadik-magor.co.il/article.html?id=" + encodeURIComponent(a.id)) : "https://hatzadik-magor.co.il/";
-      $("pushKey").value = sessionStorage.getItem("os_rest_key") || "";
+      $("pushKey").value = localStorage.getItem("push_token") || "";
       var m = $("pushMsg"); m.textContent = ""; m.style.color = "";
       $("pushSend").disabled = false;
       $("pushModal").classList.remove("hidden");
     }
     function closePushModal() { $("pushModal").classList.add("hidden"); }
-    function pushSendSegment(i, base, key) {
-      var m = $("pushMsg");
-      if (i >= PUSH_SEGMENTS.length) { m.style.color = "#c0392b"; m.textContent = "❌ לא נמצאה קבוצת נמענים. בדקו ב-OneSignal → Audience → Segments."; $("pushSend").disabled = false; return; }
-      var payload = {}; for (var k in base) payload[k] = base[k];
-      payload.included_segments = [PUSH_SEGMENTS[i]];
-      fetch("https://onesignal.com/api/v1/notifications", {
-        method: "POST",
-        headers: { "Content-Type": "application/json; charset=utf-8", "Authorization": "Basic " + key },
-        body: JSON.stringify(payload)
-      }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
-        .then(function (res) {
-          var errs = res.j && res.j.errors;
-          var errStr = errs ? (Array.isArray(errs) ? errs.join(" · ") : JSON.stringify(errs)) : "";
-          if (res.ok && res.j.id && !errs) {
-            m.style.color = "#1e7d34";
-            m.textContent = "✅ נשלח בהצלחה! הגיע ל-" + (res.j.recipients != null ? res.j.recipients : "?") + " נרשמים.";
-            if ($("pushRemember").checked) { try { sessionStorage.setItem("os_rest_key", key); } catch (e) {} } else { try { sessionStorage.removeItem("os_rest_key"); } catch (e) {} }
-            $("pushSend").disabled = false;
-          } else if (/segment/i.test(errStr)) {
-            pushSendSegment(i + 1, base, key);
-          } else if (/invalid|authorization|forbidden|api key/i.test(errStr)) {
-            m.style.color = "#c0392b"; m.textContent = "❌ המפתח שגוי או חסר הרשאה. בדקו את ה-REST API Key ב-OneSignal → Settings → Keys & IDs."; $("pushSend").disabled = false;
-          } else {
-            m.style.color = "#c0392b"; m.textContent = "❌ " + (errStr || "השליחה נכשלה."); $("pushSend").disabled = false;
-          }
-        }).catch(function (e) { m.style.color = "#c0392b"; m.textContent = "❌ תקלת רשת: " + e.message; $("pushSend").disabled = false; });
-    }
     function doSendPush() {
-      var title = $("pushTitle").value.trim(), body = $("pushBody").value.trim(), url = $("pushUrl").value.trim(), key = $("pushKey").value.trim();
+      var title = $("pushTitle").value.trim(), body = $("pushBody").value.trim(), url = $("pushUrl").value.trim(), token = $("pushKey").value.trim();
       var m = $("pushMsg");
       if (!title || !body) { m.style.color = "#c0392b"; m.textContent = "נא למלא כותרת והודעה."; return; }
-      if (!key) { m.style.color = "#c0392b"; m.textContent = "נא להזין את מפתח OneSignal (REST API Key)."; return; }
+      if (!token) { m.style.color = "#c0392b"; m.textContent = "נא להזין את סיסמת השליחה."; return; }
       if (!window.confirm("לשלוח את ההתראה לכל הנרשמים?\nאי אפשר לבטל לאחר שליחה.")) return;
       m.style.color = "var(--muted)"; m.textContent = "שולח…"; $("pushSend").disabled = true;
-      var base = { app_id: ONESIGNAL_APP_ID, headings: { en: title }, contents: { en: body } };
-      if (url) base.url = url;
-      pushSendSegment(0, base, key);
+      fetch(PUSH_RELAY_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Push-Token": token },
+        body: JSON.stringify({ title: title, body: body, url: url })
+      }).then(function (r) { return r.json().then(function (j) { return { status: r.status, j: j }; }, function () { return { status: r.status, j: null }; }); })
+        .then(function (res) {
+          $("pushSend").disabled = false;
+          if (res.j && res.j.ok) {
+            m.style.color = "#1e7d34";
+            m.textContent = "✅ נשלח בהצלחה! הגיע ל-" + (res.j.recipients != null ? res.j.recipients : "?") + " נרשמים.";
+            if ($("pushRemember").checked) { try { localStorage.setItem("push_token", token); } catch (e) {} } else { try { localStorage.removeItem("push_token"); } catch (e) {} }
+          } else if (res.status === 401 || (res.j && res.j.error === "unauthorized")) {
+            m.style.color = "#c0392b"; m.textContent = "❌ סיסמת השליחה שגויה. בדקו שהזנתם בדיוק כמו PUSH_TOKEN ב-Cloudflare.";
+          } else {
+            m.style.color = "#c0392b"; m.textContent = "❌ " + ((res.j && res.j.error) || "השליחה נכשלה.");
+          }
+        }).catch(function (e) { $("pushSend").disabled = false; m.style.color = "#c0392b"; m.textContent = "❌ תקלת רשת: " + e.message; });
     }
     $("pushCancel").addEventListener("click", closePushModal);
     $("pushSend").addEventListener("click", doSendPush);
