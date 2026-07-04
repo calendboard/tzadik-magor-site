@@ -50,6 +50,17 @@
     .feat-badge{ display:inline-block; margin-inline-start:8px; background:#fff3cd; color:#8a6d00; border:1px solid #ffe08a; border-radius:999px; padding:1px 9px; font-size:.72rem; font-weight:700; vertical-align:middle; }
     .art-row .acts{ display:flex; gap:8px; flex:0 0 auto; }
     .empty{ text-align:center; color:var(--muted); padding:40px 0; }
+    /* התאמה לנייד — שורת הכתבה נערמת יפה במסך צר */
+    @media (max-width:600px){
+      .art-row{ flex-wrap:wrap; gap:10px 12px; padding:12px; }
+      .art-row .thumb{ width:64px; height:50px; }
+      .art-row .info{ flex:1 1 60%; }
+      .art-row .info b{ font-size:1rem; }
+      .art-row .acts{ flex:1 1 100%; gap:8px; }
+      .art-row .acts .btn{ flex:1; text-align:center; padding-inline:6px; white-space:nowrap; }
+      .top{ justify-content:center; gap:10px; }
+      .top .who{ flex:1 1 100%; text-align:center; }
+    }
 
     /* עורך */
     .editor{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:22px; margin-bottom:24px; box-shadow:0 6px 24px rgba(80,60,10,.06); }
