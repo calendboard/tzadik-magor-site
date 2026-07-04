@@ -1097,19 +1097,20 @@
         source: `מקור: ארכיון המאורות · "פועל הישועות מעגור"` }
     ];
 
+    /* תמונת ברירת־מחדל לפי נושא — לסיפורים ללא תמונה (למשל ישועות מהקהל) */
+    function tagImage(tag) {
+      var m = { "פרי בטן": "assets/stories/02_baby.jpg", "רפואה": "assets/stories/03_heal.jpg", "פרנסה": "assets/stories/04_parnasa.jpg", "זיווג": "assets/stories/05_engage.jpg", "שלום בית": "assets/stories/07_shalombayit.jpg", "הצלה": "assets/stories/09_book.jpg", "הצלחה": "assets/stories/14_computer.jpg", "שמירה": "assets/stories/11_stone.jpg", "גילוי הציון": "assets/stories/01_discovery.jpg", "ישועה": "assets/stories/15_pray.jpg" };
+      return m[tag] || "assets/stories/15_pray.jpg";
+    }
     function yshBall(s) {
       var b = document.createElement("button");
       b.className = "ysh-ball";
       b.type = "button";
       b.setAttribute("aria-label", (s.title || "") + " — לחצו לקריאת הסיפור");
       var photo = document.createElement("span");
-      if (s.img) {
-        photo.className = "ysh-photo";
-        var im = document.createElement("img"); im.src = s.img + "?v=665"; im.alt = ""; im.loading = "lazy";
-        photo.appendChild(im);
-      } else {
-        photo.className = "ysh-photo ysh-photo-ph"; photo.setAttribute("aria-hidden", "true"); photo.textContent = "✨";
-      }
+      photo.className = "ysh-photo";
+      var im = document.createElement("img"); im.src = (s.img || tagImage(s.tag)) + "?v=665"; im.alt = ""; im.loading = "lazy";
+      photo.appendChild(im);
       var cap = document.createElement("span"); cap.className = "ysh-cap";
       var tag = document.createElement("span"); tag.className = "ysh-tag"; tag.textContent = s.tag || "ישועה";
       var t = document.createElement("span"); t.className = "ysh-t"; t.textContent = s.title || "";
@@ -1155,8 +1156,7 @@
         ymT = ym.querySelector(".ym-t"),
         ymBody = ym.querySelector(".ym-body");
     function yshOpen(s) {
-      if (s.img) { ymPhoto.src = s.img + "?v=665"; ymPhoto.style.display = ""; }
-      else { ymPhoto.removeAttribute("src"); ymPhoto.style.display = "none"; }
+      ymPhoto.src = (s.img || tagImage(s.tag)) + "?v=665"; ymPhoto.style.display = "";
       ymTag.textContent = s.tag || "ישועה"; ymT.textContent = s.title || "";
       ymBody.textContent = s.full || "";
       ym.classList.add("open"); document.body.style.overflow = "hidden";
