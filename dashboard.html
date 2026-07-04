@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ניהול כתבות — הצדיק מעג׳ור</title>
+  <title>ניהול כתבות - הצדיק מעג׳ור</title>
   <meta name="robots" content="noindex, nofollow" />
   <link rel="stylesheet" href="css/fonts.css" />
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
@@ -50,7 +50,7 @@
     .feat-badge{ display:inline-block; margin-inline-start:8px; background:#fff3cd; color:#8a6d00; border:1px solid #ffe08a; border-radius:999px; padding:1px 9px; font-size:.72rem; font-weight:700; vertical-align:middle; }
     .art-row .acts{ display:flex; gap:8px; flex:0 0 auto; }
     .empty{ text-align:center; color:var(--muted); padding:40px 0; }
-    /* התאמה לנייד — שורת הכתבה נערמת יפה במסך צר */
+    /* התאמה לנייד - שורת הכתבה נערמת יפה במסך צר */
     @media (max-width:600px){
       .art-row{ flex-wrap:wrap; gap:10px 12px; padding:12px; }
       .art-row .thumb{ width:64px; height:50px; }
@@ -134,10 +134,10 @@
           <img id="imgPreview" class="hidden" alt="" />
         </div>
         <input id="imgFile" type="file" accept="image/*" class="hidden" />
-        <input id="fImgCaption" type="text" class="img-cap" placeholder="כיתוב לתמונה (רשות) — מי בתמונה / איפה צולם…" />
+        <input id="fImgCaption" type="text" class="img-cap" placeholder="כיתוב לתמונה (רשות) - מי בתמונה / איפה צולם…" />
       </div>
       <div class="field">
-        <label>סרטון <span class="hint">(רשות — קישור יוטיוב או העלאת קובץ)</span></label>
+        <label>סרטון <span class="hint">(רשות - קישור יוטיוב או העלאת קובץ)</span></label>
         <input id="fVideo" type="text" placeholder="הדביקו כאן קישור יוטיוב…" />
         <div style="display:flex;gap:10px;align-items:center;margin-top:8px;flex-wrap:wrap">
           <button type="button" id="vidUploadBtn" class="btn btn-ghost btn-sm">⬆ העלאת קובץ וידאו</button>
@@ -145,10 +145,10 @@
           <span id="vidStatus" class="hint"></span>
         </div>
         <input id="vidFile" type="file" accept="video/*" class="hidden" />
-        <p class="hint" style="margin:6px 0 0">העלאת קובץ — עד ~50MB (לסרטונים ארוכים עדיף קישור יוטיוב).</p>
+        <p class="hint" style="margin:6px 0 0">העלאת קובץ - עד ~50MB (לסרטונים ארוכים עדיף קישור יוטיוב).</p>
       </div>
       <div class="field">
-        <label>גלריה — תמונות וסרטונים נוספים <span class="hint">(ללא הגבלה · יוצגו כגלריה בתוך הכתבה)</span></label>
+        <label>גלריה - תמונות וסרטונים נוספים <span class="hint">(ללא הגבלה · יוצגו כגלריה בתוך הכתבה)</span></label>
         <div id="galGrid" class="gal-grid"></div>
         <div style="display:flex;gap:10px;align-items:center;margin-top:8px;flex-wrap:wrap">
           <button type="button" id="galAddBtn" class="btn btn-ghost btn-sm">➕ הוספת תמונות / סרטונים</button>
@@ -180,10 +180,10 @@
       </div>
       <div class="field">
         <label for="fBody">גוף הכתבה <span style="color:var(--g)">*</span> <span class="hint">(שורה ריקה בין פסקה לפסקה)</span></label>
-        <textarea id="fBody" rows="8" placeholder="כתבו כאן את הכתבה המלאה…&#10;&#10;להפרדת פסקה — השאירו שורה ריקה."></textarea>
+        <textarea id="fBody" rows="8" placeholder="כתבו כאן את הכתבה המלאה…&#10;&#10;להפרדת פסקה - השאירו שורה ריקה."></textarea>
       </div>
       <div class="field">
-        <label for="fTags">תיוגים קשורים <span class="hint">(מופרדים בפסיק — יופיעו בתחתית הכתבה)</span></label>
+        <label for="fTags">תיוגים קשורים <span class="hint">(מופרדים בפסיק - יופיעו בתחתית הכתבה)</span></label>
         <input id="fTags" type="text" placeholder="לדוגמה: הילולא, רבי אריה גברא, עג׳ור, תפילה" />
       </div>
       <div class="row2">
@@ -199,7 +199,7 @@
       <div class="field">
         <label style="display:flex;align-items:center;gap:9px;cursor:pointer;font-weight:600">
           <input id="fFeatured" type="checkbox" style="width:auto;margin:0" />
-          ⭐ כתבה ראשית — מוצמדת לראש דף הבית
+          ⭐ כתבה ראשית - מוצמדת לראש דף הבית
         </label>
         <span class="hint">רק כתבה אחת ראשית בכל רגע. סימון כאן יבטל אוטומטית את הכתבה הראשית הקודמת.</span>
       </div>
@@ -252,7 +252,7 @@
     var loginBox = $("login"), app = $("app");
     var editing = null;      // מזהה כתבה בעריכה (null = חדשה)
     var pendingImageUrl = ""; // url התמונה הראשית בעורך
-    var pendingGallery = [];  // [{type:'image'|'video', url}] — גלריה
+    var pendingGallery = [];  // [{type:'image'|'video', url}] - גלריה
 
     /* ---------- תאריך יצירה: עברי · לועזי · שעה ---------- */
     function _gem(num){var L=[[400,"ת"],[300,"ש"],[200,"ר"],[100,"ק"],[90,"צ"],[80,"פ"],[70,"ע"],[60,"ס"],[50,"נ"],[40,"מ"],[30,"ל"],[20,"כ"],[10,"י"],[9,"ט"],[8,"ח"],[7,"ז"],[6,"ו"],[5,"ה"],[4,"ד"],[3,"ג"],[2,"ב"],[1,"א"]];var n=num,s="";for(var i=0;i<L.length;i++){while(n>=L[i][0]){s+=L[i][1];n-=L[i][0];}}s=s.replace("יה","טו").replace("יו","טז");if(s.length===1)return s+"׳";return s.slice(0,-1)+"״"+s.slice(-1);}
@@ -324,7 +324,7 @@
           var meta = document.createElement("div"); meta.className = "meta";
           meta.textContent = [a.cat, a.date].filter(Boolean).join(" · ");
           var meta2 = document.createElement("div"); meta2.className = "meta";
-          var who = a.created_by ? ("ע״י " + a.created_by) : "ע״י —";
+          var who = a.created_by ? ("ע״י " + a.created_by) : "ע״י -";
           meta2.textContent = "🕐 נוצר: " + [fmtCreated(a.created_at), who].filter(Boolean).join(" · ");
           info.appendChild(b); info.appendChild(meta); info.appendChild(meta2);
           var acts = document.createElement("div"); acts.className = "acts";
@@ -465,7 +465,7 @@
       var bar = document.createElement("div");
       bar.style.cssText = "background:#fff8e6;border:1px solid #ffe08a;border-radius:12px;padding:12px 16px;margin:0 0 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between";
       var txt = document.createElement("span"); txt.style.cssText = "font-size:.92rem;color:#8a6d00";
-      txt.textContent = "💾 יש טיוטה שלא נשמרה" + (d.fTitle ? ' — "' + String(d.fTitle).slice(0, 40) + '"' : "") + ". לשחזר?";
+      txt.textContent = "💾 יש טיוטה שלא נשמרה" + (d.fTitle ? ' - "' + String(d.fTitle).slice(0, 40) + '"' : "") + ". לשחזר?";
       var btns = document.createElement("span"); btns.style.cssText = "display:flex;gap:8px";
       var rb = document.createElement("button"); rb.className = "btn btn-sm"; rb.type = "button"; rb.textContent = "↩️ שחזור";
       var db = document.createElement("button"); db.className = "btn btn-ghost btn-sm"; db.type = "button"; db.textContent = "מחיקה";
@@ -520,7 +520,7 @@
       });
     }
 
-    /* תפיסת פריים מסרטון שהועלה — כתמונה ראשית (poster) */
+    /* תפיסת פריים מסרטון שהועלה - כתמונה ראשית (poster) */
     function videoPoster(file) {
       return new Promise(function (resolve) {
         var v = document.createElement("video");
@@ -568,7 +568,7 @@
       sb.storage.from("news-images").upload(name, file, { contentType: file.type || "video/mp4", upsert: true })
         .then(function (res) {
           if (res.error) {
-            $("vidStatus").textContent = "שגיאה בהעלאה (ייתכן שהקובץ גדול מ-50MB — נסו קישור יוטיוב).";
+            $("vidStatus").textContent = "שגיאה בהעלאה (ייתכן שהקובץ גדול מ-50MB - נסו קישור יוטיוב).";
             $("vidStatus").style.color = "#b23b3b"; return;
           }
           $("fVideo").value = sb.storage.from("news-images").getPublicUrl(name).data.publicUrl;
@@ -672,7 +672,7 @@
         else { rec.sort = Date.now(); op = sb.from("articles").insert(rec); }
         op.then(function (res) {
           if (res.error) {
-            /* אם עמודה חדשה עדיין לא קיימת ב-Supabase — שומרים בלעדיה, כדי לא לחסום את השמירה */
+            /* אם עמודה חדשה עדיין לא קיימת ב-Supabase - שומרים בלעדיה, כדי לא לחסום את השמירה */
             var _msg = res.error.message || "", _stripped = false;
             ["created_by", "author_display", "image_caption"].forEach(function (col) {
               if ((col in rec) && _msg.indexOf(col) !== -1) { delete rec[col]; _stripped = true; }

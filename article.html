@@ -17,11 +17,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>כתבה · הצדיק מעג׳ור</title>
-  <meta name="description" content="כתבה ועדכון ממרכז הצדיק מעג׳ור — רבי יצחק גברא זצ״ל." />
+  <meta name="description" content="כתבה ועדכון ממרכז הצדיק מעג׳ור - רבי יצחק גברא זצ״ל." />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="הצדיק מעג׳ור" />
   <meta property="og:title" content="חדשות ועדכונים · מרכז הצדיק מעג׳ור" />
-  <meta property="og:description" content="כתבות ועדכונים ממרכז הצדיק מעג׳ור — רבי יצחק גברא זצ״ל. הקליקו לקריאת הכתבה »" />
+  <meta property="og:description" content="כתבות ועדכונים ממרכז הצדיק מעג׳ור - רבי יצחק גברא זצ״ל. הקליקו לקריאת הכתבה »" />
   <meta property="og:image" content="https://hatzadik-magor.co.il/assets/og-image.jpg" />
   <meta property="og:locale" content="he_IL" />
   <link rel="stylesheet" href="css/fonts.css" />
@@ -85,7 +85,7 @@
   <!-- ====================== ניווט עליון ====================== -->
   <header class="site-header" id="siteHeader">
     <div class="container nav-wrap">
-      <a class="brand" href="index.html#hero" aria-label="הצדיק מעג׳ור – לדף הבית">
+      <a class="brand" href="index.html#hero" aria-label="הצדיק מעג׳ור - לדף הבית">
         <span class="brand-mark" aria-hidden="true">
           <img src="assets/logo-emblem.png?v=708" width="46" height="46" alt="" class="brand-logo" />
         </span>
@@ -122,7 +122,7 @@
     <div class="container footer-grid">
       <div class="footer-col footer-brand">
         <div class="brand"><span class="brand-text">הצדיק <b>מעג׳ור</b></span></div>
-        <p>זכות הצדיק תגן עלינו ועל כל עם ישראל. הדליקו נר, בקשו ברכה — וקבלו ישועה.</p>
+        <p>זכות הצדיק תגן עלינו ועל כל עם ישראל. הדליקו נר, בקשו ברכה - וקבלו ישועה.</p>
       </div>
       <div class="footer-col">
         <h4>ניווט</h4>
@@ -184,7 +184,7 @@
 
     function el(tag, cls) { var e = document.createElement(tag); if (cls) e.className = cls; return e; }
 
-    // כפתור הדלקת נר — מוביל לטופס הדלקת הנר
+    // כפתור הדלקת נר - מוביל לטופס הדלקת הנר
     function candleCta() {
       var wrap = el("div", "art-cta");
       var b = el("a", "btn btn-gold art-ner-btn"); b.href = "ner.html";
@@ -314,7 +314,7 @@
       appendBody(a.body, body);
       view.appendChild(body);
 
-      // גלריה — תמונות וסרטונים נוספים
+      // גלריה - תמונות וסרטונים נוספים
       var gal = [];
       if (a.gallery) { try { gal = JSON.parse(a.gallery) || []; } catch (e) { gal = []; } }
       if (gal.length) {
@@ -334,10 +334,10 @@
         view.appendChild(gwrap);
       }
 
-      // באנר קריאה לפעולה — מתחלף בין ישועה לדף חדש לפי הכתבה
+      // באנר קריאה לפעולה - מתחלף בין ישועה לדף חדש לפי הכתבה
       var ctaVariants = [
-        { href: "yeshua.html", icon: "🕯️", text: "גם אני רוצה ישועה בכ״א תמוז", sub: "מסירת שם לתפילה לרפואה, לזיווג ולכל ישועה — על ציון הצדיק ביום ההילולא." },
-        { href: "daf-chadash.html", icon: "📖", text: "גם אני רוצה לפתוח דף חדש בכ״א תמוז", sub: "תפילה לפרנסה בשפע ולפתיחת מקורות חדשים — על ציון הצדיק ביום ההילולא." }
+        { href: "yeshua.html", icon: "🕯️", text: "גם אני רוצה ישועה בכ״א תמוז", sub: "מסירת שם לתפילה לרפואה, לזיווג ולכל ישועה - על ציון הצדיק ביום ההילולא." },
+        { href: "daf-chadash.html", icon: "📖", text: "גם אני רוצה לפתוח דף חדש בכ״א תמוז", sub: "תפילה לפרנסה בשפע ולפתיחת מקורות חדשים - על ציון הצדיק ביום ההילולא." }
       ];
       var _h = 0, _sid = String(a.id || "");
       for (var _hi = 0; _hi < _sid.length; _hi++) _h += _sid.charCodeAt(_hi);
@@ -357,7 +357,7 @@
       var msg = "🕯️ *" + (a.title || "") + "*\n\n" +
         (a.excerpt ? a.excerpt + "\n\n" : "") +
         "👈 לכתבה המלאה:\n" + url + "\n\n" +
-        "— מתוך אתר הצדיק מעג׳ור · רבי יצחק גברא זצ״ל";
+        "- מתוך אתר הצדיק מעג׳ור · רבי יצחק גברא זצ״ל";
       var wa = el("a", "btn btn-ghost btn-sm");
       wa.href = "https://wa.me/?text=" + encodeURIComponent(msg);
       wa.target = "_blank"; wa.rel = "noopener"; wa.textContent = "📲 שיתוף בוואטסאפ"; share.appendChild(wa);
