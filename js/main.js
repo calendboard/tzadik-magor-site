@@ -1151,22 +1151,44 @@
       b.addEventListener("click", function () { yshOpen(s); });
       return b;
     }
+    /* פיזור: שני כרטיסים עם אותה תמונה לא יופיעו קרוב זה לזה (למשל שני "פרי בטן") */
+    function effImg(s) { return s.img || tagImage(s.tag); }
+    function spreadStories(items) {
+      var pool = items.slice(), out = [], GAP = 3;
+      while (pool.length) {
+        var pick = -1;
+        for (var i = 0; i < pool.length; i++) {
+          var key = effImg(pool[i]), ok = true;
+          for (var j = Math.max(0, out.length - GAP); j < out.length; j++) {
+            if (effImg(out[j]) === key) { ok = false; break; }
+          }
+          if (ok) { pick = i; break; }
+        }
+        if (pick === -1) pick = 0;
+        out.push(pool.splice(pick, 1)[0]);
+      }
+      return out;
+    }
     if (yshTrack) {
+      var spread = spreadStories(STORIES);
       for (var rep = 0; rep < 2; rep++) {
-        STORIES.forEach(function (s) { yshTrack.appendChild(yshBall(s)); });
+        spread.forEach(function (s) { yshTrack.appendChild(yshBall(s)); });
       }
     }
     if (storyGrid) {
-      STORIES.forEach(function (s) { storyGrid.appendChild(yshBall(s)); });
-      /* ישועות מהקהל (מאושרות) — מתווספות כרטיסים זהים בראש הרשת */
+      /* ישועות מהקהל (מאושרות) בראש, ואז הקבועות — מפוזרות כך שאין נושא צמוד לעצמו */
+      function renderStoryGrid(approved) {
+        var all = spreadStories((approved || []).concat(STORIES));
+        storyGrid.innerHTML = "";
+        all.forEach(function (s) { storyGrid.appendChild(yshBall(s)); });
+      }
+      renderStoryGrid([]);
       fetch(CANDLE_API + "/latest", { headers: { "X-Bin-Meta": "false" } })
         .then(function (r) { return r.json(); })
         .then(function (rec) {
-          var list = (((rec && rec.stories) || []).filter(function (x) { return x && x.status === "approved"; })).reverse();
-          list.forEach(function (us) {
-            var s = { tag: us.type || "ישועה", title: us.public_name || "מתפלל/ת (בעילום שם)", full: us.story || "", img: us.img || null };
-            storyGrid.insertBefore(yshBall(s), storyGrid.firstChild);
-          });
+          var list = (((rec && rec.stories) || []).filter(function (x) { return x && x.status === "approved"; })).reverse()
+            .map(function (us) { return { tag: us.type || "ישועה", title: us.public_name || "מתפלל/ת (בעילום שם)", full: us.story || "", img: us.img || null }; });
+          renderStoryGrid(list);
         }).catch(function () {});
     }
 
