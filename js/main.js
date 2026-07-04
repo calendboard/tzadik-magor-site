@@ -597,6 +597,26 @@
     li.appendChild(wrap);
     return li;
   }
+  /* תמונות מוכנות לשיוך לישועות (בורר בדשבורד) */
+  var STORY_IMG_OPTIONS = [
+    { label: "רפואה — תרופות", v: "assets/stories/03_heal.jpg" },
+    { label: "רפואה — החלמה", v: "assets/stories/16_cane.jpg" },
+    { label: "פרי בטן — תינוק", v: "assets/stories/02_baby.jpg" },
+    { label: "זיווג — טבעות", v: "assets/stories/05_engage.jpg" },
+    { label: "זיווג — זר פרחים", v: "assets/stories/13_bouquet.jpg" },
+    { label: "פרנסה — כסף", v: "assets/stories/04_parnasa.jpg" },
+    { label: "שלום בית", v: "assets/stories/07_shalombayit.jpg" },
+    { label: "הצלה — לימוד", v: "assets/stories/09_book.jpg" },
+    { label: "תפילה / ישועה כללית", v: "assets/stories/15_pray.jpg" },
+    { label: "גילוי הציון — נרות", v: "assets/stories/01_discovery.jpg" },
+    { label: "קדושת הציון", v: "assets/stories/11_stone.jpg" },
+    { label: "נרות הילולא", v: "assets/hilula/candles.jpg" }
+  ];
+  /* תמונת ברירת־מחדל אוטומטית לפי נושא — לסיפורים ללא תמונה משויכת */
+  function tagImage(tag) {
+    var m = { "פרי בטן": "assets/stories/02_baby.jpg", "רפואה": "assets/stories/03_heal.jpg", "פרנסה": "assets/stories/04_parnasa.jpg", "זיווג": "assets/stories/05_engage.jpg", "שלום בית": "assets/stories/07_shalombayit.jpg", "הצלה": "assets/stories/09_book.jpg", "הצלחה": "assets/stories/14_computer.jpg", "שמירה": "assets/stories/11_stone.jpg", "גילוי הציון": "assets/stories/01_discovery.jpg", "ישועה": "assets/stories/15_pray.jpg" };
+    return m[tag] || "assets/stories/15_pray.jpg";
+  }
   /* שורת ישועה אישית בדשבורד — עם אישור/הסתרה/עריכה/מחיקה */
   function admStoryRow(item) {
     var li = document.createElement("li");
@@ -610,9 +630,26 @@
     view.querySelector(".adm-cmsg").textContent = item.story || "";
     view.querySelector(".adm-date").textContent = fmtWhen(item);
     if (_admKey) { decryptBig(item.encb).then(function (o) { if (o) view.querySelector(".adm-cphone").textContent = "  (" + (o.name || "") + (o.phone ? " · 📞 " + o.phone : "") + ")"; }); }
+    /* תמונה משויכת (אוטומטית לפי נושא, או מה שנבחר ידנית) */
+    var thumb = document.createElement("img");
+    thumb.src = (item.img || tagImage(item.type)) + "?v=714"; thumb.alt = ""; thumb.loading = "lazy";
+    thumb.style.cssText = "width:60px;height:46px;object-fit:cover;border-radius:7px;flex:0 0 auto;border:1px solid #ddd;";
+    wrap.appendChild(thumb);
     wrap.appendChild(view);
     if (_admKey) {
       var acts = document.createElement("span"); acts.className = "adm-acts";
+      /* בורר תמונה — לשנות את מה ששויך אוטומטית, או להשאיר ולאשר */
+      var picker = document.createElement("select"); picker.title = "בחירת תמונה לישועה";
+      picker.style.cssText = "font-size:.82rem;max-width:150px;padding:4px 6px;border:1px solid #d8d2c4;border-radius:7px;";
+      var optAuto = document.createElement("option"); optAuto.value = ""; optAuto.textContent = "🖼 אוטומטי (לפי נושא)"; picker.appendChild(optAuto);
+      STORY_IMG_OPTIONS.forEach(function (o) {
+        var op = document.createElement("option"); op.value = o.v; op.textContent = o.label;
+        if (item.img === o.v) op.selected = true;
+        picker.appendChild(op);
+      });
+      if (!item.img) optAuto.selected = true;
+      picker.onchange = function () { admEdit("stories", item._id, { img: picker.value }); };
+      acts.appendChild(picker);
       var ap = document.createElement("button"); ap.type = "button"; ap.className = "adm-btn adm-approve"; ap.textContent = approved ? "↩️ הסתרה" : "✓ אישור";
       ap.onclick = function () { admSetStoryStatus(item._id, approved ? "pending" : "approved"); };
       var ed = document.createElement("button"); ed.type = "button"; ed.className = "adm-btn"; ed.textContent = "✏️"; ed.title = "עריכה";
@@ -1097,11 +1134,6 @@
         source: `מקור: ארכיון המאורות · "פועל הישועות מעגור"` }
     ];
 
-    /* תמונת ברירת־מחדל לפי נושא — לסיפורים ללא תמונה (למשל ישועות מהקהל) */
-    function tagImage(tag) {
-      var m = { "פרי בטן": "assets/stories/02_baby.jpg", "רפואה": "assets/stories/03_heal.jpg", "פרנסה": "assets/stories/04_parnasa.jpg", "זיווג": "assets/stories/05_engage.jpg", "שלום בית": "assets/stories/07_shalombayit.jpg", "הצלה": "assets/stories/09_book.jpg", "הצלחה": "assets/stories/14_computer.jpg", "שמירה": "assets/stories/11_stone.jpg", "גילוי הציון": "assets/stories/01_discovery.jpg", "ישועה": "assets/stories/15_pray.jpg" };
-      return m[tag] || "assets/stories/15_pray.jpg";
-    }
     function yshBall(s) {
       var b = document.createElement("button");
       b.className = "ysh-ball";
@@ -1132,7 +1164,7 @@
         .then(function (rec) {
           var list = (((rec && rec.stories) || []).filter(function (x) { return x && x.status === "approved"; })).reverse();
           list.forEach(function (us) {
-            var s = { tag: us.type || "ישועה", title: us.public_name || "מתפלל/ת (בעילום שם)", full: us.story || "", img: null };
+            var s = { tag: us.type || "ישועה", title: us.public_name || "מתפלל/ת (בעילום שם)", full: us.story || "", img: us.img || null };
             storyGrid.insertBefore(yshBall(s), storyGrid.firstChild);
           });
         }).catch(function () {});
