@@ -25,7 +25,7 @@ jobs:
           SB_URL: https://wfhgenhmoofyegysysac.supabase.co
           SB_KEY: sb_publishable_XbSp3aL_Y_O3m8yzZ_qmOQ_vp5W3EYn
         run: |
-          curl -sf "$SB_URL/rest/v1/articles?select=*&order=sort.desc" \
+          curl -sf "$SB_URL/rest/v1/articles?select=*&draft=is.false&order=sort.desc" \
             -H "apikey: $SB_KEY" \
             -H "Authorization: Bearer $SB_KEY" \
             -o data/news.new.json

@@ -48,6 +48,7 @@
     .art-row .info b{ display:block; font-size:1.05rem; }
     .art-row .info .meta{ color:var(--muted); font-size:.82rem; }
     .feat-badge{ display:inline-block; margin-inline-start:8px; background:#fff3cd; color:#8a6d00; border:1px solid #ffe08a; border-radius:999px; padding:1px 9px; font-size:.72rem; font-weight:700; vertical-align:middle; }
+    .draft-badge{ display:inline-block; margin-inline-start:8px; background:#e8eef7; color:#3a5a86; border:1px solid #c3d4ea; border-radius:999px; padding:1px 9px; font-size:.72rem; font-weight:700; vertical-align:middle; }
     .art-row .acts{ display:flex; gap:8px; flex:0 0 auto; }
     .empty{ text-align:center; color:var(--muted); padding:40px 0; }
     /* התאמה לנייד - שורת הכתבה נערמת יפה במסך צר */
@@ -206,6 +207,7 @@
       <div class="editor-actions">
         <p id="editMsg" class="muted"></p>
         <button id="cancelBtn" class="btn btn-ghost" type="button">ביטול</button>
+        <button id="draftBtn" class="btn btn-ghost" type="button">📝 שמירה כטיוטה</button>
         <button id="saveBtn" class="btn" type="button">💾 שמירה ופרסום</button>
       </div>
     </div>
@@ -321,6 +323,10 @@
             var star = document.createElement("span"); star.className = "feat-badge"; star.textContent = "⭐ ראשית";
             b.appendChild(star);
           }
+          if (a.draft && !isTrash) {
+            var dbadge = document.createElement("span"); dbadge.className = "draft-badge"; dbadge.textContent = "📝 טיוטה";
+            b.appendChild(dbadge);
+          }
           var meta = document.createElement("div"); meta.className = "meta";
           meta.textContent = [a.cat, a.date].filter(Boolean).join(" · ");
           var meta2 = document.createElement("div"); meta2.className = "meta";
@@ -335,14 +341,22 @@
             pd.onclick = function () { purgeArticle(a); };
             acts.appendChild(rs); acts.appendChild(pd);
           } else {
-            var push = document.createElement("button"); push.className = "btn btn-ghost btn-sm"; push.textContent = "🔔 פוש";
-            push.title = "שליחת התראת פוש על הכתבה הזאת";
-            push.onclick = function () { openPushModal(a); };
+            if (a.draft) {
+              var pub = document.createElement("button"); pub.className = "btn btn-sm"; pub.textContent = "🚀 פרסם";
+              pub.title = "פרסום הטיוטה - הכתבה תופיע באתר";
+              pub.onclick = function () { publishDraft(a); };
+              acts.appendChild(pub);
+            } else {
+              var push = document.createElement("button"); push.className = "btn btn-ghost btn-sm"; push.textContent = "🔔 פוש";
+              push.title = "שליחת התראת פוש על הכתבה הזאת";
+              push.onclick = function () { openPushModal(a); };
+              acts.appendChild(push);
+            }
             var ed = document.createElement("button"); ed.className = "btn btn-ghost btn-sm"; ed.textContent = "✏️ עריכה";
             ed.onclick = function () { openEditor(a); };
             var del = document.createElement("button"); del.className = "btn btn-danger btn-sm"; del.textContent = "🗑️ מחיקה";
             del.onclick = function () { trashArticle(a); };
-            acts.appendChild(push); acts.appendChild(ed); acts.appendChild(del);
+            acts.appendChild(ed); acts.appendChild(del);
           }
           row.appendChild(thumb); row.appendChild(info); row.appendChild(acts);
           list.appendChild(row);
@@ -637,16 +651,20 @@
     });
 
     /* ---------- שמירה ---------- */
-    $("saveBtn").addEventListener("click", function () {
+    function saveArticle(asDraft) {
       var title = $("fTitle").value.trim();
       var body = $("fBody").value.trim();
       var createdBy = $("fCreatedBy").value.trim();
-      if (!title || !body) {
-        $("editMsg").textContent = "נא למלא כותרת וגוף כתבה.";
+      if (!title) {
+        $("editMsg").textContent = "נא למלא לפחות כותרת.";
         $("editMsg").style.color = "#b23b3b"; return;
       }
-      if (!createdBy) {
-        $("editMsg").textContent = "נא לרשום מי יצר את הכתבה (חובה).";
+      if (!asDraft && !body) {
+        $("editMsg").textContent = "לפרסום צריך גם גוף כתבה (או שמרו כטיוטה).";
+        $("editMsg").style.color = "#b23b3b"; return;
+      }
+      if (!asDraft && !createdBy) {
+        $("editMsg").textContent = "נא לרשום מי יצר את הכתבה (חובה לפרסום).";
         $("editMsg").style.color = "#b23b3b"; $("fCreatedBy").focus(); return;
       }
       var rec = {
@@ -660,12 +678,13 @@
         video_url: $("fVideo").value.trim() || null,
         tags: $("fTags").value.trim() || null,
         gallery: pendingGallery.length ? JSON.stringify(pendingGallery) : null,
-        created_by: createdBy,
+        created_by: createdBy || null,
         author_display: $("fAuthorDisplay").value.trim() || null,
-        featured: $("fFeatured").checked
+        featured: asDraft ? false : $("fFeatured").checked,
+        draft: !!asDraft
       };
-      var btn = $("saveBtn"); btn.disabled = true;
-      $("editMsg").textContent = "שומר…"; $("editMsg").style.color = "var(--muted)";
+      var btn = $("saveBtn"), db = $("draftBtn"); btn.disabled = true; db.disabled = true;
+      $("editMsg").textContent = asDraft ? "שומר טיוטה…" : "שומר…"; $("editMsg").style.color = "var(--muted)";
       function doSave() {
         var op;
         if (editing) { op = sb.from("articles").update(rec).eq("id", editing); }
@@ -678,10 +697,11 @@
               if ((col in rec) && _msg.indexOf(col) !== -1) { delete rec[col]; _stripped = true; }
             });
             if (_stripped) { doSave(); return; }
-            btn.disabled = false;
+            btn.disabled = false; db.disabled = false;
             $("editMsg").textContent = "שגיאה בשמירה: " + res.error.message; $("editMsg").style.color = "#b23b3b"; return;
           }
-          btn.disabled = false;
+          btn.disabled = false; db.disabled = false;
+          clearDraft();
           closeEditor();
           loadArticles();
         });
@@ -690,7 +710,17 @@
       if (rec.featured) {
         sb.from("articles").update({ featured: false }).eq("featured", true).then(function () { doSave(); });
       } else { doSave(); }
-    });
+    }
+    $("saveBtn").addEventListener("click", function () { saveArticle(false); });
+    $("draftBtn").addEventListener("click", function () { saveArticle(true); });
+
+    function publishDraft(a) {
+      if (!confirm('לפרסם את "' + (a.title || "") + '"?\nהכתבה תופיע באתר.')) return;
+      sb.from("articles").update({ draft: false }).eq("id", a.id).then(function (res) {
+        if (res.error) { alert("שגיאה בפרסום: " + res.error.message); return; }
+        loadArticles();
+      });
+    }
 
     /* ---------- מחיקה ---------- */
     /* ---------- מחיקה רכה / שחזור / מחיקה לצמיתות ---------- */

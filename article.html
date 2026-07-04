@@ -178,7 +178,7 @@
       fetch(SB_URL + "/rest/v1/articles?id=eq." + encodeURIComponent(id) + "&select=*",
         { headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY } })
         .then(function (r) { return r.json(); })
-        .then(function (rows) { var a = rows && rows[0]; (a && !a.deleted) ? render(a) : notFound(); })
+        .then(function (rows) { var a = rows && rows[0]; (a && !a.deleted && !a.draft) ? render(a) : notFound(); })
         .catch(notFound);
     }
 
@@ -397,6 +397,6 @@
     <button class="hb-close" id="hilulaClose" type="button" aria-label="סגירת הבאנר">×</button>
   </div>
 
-  <script src="js/main.js?v=716" defer></script>
+  <script src="js/main.js?v=717" defer></script>
 </body>
 </html>
