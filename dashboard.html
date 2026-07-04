@@ -287,6 +287,7 @@
       loginBox.classList.add("hidden");
       app.classList.remove("hidden");
       loadArticles();
+      maybeOfferDraft();
     }
     // אם כבר מחוברים (session שמור)
     sb.auth.getSession().then(function (r) { if (r.data && r.data.session) showApp(); });
@@ -425,9 +426,54 @@
       $("editor").classList.remove("hidden");
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
-    function closeEditor() { $("editor").classList.add("hidden"); editing = null; pendingImageUrl = ""; }
+    function closeEditor() { $("editor").classList.add("hidden"); editing = null; pendingImageUrl = ""; clearDraft(); }
     $("newBtn").addEventListener("click", function () { openEditor(null); });
     $("cancelBtn").addEventListener("click", closeEditor);
+
+    /* ---------- שמירת טיוטה אוטומטית (מגן מפני איפוס הטאב בנייד) ---------- */
+    var DRAFT_KEY = "dash_article_draft_v1";
+    var DRAFT_FIELDS = ["fTitle", "fCat", "fDate", "fExcerpt", "fBody", "fVideo", "fImgCaption", "fTags", "fCreatedBy", "fAuthorDisplay"];
+    var _draftTimer = null;
+    function editorOpen() { return !$("editor").classList.contains("hidden"); }
+    function saveDraft() {
+      if (!editorOpen()) return;
+      var d = { editing: editing, image: pendingImageUrl, gallery: pendingGallery, featured: $("fFeatured").checked, ts: Date.now() };
+      DRAFT_FIELDS.forEach(function (id) { d[id] = $(id).value; });
+      if (!d.fTitle && !d.fBody && !d.fExcerpt) { clearDraft(); return; }
+      try { localStorage.setItem(DRAFT_KEY, JSON.stringify(d)); } catch (e) {}
+    }
+    function scheduleDraftSave() { clearTimeout(_draftTimer); _draftTimer = setTimeout(saveDraft, 600); }
+    function clearDraft() { try { localStorage.removeItem(DRAFT_KEY); } catch (e) {} }
+    DRAFT_FIELDS.concat(["fFeatured"]).forEach(function (id) {
+      var elx = $(id); if (elx) { elx.addEventListener("input", scheduleDraftSave); elx.addEventListener("change", scheduleDraftSave); }
+    });
+    function applyDraft(d) {
+      openEditor(null);
+      editing = d.editing || null;
+      $("editorTitle").textContent = editing ? "עריכת כתבה" : "כתבה חדשה";
+      DRAFT_FIELDS.forEach(function (id) { $(id).value = d[id] || ""; });
+      $("fFeatured").checked = !!d.featured;
+      pendingImageUrl = d.image || ""; setPreview(pendingImageUrl);
+      pendingGallery = d.gallery || []; renderGallery();
+      updateVidStatus();
+    }
+    function maybeOfferDraft() {
+      var raw; try { raw = localStorage.getItem(DRAFT_KEY); } catch (e) { return; }
+      if (!raw) return;
+      var d; try { d = JSON.parse(raw); } catch (e) { clearDraft(); return; }
+      if (!d || (!d.fTitle && !d.fBody)) { clearDraft(); return; }
+      var bar = document.createElement("div");
+      bar.style.cssText = "background:#fff8e6;border:1px solid #ffe08a;border-radius:12px;padding:12px 16px;margin:0 0 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between";
+      var txt = document.createElement("span"); txt.style.cssText = "font-size:.92rem;color:#8a6d00";
+      txt.textContent = "💾 יש טיוטה שלא נשמרה" + (d.fTitle ? ' — "' + String(d.fTitle).slice(0, 40) + '"' : "") + ". לשחזר?";
+      var btns = document.createElement("span"); btns.style.cssText = "display:flex;gap:8px";
+      var rb = document.createElement("button"); rb.className = "btn btn-sm"; rb.type = "button"; rb.textContent = "↩️ שחזור";
+      var db = document.createElement("button"); db.className = "btn btn-ghost btn-sm"; db.type = "button"; db.textContent = "מחיקה";
+      rb.onclick = function () { applyDraft(d); bar.remove(); };
+      db.onclick = function () { clearDraft(); bar.remove(); };
+      btns.appendChild(rb); btns.appendChild(db); bar.appendChild(txt); bar.appendChild(btns);
+      var listEl = $("list"); listEl.parentNode.insertBefore(bar, listEl);
+    }
 
     function setPreview(url) {
       var img = $("imgPreview"), drop = $("imgDrop");
