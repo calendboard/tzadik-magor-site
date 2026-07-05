@@ -514,8 +514,8 @@
     /* פרטי קשר (טלפון/מייל) - לתפילה ולנר. נשמרים מוצפנים ב-enc. */
     var _prefillBy = null;
     if (kind !== "stories") {
-      form.appendChild(fld("טלפון", "_phone", ""));
-      form.appendChild(fld("אימייל", "_email", ""));
+      form.appendChild(fld("טלפון", "_phone", item._phoneInit || ""));
+      form.appendChild(fld("אימייל", "_email", item._emailInit || ""));
       if (item.enc && _admKey) {  // עריכת רשומה קיימת - טוענים את הפרטים המוצפנים
         decryptContact(item.enc).then(function (o) {
           if (!o) return;
@@ -639,9 +639,31 @@
     wrap.appendChild(view);
     if (_admKey) {
       var acts = document.createElement("span"); acts.className = "adm-acts";
+      /* העברת הפנייה לרשימת שמות לתפילה: פותח טופס מוכן מראש,
+         ובשמירה - מוסיף לתפילות ומוחק מהפניות בפעולה אחת. */
+      var mv = document.createElement("button"); mv.type = "button"; mv.className = "adm-btn adm-save"; mv.textContent = "🙏 העבר לתפילה"; mv.title = "העברה לרשימת שמות לתפילה";
+      mv.onclick = function () {
+        decryptBig(item.encb).then(function (o) {
+          if (!o) { alert("לא ניתן לפענח את הפנייה 🙏"); return; }
+          var today = new Date().toISOString().slice(0, 10);
+          var form = admFormEl("prayers", {
+            name: (o.message || "").trim() || o.name || "",
+            request: "", date: (item.date || today),
+            _phoneInit: o.phone || "", _emailInit: o.email || ""
+          }, function (fields) {
+            fields._id = uid();
+            admPersist(function (rec) {
+              rec.prayers.push(fields);
+              rec.contacts = (rec.contacts || []).filter(function (x) { return !(x && x._id === item._id); });
+            }, function (ok) { if (!ok) alert("ההעברה נכשלה, נסו שוב 🙏"); });
+          });
+          wrap.innerHTML = ""; wrap.appendChild(form);
+          var f0 = form.querySelector("input"); if (f0) f0.focus();
+        });
+      };
       var del = document.createElement("button"); del.type = "button"; del.className = "adm-btn adm-del"; del.textContent = "🗑️"; del.title = "מחיקה";
       del.onclick = function () { if (confirm("למחוק את הפנייה?")) admDelete("contacts", item._id); };
-      acts.appendChild(del); wrap.appendChild(acts);
+      acts.appendChild(mv); acts.appendChild(del); wrap.appendChild(acts);
     }
     li.appendChild(wrap);
     return li;
