@@ -166,6 +166,8 @@
           var p = document.getElementById("sec-prayers"), c = document.getElementById("sec-candles");
           var any = (p && p.style.display !== "none") || (c && c.style.display !== "none");
           cols.style.display = any ? "" : "none";
+          /* קטגוריה בודדת מתוך העמודות - שתתפרס לרוחב מלא (מקום ל-2-3 טורים) */
+          cols.style.gridTemplateColumns = (cat === "prayers" || cat === "candles") ? "1fr" : "";
         }
         /* כשמסננים קטגוריה בודדת - פורסים אותה ל-2-3 טורים */
         var pl = document.getElementById("prayerList"), cl = document.getElementById("candleList");
