@@ -65,12 +65,11 @@
     .adm-btn:hover{ border-color:var(--g); background:#faf8f2; }
     .adm-del:hover{ border-color:#d6a; background:#fbeeee; }
     @media (hover:hover){
-      li .adm-acts .adm-btn:not(.adm-don.on){ opacity:0; transition:opacity .15s; }
+      li .adm-acts .adm-btn:not(.adm-don){ opacity:0; transition:opacity .15s; }
       li:hover .adm-acts .adm-btn{ opacity:1; }
-      li .adm-acts .adm-don.on{ opacity:1; }
     }
-    /* סימון תרומה - תגית עדינה */
-    .adm-don{ white-space:nowrap; font-weight:600; }
+    /* סימון תרומה - תמיד גלוי, לחיץ להחלפה ידנית */
+    .adm-don{ white-space:nowrap; font-weight:600; opacity:1 !important; }
     .adm-don.on{ background:#e9f7ee; border-color:#b9e2c6; color:#12692f; }
     .adm-don.on:hover{ background:#ddf1e4; }
 
