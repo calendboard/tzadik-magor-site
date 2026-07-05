@@ -157,6 +157,18 @@
         <p class="hint" style="margin:6px 0 0">העלאת קובץ - עד ~50MB (לסרטונים ארוכים עדיף קישור יוטיוב).</p>
       </div>
       <div class="field">
+        <label>הקלטה / אודיו <span class="hint">(רשות - שיעור / הספד / הקלטה קולית)</span></label>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <button type="button" id="audUploadBtn" class="btn btn-ghost btn-sm">🎙️ העלאת הקלטה</button>
+          <button type="button" id="audClearBtn" class="btn btn-ghost btn-sm hidden">✕ הסרת הקלטה</button>
+          <span id="audStatus" class="hint"></span>
+        </div>
+        <audio id="audPreview" class="hidden" controls style="width:100%;margin-top:10px"></audio>
+        <input id="fAudio" type="hidden" />
+        <input id="audFile" type="file" accept="audio/*" class="hidden" />
+        <p class="hint" style="margin:6px 0 0">MP3 / M4A / הקלטת ווטסאפ - עד ~50MB. יופיע כנגן בתוך הכתבה.</p>
+      </div>
+      <div class="field">
         <label>גלריה - תמונות וסרטונים נוספים <span class="hint">(ללא הגבלה · יוצגו כגלריה בתוך הכתבה)</span></label>
         <div id="galGrid" class="gal-grid"></div>
         <div style="display:flex;gap:10px;align-items:center;margin-top:8px;flex-wrap:wrap">
@@ -434,6 +446,7 @@
       $("fExcerpt").value = a ? (a.excerpt || "") : "";
       $("fBody").value = a ? (a.body || "") : "";
       $("fVideo").value = a ? (a.video_url || "") : "";
+      $("fAudio").value = a ? (a.audio_url || "") : "";
       $("fImgCaption").value = a ? (a.image_caption || "") : "";
       $("fTags").value = a ? (a.tags || "") : "";
       $("fCreatedBy").value = a ? (a.created_by || "") : "";
@@ -443,6 +456,7 @@
       if (a && a.gallery) { try { pendingGallery = JSON.parse(a.gallery) || []; } catch (e) { pendingGallery = []; } }
       renderGallery();
       updateVidStatus();
+      updateAudStatus();
       setPreview(pendingImageUrl);
       $("editMsg").textContent = "";
       $("editor").classList.remove("hidden");
@@ -613,6 +627,38 @@
         });
     });
 
+    /* ---------- הקלטה / אודיו (העלאת קובץ ל-Storage) ---------- */
+    function updateAudStatus() {
+      var url = $("fAudio").value.trim();
+      var clear = $("audClearBtn"), st = $("audStatus"), prev = $("audPreview");
+      if (url) {
+        clear.classList.remove("hidden");
+        st.textContent = "הקלטה מצורפת ✓"; st.style.color = "#167a3a";
+        prev.src = url; prev.classList.remove("hidden");
+      } else {
+        clear.classList.add("hidden"); st.textContent = "";
+        prev.classList.add("hidden"); prev.removeAttribute("src");
+      }
+    }
+    $("audClearBtn").addEventListener("click", function () { $("fAudio").value = ""; updateAudStatus(); });
+    $("audUploadBtn").addEventListener("click", function () { $("audFile").click(); });
+    $("audFile").addEventListener("change", function () {
+      var file = this.files && this.files[0];
+      if (!file) return;
+      $("audStatus").textContent = "מעלה הקלטה…"; $("audStatus").style.color = "var(--muted)";
+      var ext = (file.name.split(".").pop() || "mp3").toLowerCase();
+      var name = "audio-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7) + "." + ext;
+      sb.storage.from("news-images").upload(name, file, { contentType: file.type || "audio/mpeg", upsert: true })
+        .then(function (res) {
+          if (res.error) {
+            $("audStatus").textContent = "שגיאה בהעלאה (ייתכן שהקובץ גדול מ-50MB).";
+            $("audStatus").style.color = "#b23b3b"; return;
+          }
+          $("fAudio").value = sb.storage.from("news-images").getPublicUrl(name).data.publicUrl;
+          updateAudStatus();
+        });
+    });
+
     /* ---------- גלריה (תמונות + סרטונים, ללא הגבלה) ---------- */
     function renderGallery() {
       var g = $("galGrid"); if (!g) return; g.innerHTML = "";
@@ -684,6 +730,7 @@
         image_url: pendingImageUrl || null,
         image_caption: $("fImgCaption").value.trim() || null,
         video_url: $("fVideo").value.trim() || null,
+        audio_url: $("fAudio").value.trim() || null,
         tags: $("fTags").value.trim() || null,
         gallery: pendingGallery.length ? JSON.stringify(pendingGallery) : null,
         created_by: createdBy || null,
@@ -701,7 +748,7 @@
           if (res.error) {
             /* אם עמודה חדשה עדיין לא קיימת ב-Supabase - שומרים בלעדיה, כדי לא לחסום את השמירה */
             var _msg = res.error.message || "", _stripped = false;
-            ["created_by", "author_display", "image_caption"].forEach(function (col) {
+            ["created_by", "author_display", "image_caption", "audio_url"].forEach(function (col) {
               if ((col in rec) && _msg.indexOf(col) !== -1) { delete rec[col]; _stripped = true; }
             });
             if (_stripped) { doSave(); return; }

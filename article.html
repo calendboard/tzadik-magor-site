@@ -35,6 +35,9 @@
     .art-title{ font-family:var(--ff-serif); font-weight:800; color:#fbe8b0; font-size:clamp(1.8rem,4.6vw,2.6rem); line-height:1.25; margin:0 0 24px; }
     .art-media{ margin:0 0 26px; }
     .art-media img{ width:100%; border-radius:16px; display:block; border:1px solid var(--line-2); }
+    .art-audio{ margin:0 0 26px; background:linear-gradient(180deg,#3a2c17,#322616); border:1px solid rgba(216,179,73,.35); border-radius:16px; padding:15px 18px; }
+    .art-audio-lbl{ color:var(--gold-2); font-weight:700; font-size:1rem; margin-bottom:10px; letter-spacing:.5px; }
+    .art-audio audio{ width:100%; display:block; }
     .art-body{ color:var(--cream); font-size:1.18rem; line-height:1.8;
       background:#322616; border:1px solid rgba(216,179,73,.15); border-radius:16px;
       padding:30px 34px; box-shadow:0 12px 34px rgba(0,0,0,.25); }
@@ -327,6 +330,15 @@
       if (media.children.length) view.appendChild(media);
       if (media.children.length && a.image_caption) {
         var mcap = el("p", "art-cap"); mcap.textContent = a.image_caption; view.appendChild(mcap);
+      }
+
+      // הקלטה / אודיו
+      if (a.audio_url) {
+        var audWrap = el("div", "art-audio");
+        var aLabel = el("div", "art-audio-lbl"); aLabel.textContent = "🎙️ להאזנה";
+        var au = el("audio"); au.controls = true; au.preload = "metadata"; au.src = a.audio_url;
+        audWrap.appendChild(aLabel); audWrap.appendChild(au);
+        view.appendChild(audWrap);
       }
 
       var body = el("div", "art-body");
