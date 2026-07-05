@@ -50,6 +50,11 @@
     .adm-btn{ background:#fff; border:1px solid #d8d2c4; border-radius:7px; padding:3px 9px; font-size:.9rem; cursor:pointer; font-family:inherit; line-height:1.4; }
     .adm-btn:hover{ border-color:var(--g); background:#faf8f2; }
     .adm-del:hover{ border-color:#d6a; background:#fbeeee; }
+    /* סימון תרומה (תרם / לא תרם) - להצלבה מול נדרים פלוס */
+    .adm-don{ background:#fff; border:1px solid #d8d2c4; color:#8a8270; white-space:nowrap; font-weight:600; }
+    .adm-don:hover{ border-color:var(--g); background:#faf8f2; }
+    .adm-don.on{ background:#e3f6e8; border-color:#8ccfa2; color:#12692f; }
+    .adm-don.on:hover{ background:#d6f0de; }
     .adm-edit{ width:100%; display:grid; gap:9px; padding:6px 0 4px; }
     .adm-fld{ display:grid; gap:3px; }
     .adm-fld span{ font-size:.8rem; color:#8a8270; font-weight:600; }
@@ -149,7 +154,7 @@
     <p class="note">דף פנימי - אינו מקושר באתר ואינו מופיע בחיפוש. הנתונים מתעדכנים בזמן אמת מהמערכת.</p>
   </div>
 
-  <script src="js/main.js?v=717" defer></script>
+  <script src="js/main.js?v=718" defer></script>
   <script>
     /* סינון לפי קטגוריה - מציג רק את הקטגוריה שנבחרה */
     (function () {

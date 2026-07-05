@@ -456,11 +456,17 @@
     wrap.appendChild(view);
     if (_admKey) {
       var acts = document.createElement("span"); acts.className = "adm-acts";
+      // סימון תרומה (להצלבה מול דו"ח נדרים פלוס) - רק בקובץ הסגור, כשפתוח עם קוד
+      var don = document.createElement("button"); don.type = "button";
+      don.className = "adm-btn adm-don" + (item.donated ? " on" : "");
+      don.textContent = item.donated ? "💰 תרם" : "○ לא תרם";
+      don.title = "סימון תרומה - להצלבה מול נדרים פלוס";
+      don.onclick = function () { admToggleDonated(kind, item._id, !item.donated); };
       var ed = document.createElement("button"); ed.type = "button"; ed.className = "adm-btn"; ed.textContent = "✏️"; ed.title = "עריכה";
       ed.onclick = function () { admOpenEdit(wrap, kind, item); };
       var del = document.createElement("button"); del.type = "button"; del.className = "adm-btn adm-del"; del.textContent = "🗑️"; del.title = "מחיקה";
       del.onclick = function () { if (confirm("למחוק את הרשומה?\n" + (kind === "prayers" ? (item.name || "") : admLine(item)))) admDelete(kind, item._id); };
-      acts.appendChild(ed); acts.appendChild(del);
+      acts.appendChild(don); acts.appendChild(ed); acts.appendChild(del);
       wrap.appendChild(acts);
     }
     li.appendChild(wrap);
@@ -565,6 +571,12 @@
     admPersist(function (rec) {
       rec[kind] = (rec[kind] || []).filter(function (x) { return !(x && x._id === id); });
     }, function (ok) { if (!ok) alert("המחיקה נכשלה, נסו שוב 🙏"); });
+  }
+  /* סימון "תרם / לא תרם" לרשומה - נשמר ל-backend (להצלבה מול נדרים פלוס) */
+  function admToggleDonated(kind, id, val) {
+    admPersist(function (rec) {
+      (rec[kind] || []).forEach(function (it) { if (it && it._id === id) it.donated = !!val; });
+    }, function (ok) { if (!ok) alert("עדכון הסימון נכשל, נסו שוב 🙏"); });
   }
   /* שורת פניית "צור קשר" - מפוענחת רק כשהקוד מוזן */
   function admContactRow(item) {
