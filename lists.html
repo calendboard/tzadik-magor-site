@@ -105,8 +105,8 @@
     .note{ color:#a89d84; font-size:.82rem; margin-top:30px; text-align:center; }
 
     /* כשמסננים קטגוריה אחת - פורסים את הרשימה ל-2-3 טורים לפי רוחב המסך */
-    #prayerList.multi, #candleList.multi{ columns:3 260px; column-gap:20px; }
-    #prayerList.multi > li, #candleList.multi > li{ break-inside:avoid; -webkit-column-break-inside:avoid; margin-bottom:8px; }
+    #prayerList.multi, #candleList.multi, #pidyonList.multi{ columns:3 260px; column-gap:20px; }
+    #prayerList.multi > li, #candleList.multi > li, #pidyonList.multi > li{ break-inside:avoid; -webkit-column-break-inside:avoid; margin-bottom:8px; }
 
     @media print{
       .adm-acts{ display:none; }
@@ -150,6 +150,7 @@
       <span class="fl-lbl">קטגוריה:</span>
       <button type="button" data-cat="all" class="active">הכל</button>
       <button type="button" data-cat="prayers">🙏 שמות לתפילה</button>
+      <button type="button" data-cat="pidyon">🕊️ פדיון נפש</button>
       <button type="button" data-cat="candles">🕯️ נרות נשמה</button>
       <button type="button" data-cat="stories">📜 ישועות</button>
       <button type="button" data-cat="contacts">✉️ צור קשר</button>
@@ -166,6 +167,11 @@
       </div>
     </div>
 
+    <div class="contacts-sec" id="sec-pidyon">
+      <h2>🕊️ פדיון נפש (<span id="pidyonCount">0</span>) <button type="button" id="addPidyon" class="adm-add hidden">➕ הוספת שם</button></h2>
+      <ol id="pidyonList"><li class="adm-empty">טוען…</li></ol>
+    </div>
+
     <div class="contacts-sec" id="sec-stories">
       <h2>📜 ישועות אישיות - ממתינות לאישור (<span id="storyAdminCount">0</span>) <button type="button" id="addStory" class="adm-add hidden">➕ הוספת ישועה</button></h2>
       <ol id="storyAdminList"><li class="adm-empty">טוען…</li></ol>
@@ -179,13 +185,13 @@
     <p class="note">דף פנימי - אינו מקושר באתר ואינו מופיע בחיפוש. הנתונים מתעדכנים בזמן אמת מהמערכת.</p>
   </div>
 
-  <script src="js/main.js?v=720" defer></script>
+  <script src="js/main.js?v=721" defer></script>
   <script>
     /* סינון לפי קטגוריה - מציג רק את הקטגוריה שנבחרה */
     (function () {
       var bar = document.getElementById("admCatFilter");
       if (!bar) return;
-      var SEC = { prayers: "sec-prayers", candles: "sec-candles", stories: "sec-stories", contacts: "sec-contacts" };
+      var SEC = { prayers: "sec-prayers", candles: "sec-candles", pidyon: "sec-pidyon", stories: "sec-stories", contacts: "sec-contacts" };
       var cols = document.querySelector(".cols");
       function apply(cat) {
         Object.keys(SEC).forEach(function (k) {
@@ -200,9 +206,10 @@
           cols.style.gridTemplateColumns = (cat === "prayers" || cat === "candles") ? "1fr" : "";
         }
         /* כשמסננים קטגוריה בודדת - פורסים אותה ל-2-3 טורים */
-        var pl = document.getElementById("prayerList"), cl = document.getElementById("candleList");
+        var pl = document.getElementById("prayerList"), cl = document.getElementById("candleList"), pd = document.getElementById("pidyonList");
         if (pl) pl.classList.toggle("multi", cat === "prayers");
         if (cl) cl.classList.toggle("multi", cat === "candles");
+        if (pd) pd.classList.toggle("multi", cat === "pidyon");
       }
       bar.addEventListener("click", function (e) {
         var b = e.target.closest("button[data-cat]"); if (!b) return;

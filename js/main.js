@@ -227,6 +227,7 @@
         if (!Array.isArray(rec.prayers)) rec.prayers = [];
         if (!Array.isArray(rec.contacts)) rec.contacts = [];
         if (!Array.isArray(rec.stories)) rec.stories = [];
+        if (!Array.isArray(rec.pidyon)) rec.pidyon = [];
         var exists = rec[key].some(function (x) { return x && x._id === item._id; });
         if (!exists) rec[key].push(item);
         return fetch(CANDLE_API, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(rec) });
@@ -449,7 +450,7 @@
     var li = document.createElement("li");
     var wrap = document.createElement("div"); wrap.className = "adm-rowwrap";
     var view = document.createElement("span"); view.className = "adm-view";
-    if (kind === "prayers") {
+    if (kind === "prayers" || kind === "pidyon") {
       view.innerHTML = '<b></b><span class="adm-req"></span><span class="adm-date"></span><span class="adm-contact"></span>';
       view.querySelector("b").textContent = item.name || "";
       view.querySelector(".adm-req").textContent = item.request ? " - " + item.request : "";
@@ -495,8 +496,8 @@
       var inp = document.createElement("textarea"); inp.rows = 5; inp.value = val || ""; inp.setAttribute("data-key", key);
       w.appendChild(s); w.appendChild(inp); return w;
     }
-    if (kind === "prayers") {
-      form.appendChild(fld("שם לתפילה", "name", item.name));
+    if (kind === "prayers" || kind === "pidyon") {
+      form.appendChild(fld(kind === "pidyon" ? "השם לפדיון נפש (ושם האם)" : "שם לתפילה", "name", item.name));
       form.appendChild(fld("בקשה", "request", item.request));
       form.appendChild(fld("תאריך (YYYY-MM-DD)", "date", item.date));
     } else if (kind === "stories") {
@@ -565,7 +566,7 @@
   /* הוספת רשומה חדשה (נר/תפילה/ישועה) ידנית מהדשבורד */
   function admAdd(kind) {
     if (!_admKey) return;
-    var listId = kind === "prayers" ? "prayerList" : kind === "stories" ? "storyAdminList" : "candleList";
+    var listId = kind === "prayers" ? "prayerList" : kind === "stories" ? "storyAdminList" : kind === "pidyon" ? "pidyonList" : "candleList";
     var listEl = document.getElementById(listId);
     if (!listEl) return;
     if (listEl.querySelector(".adm-newrow")) return;
@@ -591,6 +592,7 @@
         if (!Array.isArray(rec.prayers)) rec.prayers = [];
         if (!Array.isArray(rec.contacts)) rec.contacts = [];
         if (!Array.isArray(rec.stories)) rec.stories = [];
+        if (!Array.isArray(rec.pidyon)) rec.pidyon = [];
         mutator(rec);
         return fetch(CANDLE_API, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(rec) })
           .then(function () { return fetch(CANDLE_API + "/latest", { headers: { "X-Bin-Meta": "false" }, cache: "no-store" }); })
@@ -744,10 +746,12 @@
     var ctWrap = document.getElementById("contactList");
     var saWrap = document.getElementById("storyAdminList");
     var prayers = (_admData.prayers || []).slice().reverse().filter(function (p) { return admPass(p.date); });
+    var pidyon = (_admData.pidyon || []).slice().reverse().filter(function (p) { return admPass(p.date); });
     var candles = (_admData.candles || []).slice().reverse().filter(function (c) { return admPass(c.date); });
     var contacts = (_admData.contacts || []).slice().reverse().filter(function (c) { return admPass(c.date); });
     var stories = (_admData.stories || []).slice().reverse().filter(function (s) { return admPass(s.date); });
     var pc = document.getElementById("prayerCount"); if (pc) pc.textContent = prayers.length;
+    var pdc = document.getElementById("pidyonCount"); if (pdc) pdc.textContent = pidyon.length;
     var clc = document.getElementById("candleListCount"); if (clc) clc.textContent = candles.length;
     var ctc = document.getElementById("contactCount"); if (ctc) ctc.textContent = contacts.length;
     var sac = document.getElementById("storyAdminCount"); if (sac) sac.textContent = stories.filter(function (s) { return s.status !== "approved"; }).length;
@@ -758,6 +762,11 @@
     if (pWrap) {
       pWrap.innerHTML = prayers.length ? "" : '<li class="adm-empty">אין רשומות בטווח זה.</li>';
       prayers.forEach(function (p) { pWrap.appendChild(admRow("prayers", p)); });
+    }
+    var pdWrap = document.getElementById("pidyonList");
+    if (pdWrap) {
+      pdWrap.innerHTML = pidyon.length ? "" : '<li class="adm-empty">אין רשומות בטווח זה.</li>';
+      pidyon.forEach(function (p) { pdWrap.appendChild(admRow("pidyon", p)); });
     }
     if (cWrap) {
       cWrap.innerHTML = candles.length ? "" : '<li class="adm-empty">אין רשומות בטווח זה.</li>';
@@ -782,6 +791,7 @@
     var addP = document.getElementById("addPrayer"); if (addP) addP.classList.toggle("hidden", !_admKey);
     var addC = document.getElementById("addCandle"); if (addC) addC.classList.toggle("hidden", !_admKey);
     var addS = document.getElementById("addStory"); if (addS) addS.classList.toggle("hidden", !_admKey);
+    var addPd = document.getElementById("addPidyon"); if (addPd) addPd.classList.toggle("hidden", !_admKey);
   }
   function loadAdminLists() {
     if (!document.getElementById("prayerList") && !document.getElementById("candleList")) return;
@@ -791,7 +801,7 @@
         .then(function (rec) {
           rec = rec || {};
           var changed = false;
-          ["candles", "prayers", "contacts", "stories"].forEach(function (k) {
+          ["candles", "prayers", "contacts", "stories", "pidyon"].forEach(function (k) {
             if (!Array.isArray(rec[k])) rec[k] = [];
             rec[k].forEach(function (it) { if (it && !it._id) { it._id = uid(); changed = true; } });
           });
@@ -832,6 +842,8 @@
     if (addC && !addC._wired) { addC._wired = true; addC.addEventListener("click", function () { admAdd("candles"); }); }
     var addS = document.getElementById("addStory");
     if (addS && !addS._wired) { addS._wired = true; addS.addEventListener("click", function () { admAdd("stories"); }); }
+    var addPd = document.getElementById("addPidyon");
+    if (addPd && !addPd._wired) { addPd._wired = true; addPd.addEventListener("click", function () { admAdd("pidyon"); }); }
     var fb = document.getElementById("admFilter");
     if (fb && !fb._wired) {
       fb._wired = true;
