@@ -332,13 +332,22 @@
         var mcap = el("p", "art-cap"); mcap.textContent = a.image_caption; view.appendChild(mcap);
       }
 
-      // הקלטה / אודיו
+      // הקלטות / אודיו (הקלטה בודדת כקישור רגיל, או כמה כרשימה)
       if (a.audio_url) {
-        var audWrap = el("div", "art-audio");
-        var aLabel = el("div", "art-audio-lbl"); aLabel.textContent = "🎙️ להאזנה";
-        var au = el("audio"); au.controls = true; au.preload = "metadata"; au.src = a.audio_url;
-        audWrap.appendChild(aLabel); audWrap.appendChild(au);
-        view.appendChild(audWrap);
+        var audioUrls = [];
+        if (String(a.audio_url).charAt(0) === "[") { try { audioUrls = JSON.parse(a.audio_url) || []; } catch (e) { audioUrls = []; } }
+        else audioUrls = [a.audio_url];
+        if (audioUrls.length) {
+          var audWrap = el("div", "art-audio");
+          var aLabel = el("div", "art-audio-lbl"); aLabel.textContent = "🎙️ להאזנה";
+          audWrap.appendChild(aLabel);
+          audioUrls.forEach(function (u, i) {
+            var au = el("audio"); au.controls = true; au.preload = "metadata"; au.src = u;
+            if (i) au.style.marginTop = "10px";
+            audWrap.appendChild(au);
+          });
+          view.appendChild(audWrap);
+        }
       }
 
       var body = el("div", "art-body");

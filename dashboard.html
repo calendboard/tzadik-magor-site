@@ -157,16 +157,14 @@
         <p class="hint" style="margin:6px 0 0">העלאת קובץ - עד ~50MB (לסרטונים ארוכים עדיף קישור יוטיוב).</p>
       </div>
       <div class="field">
-        <label>הקלטה / אודיו <span class="hint">(רשות - שיעור / הספד / הקלטה קולית)</span></label>
+        <label>הקלטות / אודיו <span class="hint">(רשות - שיעורים / הספדים / הקלטות קוליות · אפשר כמה)</span></label>
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-          <button type="button" id="audUploadBtn" class="btn btn-ghost btn-sm">🎙️ העלאת הקלטה</button>
-          <button type="button" id="audClearBtn" class="btn btn-ghost btn-sm hidden">✕ הסרת הקלטה</button>
+          <button type="button" id="audUploadBtn" class="btn btn-ghost btn-sm">🎙️ הוספת הקלטות</button>
           <span id="audStatus" class="hint"></span>
         </div>
-        <audio id="audPreview" class="hidden" controls style="width:100%;margin-top:10px"></audio>
-        <input id="fAudio" type="hidden" />
-        <input id="audFile" type="file" accept="audio/*,.mpeg,.mp3,.m4a,.opus,.ogg,.aac,.wav" class="hidden" />
-        <p class="hint" style="margin:6px 0 0">MP3 / M4A / הקלטת ווטסאפ - עד ~50MB. יופיע כנגן בתוך הכתבה.</p>
+        <div id="audList"></div>
+        <input id="audFile" type="file" accept="audio/*,.mpeg,.mp3,.m4a,.opus,.ogg,.aac,.wav" multiple class="hidden" />
+        <p class="hint" style="margin:6px 0 0">MP3 / M4A / הקלטת ווטסאפ - עד ~50MB לקובץ. אפשר לבחור כמה קבצים יחד. יופיעו כנגנים בתוך הכתבה.</p>
       </div>
       <div class="field">
         <label>גלריה - תמונות וסרטונים נוספים <span class="hint">(ללא הגבלה · יוצגו כגלריה בתוך הכתבה)</span></label>
@@ -446,7 +444,12 @@
       $("fExcerpt").value = a ? (a.excerpt || "") : "";
       $("fBody").value = a ? (a.body || "") : "";
       $("fVideo").value = a ? (a.video_url || "") : "";
-      $("fAudio").value = a ? (a.audio_url || "") : "";
+      pendingAudios = [];
+      if (a && a.audio_url) {
+        /* תמיכה גם בהקלטה בודדת (קישור רגיל) וגם בכמה (רשימה) */
+        if (String(a.audio_url).charAt(0) === "[") { try { pendingAudios = JSON.parse(a.audio_url) || []; } catch (e) { pendingAudios = []; } }
+        else pendingAudios = [a.audio_url];
+      }
       $("fImgCaption").value = a ? (a.image_caption || "") : "";
       $("fTags").value = a ? (a.tags || "") : "";
       $("fCreatedBy").value = a ? (a.created_by || "") : "";
@@ -456,7 +459,7 @@
       if (a && a.gallery) { try { pendingGallery = JSON.parse(a.gallery) || []; } catch (e) { pendingGallery = []; } }
       renderGallery();
       updateVidStatus();
-      updateAudStatus();
+      renderAudios();
       setPreview(pendingImageUrl);
       $("editMsg").textContent = "";
       $("editor").classList.remove("hidden");
@@ -627,38 +630,53 @@
         });
     });
 
-    /* ---------- הקלטה / אודיו (העלאת קובץ ל-Storage) ---------- */
-    function updateAudStatus() {
-      var url = $("fAudio").value.trim();
-      var clear = $("audClearBtn"), st = $("audStatus"), prev = $("audPreview");
-      if (url) {
-        clear.classList.remove("hidden");
-        st.textContent = "הקלטה מצורפת ✓"; st.style.color = "#167a3a";
-        prev.src = url; prev.classList.remove("hidden");
-      } else {
-        clear.classList.add("hidden"); st.textContent = "";
-        prev.classList.add("hidden"); prev.removeAttribute("src");
-      }
+    /* ---------- הקלטות / אודיו (כמה הקלטות לכתבה, ל-Storage) ---------- */
+    var pendingAudios = [];
+    function renderAudios() {
+      var box = $("audList"); if (!box) return; box.innerHTML = "";
+      pendingAudios.forEach(function (url, i) {
+        var row = document.createElement("div");
+        row.style.cssText = "display:flex;gap:8px;align-items:center;margin-top:10px";
+        var au = document.createElement("audio");
+        au.controls = true; au.preload = "metadata"; au.src = url;
+        au.style.cssText = "flex:1;min-width:0";
+        var rm = document.createElement("button");
+        rm.type = "button"; rm.className = "btn btn-ghost btn-sm"; rm.textContent = "✕";
+        rm.title = "הסרת הקלטה";
+        rm.addEventListener("click", function () { pendingAudios.splice(i, 1); renderAudios(); });
+        row.appendChild(au); row.appendChild(rm); box.appendChild(row);
+      });
+      var st = $("audStatus");
+      st.textContent = pendingAudios.length ? (pendingAudios.length === 1 ? "הקלטה אחת מצורפת ✓" : pendingAudios.length + " הקלטות מצורפות ✓") : "";
+      st.style.color = "#167a3a";
     }
-    $("audClearBtn").addEventListener("click", function () { $("fAudio").value = ""; updateAudStatus(); });
     $("audUploadBtn").addEventListener("click", function () { $("audFile").click(); });
     $("audFile").addEventListener("change", function () {
-      var file = this.files && this.files[0];
-      if (!file) return;
-      $("audStatus").textContent = "מעלה הקלטה…"; $("audStatus").style.color = "var(--muted)";
-      var ext = (file.name.split(".").pop() || "mp3").toLowerCase();
-      if (ext === "mpeg" || ext === "mpga") ext = "mp3"; /* הקלטות ווטסאפ מגיעות כ-mpeg אבל הן MP3 */
-      var ct = (file.type && file.type.indexOf("audio") === 0) ? file.type : "audio/mpeg";
-      var name = "audio-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7) + "." + ext;
-      sb.storage.from("news-images").upload(name, file, { contentType: ct, upsert: true })
-        .then(function (res) {
-          if (res.error) {
-            $("audStatus").textContent = "שגיאה בהעלאה (ייתכן שהקובץ גדול מ-50MB).";
-            $("audStatus").style.color = "#b23b3b"; return;
-          }
-          $("fAudio").value = sb.storage.from("news-images").getPublicUrl(name).data.publicUrl;
-          updateAudStatus();
-        });
+      var files = Array.prototype.slice.call(this.files || []);
+      this.value = "";
+      if (!files.length) return;
+      var left = files.length, failed = 0;
+      $("audStatus").textContent = files.length === 1 ? "מעלה הקלטה…" : "מעלה " + files.length + " הקלטות…";
+      $("audStatus").style.color = "var(--muted)";
+      files.forEach(function (file) {
+        var ext = (file.name.split(".").pop() || "mp3").toLowerCase();
+        if (ext === "mpeg" || ext === "mpga") ext = "mp3"; /* הקלטות ווטסאפ מגיעות כ-mpeg אבל הן MP3 */
+        var ct = (file.type && file.type.indexOf("audio") === 0) ? file.type : "audio/mpeg";
+        var name = "audio-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7) + "." + ext;
+        sb.storage.from("news-images").upload(name, file, { contentType: ct, upsert: true })
+          .then(function (res) {
+            left--;
+            if (res.error) failed++;
+            else pendingAudios.push(sb.storage.from("news-images").getPublicUrl(name).data.publicUrl);
+            if (left === 0) {
+              renderAudios();
+              if (failed) {
+                $("audStatus").textContent = failed + " הקלטות נכשלו בהעלאה (ייתכן שגדולות מ-50MB)." + (pendingAudios.length ? " השאר צורפו ✓" : "");
+                $("audStatus").style.color = "#b23b3b";
+              }
+            }
+          });
+      });
     });
 
     /* ---------- גלריה (תמונות + סרטונים, ללא הגבלה) ---------- */
@@ -732,7 +750,7 @@
         image_url: pendingImageUrl || null,
         image_caption: $("fImgCaption").value.trim() || null,
         video_url: $("fVideo").value.trim() || null,
-        audio_url: $("fAudio").value.trim() || null,
+        audio_url: pendingAudios.length ? (pendingAudios.length === 1 ? pendingAudios[0] : JSON.stringify(pendingAudios)) : null,
         tags: $("fTags").value.trim() || null,
         gallery: pendingGallery.length ? JSON.stringify(pendingGallery) : null,
         created_by: createdBy || null,
