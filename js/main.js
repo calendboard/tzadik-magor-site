@@ -436,6 +436,14 @@
         span.className = "adm-contact show";
       }).catch(function () {});
   }
+  /* מפענח enc של תפילה/נר → אובייקט {phone,email,by} (לעריכה); דורש _admKey */
+  function decryptContact(enc) {
+    if (!_admKey || !enc) return Promise.resolve(null);
+    var raw; try { raw = _unb64(enc); } catch (e) { return Promise.resolve(null); }
+    return crypto.subtle.decrypt({ name: "RSA-OAEP" }, _admKey, raw)
+      .then(function (buf) { return JSON.parse(new TextDecoder().decode(buf)); })
+      .catch(function () { return null; });
+  }
   /* בונה שורה אחת (תפילה/נר) עם תצוגה + כפתורי עריכה/מחיקה (רק כשפתוח עם קוד) */
   function admRow(kind, item) {
     var li = document.createElement("li");
@@ -503,6 +511,21 @@
       form.appendChild(fld("הקדשה", "dedication", item.dedication));
       form.appendChild(fld("תאריך (YYYY-MM-DD)", "date", item.date));
     }
+    /* פרטי קשר (טלפון/מייל) - לתפילה ולנר. נשמרים מוצפנים ב-enc. */
+    var _prefillBy = null;
+    if (kind !== "stories") {
+      form.appendChild(fld("טלפון", "_phone", ""));
+      form.appendChild(fld("אימייל", "_email", ""));
+      if (item.enc && _admKey) {  // עריכת רשומה קיימת - טוענים את הפרטים המוצפנים
+        decryptContact(item.enc).then(function (o) {
+          if (!o) return;
+          _prefillBy = o.by || null;
+          var pin = form.querySelector('[data-key="_phone"]'), ein = form.querySelector('[data-key="_email"]');
+          if (pin && o.phone) pin.value = o.phone;
+          if (ein && o.email) ein.value = o.email;
+        });
+      }
+    }
     var bar = document.createElement("div"); bar.className = "adm-editbar";
     var save = document.createElement("button"); save.type = "button"; save.className = "adm-btn adm-save"; save.textContent = "💾 שמירה";
     var cancel = document.createElement("button"); cancel.type = "button"; cancel.className = "adm-btn"; cancel.textContent = "ביטול";
@@ -511,8 +534,22 @@
       form.querySelectorAll("[data-key]").forEach(function (inp) { fields[inp.getAttribute("data-key")] = inp.value.trim(); });
       if (kind === "stories") { if (!fields.story) { alert("חובה למלא את הסיפור 🙏"); return; } }
       else if (!fields.name) { alert("חובה למלא שם 🙏"); return; }
+      var _phone = fields._phone || "", _email = fields._email || "";
+      delete fields._phone; delete fields._email;
       save.disabled = true; save.textContent = "שומר…";
-      onSave(fields);
+      if (kind !== "stories" && (_phone || _email)) {
+        // מצפינים את הטלפון/מייל (מפתח ציבורי) → נשמר ב-enc
+        var payload = { phone: _phone, email: _email };
+        if (_prefillBy) payload.by = _prefillBy;
+        encryptContact(payload).then(function (e) {
+          if (e) { fields.enc = e; }
+          else { alert("הצפנת פרטי הקשר נכשלה - נשמר בלי טלפון/מייל 🙏"); }
+          onSave(fields);
+        }).catch(function () { onSave(fields); });
+      } else {
+        // לא הוזנו טלפון/מייל → משאירים enc קיים ללא שינוי (לא מוחקים)
+        onSave(fields);
+      }
     };
     cancel.onclick = function () { renderAdmin(); };
     bar.appendChild(save); bar.appendChild(cancel);
