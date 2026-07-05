@@ -197,12 +197,12 @@
     }
 
     var bodyHasLpCta = false;
-    // קישור לישועה/דף-חדש בתוך גוף הכתבה => אייקון עגול לחיץ (בלי מלל). מבטל גם את הבאנר התחתון.
-    function lpCta(url) {
+    // קישור לישועה/דף-חדש בתוך גוף הכתבה => כפתור זהב בולט עם הטקסט שנכתב. מבטל גם את הבאנר התחתון.
+    function lpCta(url, label) {
       var wrap = el("div", "art-cta");
-      var a = el("a", "lp-icon-btn"); a.href = url;
-      a.setAttribute("aria-label", "הצטרפו לתפילת גדולי וצדיקי הדור");
-      a.textContent = /daf-chadash/i.test(url) ? "📖" : "🙏";
+      var a = el("a", "btn btn-gold btn-lg"); a.href = url;
+      var txt = (label && label.trim()) || (/daf-chadash/i.test(url) ? "לפתיחת דף חדש" : "להצטרף לתפילה");
+      a.textContent = /»\s*$/.test(txt) ? txt : (txt + " »");
       wrap.appendChild(a);
       return wrap;
     }
@@ -243,7 +243,7 @@
               ctas++;
               if (label && !/^https?:\/\//i.test(label)) p.appendChild(document.createTextNode(label));
             } else if (LP.test(url)) {
-              lpUrls.push(url); bodyHasLpCta = true;
+              lpUrls.push({ u: url, l: label }); bodyHasLpCta = true;
             } else {
               var a = el("a", "art-link"); a.href = url; a.textContent = label || url;
               if (/^https?:\/\//i.test(url)) { a.target = "_blank"; a.rel = "noopener"; }
@@ -255,7 +255,7 @@
           if (tail.trim()) p.appendChild(document.createTextNode(tail));
           if (p.textContent.trim()) container.appendChild(p);
           for (var i = 0; i < ctas; i++) container.appendChild(candleCta());
-          lpUrls.forEach(function (u) { container.appendChild(lpCta(u)); });
+          lpUrls.forEach(function (it) { container.appendChild(lpCta(it.u, it.l)); });
         });
     }
 
