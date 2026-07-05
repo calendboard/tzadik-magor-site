@@ -156,6 +156,13 @@
       <button type="button" data-cat="contacts">✉️ צור קשר</button>
     </div>
 
+    <div class="filterbar" id="admDonFilter">
+      <span class="fl-lbl">תרומה:</span>
+      <button type="button" data-don="all" class="active">הכל</button>
+      <button type="button" data-don="yes">💰 תרמו</button>
+      <button type="button" data-don="no">○ לא תרמו</button>
+    </div>
+
     <div class="cols">
       <div class="col" id="sec-prayers">
         <h2>🙏 שמות לתפילה (<span id="prayerCount">0</span>) <button type="button" id="addPrayer" class="adm-add hidden">➕ הוספת שם</button></h2>
@@ -185,7 +192,7 @@
     <p class="note">דף פנימי - אינו מקושר באתר ואינו מופיע בחיפוש. הנתונים מתעדכנים בזמן אמת מהמערכת.</p>
   </div>
 
-  <script src="js/main.js?v=721" defer></script>
+  <script src="js/main.js?v=722" defer></script>
   <script>
     /* סינון לפי קטגוריה - מציג רק את הקטגוריה שנבחרה */
     (function () {

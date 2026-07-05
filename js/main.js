@@ -402,7 +402,13 @@
 
 
   /* ---------- דף הרשימות (admin): שמות לתפילה + נרות, עם תאריך וסינון ---------- */
-  var _admData = null, _admDays = null, _admDate = "";
+  var _admData = null, _admDays = null, _admDate = "", _admDon = "all";
+  /* סינון לפי תרומה: all / yes (תרמו) / no (לא תרמו) */
+  function admDonPass(item) {
+    if (_admDon === "yes") return !!item.donated;
+    if (_admDon === "no") return !item.donated;
+    return true;
+  }
   function withinDays(dateStr, days) {
     if (days == null) return true;
     var d = new Date(String(dateStr).slice(0, 10) + "T00:00:00");
@@ -745,9 +751,9 @@
     var cWrap = document.getElementById("candleList");
     var ctWrap = document.getElementById("contactList");
     var saWrap = document.getElementById("storyAdminList");
-    var prayers = (_admData.prayers || []).slice().reverse().filter(function (p) { return admPass(p.date); });
-    var pidyon = (_admData.pidyon || []).slice().reverse().filter(function (p) { return admPass(p.date); });
-    var candles = (_admData.candles || []).slice().reverse().filter(function (c) { return admPass(c.date); });
+    var prayers = (_admData.prayers || []).slice().reverse().filter(function (p) { return admPass(p.date) && admDonPass(p); });
+    var pidyon = (_admData.pidyon || []).slice().reverse().filter(function (p) { return admPass(p.date) && admDonPass(p); });
+    var candles = (_admData.candles || []).slice().reverse().filter(function (c) { return admPass(c.date) && admDonPass(c); });
     var contacts = (_admData.contacts || []).slice().reverse().filter(function (c) { return admPass(c.date); });
     var stories = (_admData.stories || []).slice().reverse().filter(function (s) { return admPass(s.date); });
     var pc = document.getElementById("prayerCount"); if (pc) pc.textContent = prayers.length;
@@ -863,6 +869,17 @@
       dpick.addEventListener("change", function () {
         _admDate = dpick.value || "";
         if (_admDate && fb) fb.querySelectorAll("[data-days]").forEach(function (x) { x.classList.remove("active"); });
+        renderAdmin();
+      });
+    }
+    /* סינון לפי תרומה (תרמו / לא תרמו / הכל) */
+    var db = document.getElementById("admDonFilter");
+    if (db && !db._wired) {
+      db._wired = true;
+      db.addEventListener("click", function (e) {
+        var b = e.target.closest("[data-don]"); if (!b) return;
+        _admDon = b.getAttribute("data-don") || "all";
+        db.querySelectorAll("[data-don]").forEach(function (x) { x.classList.toggle("active", x === b); });
         renderAdmin();
       });
     }
