@@ -165,7 +165,7 @@
         </div>
         <audio id="audPreview" class="hidden" controls style="width:100%;margin-top:10px"></audio>
         <input id="fAudio" type="hidden" />
-        <input id="audFile" type="file" accept="audio/*" class="hidden" />
+        <input id="audFile" type="file" accept="audio/*,.mpeg,.mp3,.m4a,.opus,.ogg,.aac,.wav" class="hidden" />
         <p class="hint" style="margin:6px 0 0">MP3 / M4A / הקלטת ווטסאפ - עד ~50MB. יופיע כנגן בתוך הכתבה.</p>
       </div>
       <div class="field">
@@ -647,8 +647,10 @@
       if (!file) return;
       $("audStatus").textContent = "מעלה הקלטה…"; $("audStatus").style.color = "var(--muted)";
       var ext = (file.name.split(".").pop() || "mp3").toLowerCase();
+      if (ext === "mpeg" || ext === "mpga") ext = "mp3"; /* הקלטות ווטסאפ מגיעות כ-mpeg אבל הן MP3 */
+      var ct = (file.type && file.type.indexOf("audio") === 0) ? file.type : "audio/mpeg";
       var name = "audio-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7) + "." + ext;
-      sb.storage.from("news-images").upload(name, file, { contentType: file.type || "audio/mpeg", upsert: true })
+      sb.storage.from("news-images").upload(name, file, { contentType: ct, upsert: true })
         .then(function (res) {
           if (res.error) {
             $("audStatus").textContent = "שגיאה בהעלאה (ייתכן שהקובץ גדול מ-50MB).";
