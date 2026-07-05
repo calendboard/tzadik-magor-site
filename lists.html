@@ -21,6 +21,9 @@
     .actions a{ color:var(--g2); text-decoration:none; font-weight:600; }
     .cols{ display:grid; grid-template-columns:1fr 1fr; gap:34px; }
     @media (max-width:760px){ .cols{ grid-template-columns:1fr; } }
+    /* כשמסננים קטגוריה אחת - פורסים את הרשימה ל-2-3 טורים לפי רוחב המסך */
+    #prayerList.multi, #candleList.multi{ columns:3 240px; column-gap:22px; }
+    #prayerList.multi > li, #candleList.multi > li{ break-inside:avoid; -webkit-column-break-inside:avoid; margin-bottom:10px; }
     .col h2{ font-size:1.3rem; color:var(--g2); border-bottom:1px solid #d8d2c4; padding-bottom:8px; margin-top:0; }
     ol{ margin:0; padding-inline-start:1.6em; }
     li{ padding:5px 2px; font-size:1.06rem; border-bottom:1px dotted #e0dac9; }
@@ -164,6 +167,10 @@
           var any = (p && p.style.display !== "none") || (c && c.style.display !== "none");
           cols.style.display = any ? "" : "none";
         }
+        /* כשמסננים קטגוריה בודדת - פורסים אותה ל-2-3 טורים */
+        var pl = document.getElementById("prayerList"), cl = document.getElementById("candleList");
+        if (pl) pl.classList.toggle("multi", cat === "prayers");
+        if (cl) cl.classList.toggle("multi", cat === "candles");
       }
       bar.addEventListener("click", function (e) {
         var b = e.target.closest("button[data-cat]"); if (!b) return;
