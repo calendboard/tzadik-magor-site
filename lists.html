@@ -113,23 +113,32 @@
       <input type="date" id="admDatePick" class="adm-datepick" />
     </div>
 
+    <div class="filterbar" id="admCatFilter">
+      <span class="fl-lbl">קטגוריה:</span>
+      <button type="button" data-cat="all" class="active">הכל</button>
+      <button type="button" data-cat="prayers">🙏 שמות לתפילה</button>
+      <button type="button" data-cat="candles">🕯️ נרות נשמה</button>
+      <button type="button" data-cat="stories">📜 ישועות</button>
+      <button type="button" data-cat="contacts">✉️ צור קשר</button>
+    </div>
+
     <div class="cols">
-      <div class="col">
+      <div class="col" id="sec-prayers">
         <h2>🙏 שמות לתפילה (<span id="prayerCount">0</span>) <button type="button" id="addPrayer" class="adm-add hidden">➕ הוספת שם</button></h2>
         <ol id="prayerList"><li class="adm-empty">טוען…</li></ol>
       </div>
-      <div class="col">
+      <div class="col" id="sec-candles">
         <h2>🕯️ נרות נשמה (<span id="candleListCount">0</span>) <button type="button" id="addCandle" class="adm-add hidden">➕ הוספת נר</button></h2>
         <ol id="candleList"><li class="adm-empty">טוען…</li></ol>
       </div>
     </div>
 
-    <div class="contacts-sec">
+    <div class="contacts-sec" id="sec-stories">
       <h2>📜 ישועות אישיות - ממתינות לאישור (<span id="storyAdminCount">0</span>) <button type="button" id="addStory" class="adm-add hidden">➕ הוספת ישועה</button></h2>
       <ol id="storyAdminList"><li class="adm-empty">טוען…</li></ol>
     </div>
 
-    <div class="contacts-sec">
+    <div class="contacts-sec" id="sec-contacts">
       <h2>✉️ פניות מצור קשר (<span id="contactCount">0</span>)</h2>
       <ol id="contactList"><li class="adm-empty">טוען…</li></ol>
     </div>
@@ -138,5 +147,30 @@
   </div>
 
   <script src="js/main.js?v=717" defer></script>
+  <script>
+    /* סינון לפי קטגוריה - מציג רק את הקטגוריה שנבחרה */
+    (function () {
+      var bar = document.getElementById("admCatFilter");
+      if (!bar) return;
+      var SEC = { prayers: "sec-prayers", candles: "sec-candles", stories: "sec-stories", contacts: "sec-contacts" };
+      var cols = document.querySelector(".cols");
+      function apply(cat) {
+        Object.keys(SEC).forEach(function (k) {
+          var el = document.getElementById(SEC[k]);
+          if (el) el.style.display = (cat === "all" || cat === k) ? "" : "none";
+        });
+        if (cols) {
+          var p = document.getElementById("sec-prayers"), c = document.getElementById("sec-candles");
+          var any = (p && p.style.display !== "none") || (c && c.style.display !== "none");
+          cols.style.display = any ? "" : "none";
+        }
+      }
+      bar.addEventListener("click", function (e) {
+        var b = e.target.closest("button[data-cat]"); if (!b) return;
+        bar.querySelectorAll("button").forEach(function (x) { x.classList.toggle("active", x === b); });
+        apply(b.getAttribute("data-cat"));
+      });
+    })();
+  </script>
 </body>
 </html>
