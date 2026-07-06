@@ -375,16 +375,10 @@
         view.appendChild(gwrap);
       }
 
-      // באנר קריאה לפעולה - מתחלף בין ישועה לדף חדש לפי הכתבה.
+      // באנר קריאה לפעולה - דף חדש בלבד (באנר הישועה/שם לתפילה הוסר לבקשת אהרן אחרי ההילולא).
       // מדלגים עליו אם בגוף הכתבה כבר יש אייקון/קישור לישועה או לדף חדש (כדי לא לכפול).
       if (!bodyHasLpCta) {
-        var ctaVariants = [
-          { href: "yeshua.html", icon: "🕯️", text: "גם אני רוצה ישועה בכ״א תמוז", sub: "מסירת שם לתפילה לרפואה, לזיווג ולכל ישועה - על ציון הצדיק ביום ההילולא." },
-          { href: "daf-chadash.html", icon: "📖", text: "גם אני רוצה לפתוח דף חדש בכ״א תמוז", sub: "תפילה לפרנסה בשפע ולפתיחת מקורות חדשים - על ציון הצדיק ביום ההילולא." }
-        ];
-        var _h = 0, _sid = String(a.id || "");
-        for (var _hi = 0; _hi < _sid.length; _hi++) _h += _sid.charCodeAt(_hi);
-        var cv = ctaVariants[_h % 2];
+        var cv = { href: "daf-chadash.html", icon: "📖", text: "גם אני רוצה לפתוח דף חדש בכ״א תמוז", sub: "תפילה לפרנסה בשפע ולפתיחת מקורות חדשים - על ציון הצדיק ביום ההילולא." };
         var cta = el("div", "art-hilula-cta");
         var ceb = el("p", "art-hilula-eyebrow"); ceb.textContent = "✦ לזכות ההילולא הקדושה · כ״א בתמוז ✦";
         var ctt = el("p", "art-hilula-title"); ctt.textContent = cv.icon + " " + cv.text;
