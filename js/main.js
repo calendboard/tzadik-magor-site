@@ -1384,8 +1384,7 @@
 
     var activeTag = new URLSearchParams(location.search).get("tag");
 
-    /* מזהה שמתחלף כל דקה - שובר מטמון כך שכתבה חדשה תופיע תוך ~דקה במקום עד 10 דק' */
-    fetch("data/news.json?t=" + Math.floor(Date.now() / 60000))
+    fetch("data/news.json")
       .then(function (r) { return r.json(); })
       .then(function (rows) {
         var NEWS = (rows || []).filter(function (a) { return !a.deleted && !a.draft; }).map(function (a) {
