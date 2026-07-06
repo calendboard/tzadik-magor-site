@@ -189,7 +189,7 @@
           }
           if (form.getAttribute("data-prayer") === "1") {
             var gp = function (s) { var el = form.querySelector(s); return el ? el.value.trim() : ""; };
-            if (gp("[name=pray_name]")) appendPrayer({ name: gp("[name=pray_name]"), request: gp("[name=request]"), by: gp("[name=name]"), phone: gp("[name=phone]"), email: gp("[name=email]") });
+            if (gp("[name=pray_name]")) appendPrayer({ name: gp("[name=pray_name]"), request: gp("[name=request]"), details: gp("[name=details]"), by: gp("[name=name]"), phone: gp("[name=phone]"), email: gp("[name=email]") });
           }
           if (success) {
             var fill = success.querySelector("[data-fill]");
@@ -266,6 +266,7 @@
       appendToBin("prayers", {
         name: String(p.name || "").substring(0, 80),
         request: String(p.request || "").substring(0, 40),
+        details: String(p.details || "").substring(0, 1500),
         date: new Date().toISOString().slice(0, 10),
         ts: new Date().toISOString(),
         enc: enc
@@ -457,9 +458,10 @@
     var wrap = document.createElement("div"); wrap.className = "adm-rowwrap";
     var view = document.createElement("span"); view.className = "adm-view";
     if (kind === "prayers" || kind === "pidyon") {
-      view.innerHTML = '<b></b><span class="adm-req"></span><span class="adm-date"></span><span class="adm-contact"></span>';
+      view.innerHTML = '<b></b><span class="adm-req"></span><span class="adm-details"></span><span class="adm-date"></span><span class="adm-contact"></span>';
       view.querySelector("b").textContent = item.name || "";
       view.querySelector(".adm-req").textContent = item.request ? " - " + item.request : "";
+      view.querySelector(".adm-details").textContent = item.details ? "💬 " + item.details : "";
       view.querySelector(".adm-date").textContent = fmtWhen(item);
       admContact(view.querySelector(".adm-contact"), item.enc);
     } else {
@@ -505,6 +507,7 @@
     if (kind === "prayers" || kind === "pidyon") {
       form.appendChild(fld(kind === "pidyon" ? "השם לפדיון נפש (ושם האם)" : "שם לתפילה", "name", item.name));
       form.appendChild(fld("בקשה", "request", item.request));
+      form.appendChild(area("פרטים נוספים", "details", item.details));
       form.appendChild(fld("תאריך (YYYY-MM-DD)", "date", item.date));
     } else if (kind === "stories") {
       form.appendChild(fld("סוג הישועה", "type", item.type));
