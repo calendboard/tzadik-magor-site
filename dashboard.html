@@ -393,6 +393,18 @@
 
     /* ---------- שליחת פוש (דרך ממסר Cloudflare) ---------- */
     var PUSH_RELAY_URL = "https://push-relay.hatzadikmagor.workers.dev";
+    /* רענון מיידי של האתר אחרי פרסום - מאותת לשרת Cloudflare לדחוף רענון ל-GitHub.
+       Best-effort: אם אין סיסמה שמורה, פשוט מדלגים (הרענון האוטומטי כל 15 דק' עדיין עובד). */
+    function triggerSync() {
+      var token = "";
+      try { token = localStorage.getItem("push_token") || ""; } catch (e) {}
+      if (!token) return;
+      fetch(PUSH_RELAY_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Push-Token": token },
+        body: JSON.stringify({ action: "sync" })
+      }).catch(function () {});
+    }
     function stripTxt(s) { var d = document.createElement("div"); d.innerHTML = String(s || ""); return (d.textContent || "").replace(/\s+/g, " ").trim(); }
     function openPushModal(a) {
       $("pushTitle").value = a ? (a.title || "") : "";
@@ -777,6 +789,7 @@
           }
           btn.disabled = false; db.disabled = false;
           clearDraft();
+          if (!rec.draft) triggerSync(); /* פרסום (לא טיוטה) => רענון מיידי */
           closeEditor();
           loadArticles();
         });
@@ -793,6 +806,7 @@
       if (!confirm('לפרסם את "' + (a.title || "") + '"?\nהכתבה תופיע באתר.')) return;
       sb.from("articles").update({ draft: false }).eq("id", a.id).then(function (res) {
         if (res.error) { alert("שגיאה בפרסום: " + res.error.message); return; }
+        triggerSync(); /* רענון מיידי */
         loadArticles();
       });
     }
