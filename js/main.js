@@ -981,23 +981,46 @@
     }
   }
 
-  /* ---------- ספירה לאחור להילולא (סקשן בדף הבית + באנר צף בכל הדפים) ---------- */
-  var HILULA_TARGET = "2026-07-05T19:30:00"; // ליל כ״א בתמוז תשפ״ו
+  /* ---------- ספירה לאחור (באנר צף בכל הדפים) ---------- */
+  var HILULA_TARGET = "2026-07-05T19:30:00"; // גיבוי לתאריך קבוע (data-date)
   function pad2(n) { return String(n).padStart(2, "0"); }
+  /* היום בחודש העברי עבור תאריך לועזי נתון */
+  function _hebDayOf(d) {
+    return parseInt(new Intl.DateTimeFormat("en-u-ca-hebrew", { day: "numeric" }).format(d), 10);
+  }
+  /* ערב ראש חודש הבא = ה-29 בחודש העברי (תמיד היום שלפני ר״ח), בערב.
+     מתגלגל אוטומטית: אחרי שעובר, מחשב את החודש הבא. */
+  function nextErevRoshChodesh() {
+    var now = new Date();
+    for (var i = 0; i < 45; i++) {
+      var probe = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i, 20, 0, 0);
+      try {
+        if (_hebDayOf(probe) === 29 && probe.getTime() > Date.now()) return probe.getTime();
+      } catch (e) { return null; }
+    }
+    return null;
+  }
   function setupCountdown(root) {
     if (!root) return;
-    var target = new Date(root.getAttribute("data-date") || HILULA_TARGET).getTime();
+    var recurring = root.getAttribute("data-recurring") === "erevrc";
+    var target = recurring ? nextErevRoshChodesh()
+                           : new Date(root.getAttribute("data-date") || HILULA_TARGET).getTime();
     var elD = root.querySelector('[data-cd="days"]'),
         elH = root.querySelector('[data-cd="hours"]'),
         elM = root.querySelector('[data-cd="mins"]'),
         elS = root.querySelector('[data-cd="secs"]');
     function tick() {
-      var diff = target - Date.now();
+      var diff = (target || 0) - Date.now();
       if (diff <= 0) {
-        diff = 0;
-        // לאחר ההילולא - מסתירים את הבאנר הצף כדי לא להציג אפסים
-        var bar = document.getElementById("hilulaBar");
-        if (root.id === "floatCountdown" && bar) bar.classList.add("hidden");
+        if (recurring) {
+          // ערב ר״ח עבר - מתגלגלים לחודש הבא
+          target = nextErevRoshChodesh();
+          diff = Math.max(0, (target || 0) - Date.now());
+        } else {
+          diff = 0;
+          var bar = document.getElementById("hilulaBar");
+          if (root.id === "floatCountdown" && bar) bar.classList.add("hidden");
+        }
       }
       if (elD) elD.textContent = pad2(Math.floor(diff / 86400000));
       if (elH) elH.textContent = pad2(Math.floor((diff % 86400000) / 3600000));
