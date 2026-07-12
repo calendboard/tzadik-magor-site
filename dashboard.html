@@ -146,14 +146,13 @@
         <input id="fImgCaption" type="text" class="img-cap" placeholder="כיתוב לתמונה (רשות) - מי בתמונה / איפה צולם…" />
       </div>
       <div class="field">
-        <label>סרטון <span class="hint">(רשות - קישור יוטיוב או העלאת קובץ)</span></label>
+        <label>סרטון <span class="hint">(רשות - קישור יוטיוב)</span></label>
         <input id="fVideo" type="text" placeholder="הדביקו כאן קישור יוטיוב…" />
         <div style="display:flex;gap:10px;align-items:center;margin-top:8px;flex-wrap:wrap">
-          <button type="button" id="vidUploadBtn" class="btn btn-ghost btn-sm">⬆ העלאת קובץ וידאו</button>
           <button type="button" id="vidClearBtn" class="btn btn-ghost btn-sm hidden">✕ הסרת סרטון</button>
           <span id="vidStatus" class="hint"></span>
         </div>
-        <input id="vidFile" type="file" accept="video/*" class="hidden" />
+        <p class="hint" style="margin:7px 0 0;line-height:1.5">🎬 <b>איך מוסיפים סרטון:</b> העלו אותו קודם ל-<b>יוטיוב</b> (חינם ומהיר), ואז הדביקו כאן את הקישור. <span style="color:#b23b3b">אין להעלות קובצי וידאו ישירות - זה מכביד על האתר ומאט אותו.</span></p>
         <p class="hint" style="margin:6px 0 0">העלאת קובץ - עד ~50MB (לסרטונים ארוכים עדיף קישור יוטיוב).</p>
       </div>
       <div class="field">
@@ -597,38 +596,7 @@
     }
     $("fVideo").addEventListener("input", updateVidStatus);
     $("vidClearBtn").addEventListener("click", function () { $("fVideo").value = ""; updateVidStatus(); });
-    $("vidUploadBtn").addEventListener("click", function () { $("vidFile").click(); });
-    $("vidFile").addEventListener("change", function () {
-      var file = this.files && this.files[0];
-      if (!file) return;
-      $("vidStatus").textContent = "מעלה סרטון… (עשוי לקחת זמן)"; $("vidStatus").style.color = "var(--muted)";
-      var ext = (file.name.split(".").pop() || "mp4").toLowerCase();
-      var name = "vid-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7) + "." + ext;
-      sb.storage.from("news-images").upload(name, file, { contentType: file.type || "video/mp4", upsert: true })
-        .then(function (res) {
-          if (res.error) {
-            $("vidStatus").textContent = "שגיאה בהעלאה (ייתכן שהקובץ גדול מ-50MB - נסו קישור יוטיוב).";
-            $("vidStatus").style.color = "#b23b3b"; return;
-          }
-          $("fVideo").value = sb.storage.from("news-images").getPublicUrl(name).data.publicUrl;
-          updateVidStatus();
-          /* תפיסת פריים אוטומטית כתמונה ראשית (רק אם עדיין אין תמונה) */
-          if (!pendingImageUrl) {
-            $("vidStatus").textContent = "תופס תמונה מהסרטון…"; $("vidStatus").style.color = "var(--muted)";
-            videoPoster(file).then(function (pb) {
-              if (!pb || pendingImageUrl) { updateVidStatus(); return; }
-              var pn = "poster-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7) + ".jpg";
-              sb.storage.from("news-images").upload(pn, pb, { contentType: "image/jpeg", upsert: true }).then(function (r2) {
-                if (!r2.error && !pendingImageUrl) {
-                  pendingImageUrl = sb.storage.from("news-images").getPublicUrl(pn).data.publicUrl;
-                  setPreview(pendingImageUrl);
-                  $("vidStatus").textContent = "קובץ וידאו מצורף ✓ · תמונה נתפסה אוטומטית ✓"; $("vidStatus").style.color = "#167a3a";
-                } else { updateVidStatus(); }
-              });
-            });
-          }
-        });
-    });
+    /* העלאת וידאו ישירה ל-Supabase הוסרה - סרטונים עולים ליוטיוב ומודבקים כקישור (חוסך תעבורה) */
 
     /* ---------- הקלטות / אודיו (כמה הקלטות לכתבה, ל-Storage) ---------- */
     var pendingAudios = [];
