@@ -335,9 +335,12 @@
       } else if (a.video_url) {
         var v = el("video", "nm-video-el"); v.controls = true; v.preload = "metadata"; v.src = a.video_url;
         if (a.image_url) v.poster = a.image_url;
+        v.onerror = function () { media.style.display = "none"; }; /* סרטון שאינו זמין - מוסתר */
         media.appendChild(v);
       } else if (a.image_url) {
-        var img = el("img"); img.src = a.image_url; img.alt = a.title || ""; media.appendChild(img);
+        var img = el("img"); img.src = a.image_url; img.alt = a.title || "";
+        img.onerror = function () { media.style.display = "none"; }; /* תמונה שאינה זמינה - מוסתרת (במקום אייקון שבור) */
+        media.appendChild(img);
       }
       if (media.children.length) view.appendChild(media);
       if (media.children.length && a.image_caption) {

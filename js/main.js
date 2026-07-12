@@ -1373,7 +1373,18 @@
         '</div>';
       var ncImg = c.querySelector(".nc-img");
       var thumb = a.img || (ytId(a.video) ? "https://img.youtube.com/vi/" + ytId(a.video) + "/hqdefault.jpg" : "");
-      if (thumb) { ncImg.style.backgroundImage = "url('" + thumb + "')"; }
+      /* אם תמונה נכשלת בטעינה (למשל אחסון חסום) - מציגים לוגו על רקע כהה במקום תמונה שבורה */
+      function ncFallback() {
+        ncImg.style.backgroundColor = "#2c2110";
+        ncImg.style.backgroundImage = "url('assets/logo-emblem.png?v=708')";
+        ncImg.style.backgroundSize = "52px 52px";
+        ncImg.style.backgroundRepeat = "no-repeat";
+        ncImg.style.backgroundPosition = "center";
+      }
+      if (thumb) {
+        ncImg.style.backgroundImage = "url('" + thumb + "')";
+        var _ncPre = new Image(); _ncPre.onerror = ncFallback; _ncPre.src = thumb;
+      }
       else if (a.video) {
         var vt = document.createElement("video"); vt.className = "nc-vthumb";
         vt.src = a.video + "#t=0.1"; vt.muted = true; vt.preload = "metadata"; vt.setAttribute("playsinline", "");
