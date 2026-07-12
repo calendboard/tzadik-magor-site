@@ -180,13 +180,25 @@
     function notFound() {
       view.innerHTML = '<p class="art-loading">הכתבה לא נמצאה. <a href="news.html" style="color:var(--gold-2)">חזרה לכל הכתבות »</a></p>';
     }
-    if (!id) { notFound(); }
-    else {
+    /* שליפה ישירה מ-Supabase (נשמר כגיבוי לכתבות חדשות מאוד שעדיין לא בקובץ) */
+    function fromSupabase() {
       fetch(SB_URL + "/rest/v1/articles?id=eq." + encodeURIComponent(id) + "&select=*",
         { headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY } })
         .then(function (r) { return r.json(); })
         .then(function (rows) { var a = rows && rows[0]; (a && !a.deleted && !a.draft) ? render(a) : notFound(); })
         .catch(notFound);
+    }
+    if (!id) { notFound(); }
+    else {
+      /* קודם מהקובץ הסטטי (חינמי, דרך Cloudflare, ללא תלות ב-Supabase);
+         רק אם הכתבה לא נמצאה שם - ננסה ישירות מ-Supabase */
+      fetch("data/news.json?t=" + Math.floor(Date.now() / 60000))
+        .then(function (r) { return r.json(); })
+        .then(function (rows) {
+          var match = (rows || []).filter(function (x) { return String(x.id) === String(id) && !x.deleted && !x.draft; });
+          if (match.length) { render(match[0]); } else { fromSupabase(); }
+        })
+        .catch(fromSupabase);
     }
 
     function el(tag, cls) { var e = document.createElement(tag); if (cls) e.className = cls; return e; }
