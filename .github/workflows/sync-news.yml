@@ -25,17 +25,27 @@ jobs:
           SB_URL: https://wfhgenhmoofyegysysac.supabase.co
           SB_KEY: sb_publishable_XbSp3aL_Y_O3m8yzZ_qmOQ_vp5W3EYn
         run: |
-          curl -sf "$SB_URL/rest/v1/articles?select=*&draft=is.false&order=sort.desc" \
+          if ! curl -sf "$SB_URL/rest/v1/articles?select=*&draft=is.false&order=sort.desc" \
             -H "apikey: $SB_KEY" \
             -H "Authorization: Bearer $SB_KEY" \
-            -o data/news.new.json
+            -o data/news.new.json; then
+            echo "Supabase לא זמין (חסימת מכסה/הגבלה) - מדלגים על הריצה בלי שגיאה"
+            rm -f data/news.new.json
+            exit 0
+          fi
 
       - name: Validate JSON (must be an array)
         run: |
-          python3 -c "import json,sys; d=json.load(open('data/news.new.json')); sys.exit(0 if isinstance(d,list) else 1)"
+          [ -f data/news.new.json ] || { echo "אין קובץ חדש - מדלגים"; exit 0; }
+          if ! python3 -c "import json,sys; d=json.load(open('data/news.new.json')); sys.exit(0 if isinstance(d,list) else 1)"; then
+            echo "נתונים לא תקינים - מדלגים בלי שגיאה"
+            rm -f data/news.new.json
+            exit 0
+          fi
 
       - name: Update file if changed
         run: |
+          [ -f data/news.new.json ] || { echo "אין קובץ חדש - אין מה לעדכן"; exit 0; }
           mkdir -p data
           if cmp -s data/news.new.json data/news.json; then
             rm -f data/news.new.json
