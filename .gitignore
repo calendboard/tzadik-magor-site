@@ -2,3 +2,7 @@
 _full.html
 *.log
 .claude/
+
+# גיבויים של כלי השחזור - לא אמורים להגיע לאתר
+data/news.json.גיבוי-*
+data/*.bak
