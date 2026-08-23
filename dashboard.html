@@ -124,7 +124,7 @@
     <div class="top">
       <div>
         <h1 id="pageTitle">📰 ניהול כתבות</h1>
-        <div class="who">מחובר/ת · <a href="index.html" target="_blank">צפייה באתר »</a></div>
+        <div class="who">מחובר/ת · <a href="index.html" target="_blank">צפייה באתר »</a><br><span style="opacity:.75">כתבה שנשמרת מופיעה כאן מיד, ובאתר עצמו תוך 2 עד 5 דקות.</span></div>
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
         <button id="newBtn" class="btn">➕ כתבה חדשה</button>
@@ -259,13 +259,11 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/cms-client.js?v=1"></script>
   <script>
   (function () {
-    var SB_URL = "https://wfhgenhmoofyegysysac.supabase.co";
-    var SB_KEY = "sb_publishable_XbSp3aL_Y_O3m8yzZ_qmOQ_vp5W3EYn";
-    var TEAM_EMAIL = "hatzadikmagor@gmail.com";
-    var sb = window.supabase.createClient(SB_URL, SB_KEY);
+
+    var sb = window.cms;   /* המנוע: js/cms-client.js */
 
     var $ = function (id) { return document.getElementById(id); };
     var loginBox = $("login"), app = $("app");
@@ -292,7 +290,7 @@
       if (!pw) return;
       $("loginMsg").textContent = "מתחבר…";
       $("loginMsg").style.color = "var(--muted)";
-      sb.auth.signInWithPassword({ email: TEAM_EMAIL, password: pw }).then(function (res) {
+      sb.auth.signInWithPassword({ password: pw }).then(function (res) {
         if (res.error) {
           $("loginMsg").textContent = "סיסמה שגויה. נסו שוב.";
           $("loginMsg").style.color = "#b23b3b";
@@ -596,7 +594,7 @@
     }
     $("fVideo").addEventListener("input", updateVidStatus);
     $("vidClearBtn").addEventListener("click", function () { $("fVideo").value = ""; updateVidStatus(); });
-    /* העלאת וידאו ישירה ל-Supabase הוסרה - סרטונים עולים ליוטיוב ומודבקים כקישור (חוסך תעבורה) */
+    /* סרטונים כבדים עולים ליוטיוב ומודבקים כקישור, כדי לא לנפח את המאגר */
 
     /* ---------- הקלטות / אודיו (כמה הקלטות לכתבה, ל-Storage) ---------- */
     var pendingAudios = [];
@@ -734,12 +732,6 @@
         else { rec.sort = Date.now(); op = sb.from("articles").insert(rec); }
         op.then(function (res) {
           if (res.error) {
-            /* אם עמודה חדשה עדיין לא קיימת ב-Supabase - שומרים בלעדיה, כדי לא לחסום את השמירה */
-            var _msg = res.error.message || "", _stripped = false;
-            ["created_by", "author_display", "image_caption", "audio_url"].forEach(function (col) {
-              if ((col in rec) && _msg.indexOf(col) !== -1) { delete rec[col]; _stripped = true; }
-            });
-            if (_stripped) { doSave(); return; }
             btn.disabled = false; db.disabled = false;
             $("editMsg").textContent = "שגיאה בשמירה: " + res.error.message; $("editMsg").style.color = "#b23b3b"; return;
           }

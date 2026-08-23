@@ -1,0 +1,49 @@
+name: בניית דפי הכתבות ומפת האתר
+
+# רץ אחרי כל שינוי בכתבות (מהדשבורד או מהמחשב) ובונה מחדש את הקבצים
+# שנגזרים מהן: דף קבוע לכל כתבה, ומפת האתר לגוגל.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "data/news.json"
+      - "article.html"
+      - "tools/build_articles.py"
+      - "tools/build_sitemap.py"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-site
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: בניית דפי הכתבות ומפת האתר
+        run: |
+          python3 tools/build_articles.py
+          python3 tools/build_sitemap.py
+
+      - name: שמירה אם השתנה משהו
+        run: |
+          if git diff --quiet -- a sitemap.xml; then
+            echo "אין שינוי בדפים הנגזרים"
+            exit 0
+          fi
+          git config user.name "site-build-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add a sitemap.xml
+          git commit -m "אוטומטי: בניית דפי הכתבות ומפת האתר"
+          for i in 1 2 3; do
+            git push && exit 0
+            echo "דחיפה נכשלה, מנסה שוב ($i)"
+            git pull --rebase && sleep 5
+          done
+          echo "הדחיפה נכשלה שלוש פעמים"
+          exit 1
