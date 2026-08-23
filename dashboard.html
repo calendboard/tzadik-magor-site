@@ -396,7 +396,7 @@
     function openPushModal(a) {
       $("pushTitle").value = a ? (a.title || "") : "";
       $("pushBody").value = a ? stripTxt(a.body || a.excerpt || a.content || "").slice(0, 140) : "";
-      $("pushUrl").value = a ? ("https://hatzadik-magor.co.il/article.html?id=" + encodeURIComponent(a.id)) : "https://hatzadik-magor.co.il/";
+      $("pushUrl").value = a ? ("https://hatzadik-magor.co.il/a/" + encodeURIComponent(a.id) + ".html") : "https://hatzadik-magor.co.il/";
       $("pushKey").value = localStorage.getItem("push_token") || "";
       var m = $("pushMsg"); m.textContent = ""; m.style.color = "";
       $("pushSend").disabled = false;

@@ -65,7 +65,7 @@ def build():
 
     arts = articles()
     for aid, lastmod, _ in arts:
-        loc = escape(f"{BASE}/article.html?id={aid}")
+        loc = escape(f"{BASE}/a/{aid}.html")
         rows.append("  <url>")
         rows.append(f"    <loc>{loc}</loc>")
         if lastmod:

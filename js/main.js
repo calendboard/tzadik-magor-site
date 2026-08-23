@@ -1362,7 +1362,7 @@
     function newsCard(a, isFeatured) {
       var c = document.createElement("a");
       c.className = "news-card" + (isFeatured ? " featured" : "");
-      c.href = "article.html?id=" + encodeURIComponent(a.id);
+      c.href = "/a/" + encodeURIComponent(a.id) + ".html";
       c.innerHTML =
         '<div class="nc-img"></div>' +
         '<div class="nc-body">' +
