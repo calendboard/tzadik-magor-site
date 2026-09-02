@@ -1,0 +1,11 @@
+name = "holy-rice-5df3"
+main = "article-meta.js"
+compatibility_date = "2025-01-01"
+account_id = "1aebf018df02b8591ddd945c68d11de9"
+workers_dev = true
+preview_urls = false
+
+# ה-route הקיים - מזריק מטא לכתובת הישנה article.html?id=X
+routes = [
+  { pattern = "hatzadik-magor.co.il/article.html*", zone_name = "hatzadik-magor.co.il" }
+]
