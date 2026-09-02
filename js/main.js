@@ -260,16 +260,23 @@
       }, loadCandleWall);
     });
   }
+  /* שם לתפילה הוא מידע אישי. הקופסה נקראת בידי כל מי שמכיר את הכתובת,
+     ולכן שום שדה אישי לא נשמר בה גלוי - הכל נארז מוצפן ב-encb, והפענוח
+     אפשרי רק עם הקוד הסודי בדף הרשימות. אם ההצפנה לא זמינה בדפדפן,
+     לא כותבים לקופסה בכלל - הפנייה ממילא הגיעה במייל דרך sendLead. */
   function appendPrayer(p) {
     p = p || {};
-    encryptContact({ by: p.by || "", phone: p.phone || "", email: p.email || "" }).then(function (enc) {
+    encryptBig({
+      name: String(p.name || "").substring(0, 80),
+      request: String(p.request || "").substring(0, 40),
+      details: String(p.details || "").substring(0, 1500),
+      by: p.by || "", phone: p.phone || "", email: p.email || ""
+    }).then(function (encb) {
+      if (!encb) return;
       appendToBin("prayers", {
-        name: String(p.name || "").substring(0, 80),
-        request: String(p.request || "").substring(0, 40),
-        details: String(p.details || "").substring(0, 1500),
         date: new Date().toISOString().slice(0, 10),
         ts: new Date().toISOString(),
-        enc: enc
+        encb: encb
       });
     });
   }
@@ -459,11 +466,33 @@
     var view = document.createElement("span"); view.className = "adm-view";
     if (kind === "prayers" || kind === "pidyon") {
       view.innerHTML = '<b></b><span class="adm-req"></span><span class="adm-details"></span><span class="adm-date"></span><span class="adm-contact"></span>';
-      view.querySelector("b").textContent = item.name || "";
+      var nameEl = view.querySelector("b");
+      var locked = item.encb || (_admData && _admData.sens);
+      nameEl.textContent = item.name || (locked ? "🔒 " + (kind === "pidyon" ? "פדיון נפש" : "שם לתפילה") : "");
       view.querySelector(".adm-req").textContent = item.request ? " - " + item.request : "";
       view.querySelector(".adm-details").textContent = item.details ? "💬 " + item.details : "";
       view.querySelector(".adm-date").textContent = fmtWhen(item);
       admContact(view.querySelector(".adm-contact"), item.enc);
+      /* השדות האישיים חיים מוצפנים ב-encb; רק עם הקוד הסודי הם נפתחים לתצוגה ולעריכה */
+      if (item.encb && _admKey) {
+        decryptBig(item.encb).then(function (o) {
+          if (!o) { nameEl.textContent = "(שגיאת פענוח)"; return; }
+          item.name = o.name || item.name || "";
+          item.request = o.request || item.request || "";
+          item.details = o.details || item.details || "";
+          item._phoneInit = o.phone || item._phoneInit || "";
+          item._emailInit = o.email || item._emailInit || "";
+          if (o.by) item._by = o.by;
+          nameEl.textContent = item.name || "(ללא שם)";
+          view.querySelector(".adm-req").textContent = item.request ? " - " + item.request : "";
+          view.querySelector(".adm-details").textContent = item.details ? "💬 " + item.details : "";
+          var cs = view.querySelector(".adm-contact"), parts = [];
+          if (o.phone) parts.push("📞 " + o.phone);
+          if (o.email) parts.push("✉ " + o.email);
+          if (o.by) parts.push("(" + o.by + ")");
+          if (parts.length && cs) { cs.textContent = "  ·  " + parts.join("   "); cs.className = "adm-contact show"; }
+        });
+      }
     } else {
       view.innerHTML = '<span class="adm-main"></span><span class="adm-date"></span><span class="adm-contact"></span>';
       view.querySelector(".adm-main").textContent = admLine(item);
@@ -522,7 +551,7 @@
       form.appendChild(fld("תאריך (YYYY-MM-DD)", "date", item.date));
     }
     /* פרטי קשר (טלפון/מייל) - לתפילה ולנר. נשמרים מוצפנים ב-enc. */
-    var _prefillBy = null;
+    var _prefillBy = item._by || null;
     if (kind !== "stories") {
       form.appendChild(fld("טלפון", "_phone", item._phoneInit || ""));
       form.appendChild(fld("אימייל", "_email", item._emailInit || ""));
@@ -547,7 +576,17 @@
       var _phone = fields._phone || "", _email = fields._email || "";
       delete fields._phone; delete fields._email;
       save.disabled = true; save.textContent = "שומר…";
-      if (kind !== "stories" && (_phone || _email)) {
+      if (kind === "prayers" || kind === "pidyon") {
+        /* שמות תפילה ופדיון נשמרים רק מוצפנים (encb), בלי עותק גלוי בקופסה.
+           enc ישן לא נמחק - פרטי קשר של רשומות ותיקות ממשיכים להיפתח ממנו. */
+        encryptBig({
+          name: fields.name || "", request: fields.request || "", details: fields.details || "",
+          phone: _phone, email: _email, by: _prefillBy || ""
+        }).then(function (e) {
+          if (!e) { alert("ההצפנה נכשלה - הרשומה לא נשמרה 🙏"); save.disabled = false; save.textContent = "💾 שמירה"; return; }
+          onSave({ date: fields.date || "", encb: e, name: "", request: "", details: "" });
+        });
+      } else if (kind !== "stories" && (_phone || _email)) {
         // מצפינים את הטלפון/מייל (מפתח ציבורי) → נשמר ב-enc
         var payload = { phone: _phone, email: _email };
         if (_prefillBy) payload.by = _prefillBy;
@@ -748,7 +787,40 @@
     admPersist(function (rec) { (rec.stories || []).forEach(function (it) { if (it && it._id === id) it.status = status; }); },
       function (ok) { if (!ok) alert("הפעולה נכשלה, נסו שוב 🙏"); });
   }
+  /* חבילת השמות ההיסטוריים: rec.sens היא הצפנה אחת של כל השדות האישיים
+     שהוסרו מהרשומות הוותיקות (name/request/details של תפילות ופדיון).
+     נעשה כחבילה אחת ולא encb לכל רשומה בגלל תקרת הגודל של הקופסה.
+     encb פר רשומה, אם קיים, גובר - הוא תמיד חדש יותר מהחבילה. */
+  var _admHydrated = null; // איזה אובייקט נתונים כבר פוענח (לא שדה על הרשומה, כדי שלא ייכתב לשרת)
+  function admHydrateSens() {
+    if (!_admKey || !_admData || !_admData.sens || _admHydrated === _admData) return Promise.resolve();
+    var target = _admData;
+    return decryptBig(_admData.sens).then(function (m) {
+      _admHydrated = target;
+      if (!m) return;
+      ["prayers", "pidyon"].forEach(function (kind) {
+        var byId = m[kind] || {};
+        (_admData[kind] || []).forEach(function (it) {
+          var s = it && it._id && byId[it._id];
+          if (!s || it.encb) return;
+          if (!it.name && s.name) it.name = s.name;
+          if (!it.request && s.request) it.request = s.request;
+          if (!it.details && s.details) it.details = s.details;
+        });
+      });
+    });
+  }
   function renderAdmin() {
+    /* אזהרה לעתיד: אחרי הפענוח, _admData מחזיק שמות גלויים בזיכרון.
+       כל כתיבה לשרת חייבת לצאת מקריאה טרייה (כמו admPersist), לעולם לא
+       מ-JSON.stringify(_admData) - אחרת השמות יחזרו לקופסה גלויים. */
+    if (_admKey && _admData && _admData.sens && _admHydrated !== _admData) {
+      admHydrateSens().then(function () { renderAdminNow(); });
+      return;
+    }
+    renderAdminNow();
+  }
+  function renderAdminNow() {
     if (!_admData) return;
     var pWrap = document.getElementById("prayerList");
     var cWrap = document.getElementById("candleList");
@@ -1313,7 +1385,13 @@
         .then(function (r) { return r.json(); })
         .then(function (rec) {
           var list = (((rec && rec.stories) || []).filter(function (x) { return x && x.status === "approved"; })).reverse()
-            .map(function (us) { return { tag: us.type || "ישועה", title: us.public_name || "מתפלל/ת (בעילום שם)", full: us.story || "", img: us.img || null }; });
+            .map(function (us) {
+              /* תמונה רק מתוך נכסי האתר: כתובת חיצונית בשדה img הייתה מאפשרת
+                 למי שכותב לקופסה לתעד כתובות IP של גולשים דרך שרת שלו */
+              var img = String(us.img || "");
+              if (!/^assets\//.test(img)) img = null;
+              return { tag: us.type || "ישועה", title: us.public_name || "מתפלל/ת (בעילום שם)", full: us.story || "", img: img };
+            });
           renderStoryGrid(list);
         }).catch(function () {});
     }
