@@ -209,42 +209,63 @@
     });
   }
 
-  /* ---------- קיר הנרות (זיכרון משותף ציבורי דרך JSONBin) ---------- */
-  var CANDLE_API = "https://api.jsonbin.io/v3/b/6a40f90fda38895dfe0b10e7";
-  /* מזהה ייחודי לכל פריט - מאפשר זיהוי כפילויות ואימות אחרי כתיבה */
+  /* ---------- קיר הנרות (זיכרון משותף ציבורי) ----------
+     כל הקריאות והכתיבות עוברות דרך שירות הביניים ב-Cloudflare (worker/cms-relay.js),
+     שהוא היחיד שמחזיק את מפתח הקופסה. הקופסה עצמה נעולה לפרטית, כך שאי אפשר
+     לכתוב אליה או למחוק ממנה מבחוץ. כתיבות מהקהל מוגבלות בקצב בשרת, וכתיבות
+     ניהוליות (עריכה, מחיקה, אישור) דורשות את סיסמת הצוות. */
+  var WALL_API = "https://cms-relay.hatzadikmagor.workers.dev";
+  var WALL_SESSION = "tz_cms_session";
+  /* מזהה ייחודי לרשומה - משמש לזיהוי, עריכה ומחיקה (השרת מקצה לרשומות חדשות) */
   function uid() { return Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 9); }
-  /* מוסיף פריט למערך בקופסה (candles/prayers) תוך שמירה על שאר המבנה.
-     עמיד ל"lost update": קורא טרי לפני כל כתיבה, מאמת שהפריט נשמר,
-     ואם נדרס ע"י כתיבה מקבילה - מנסה שוב עם השהיה אקראית (עד 5 פעמים). */
-  function appendToBin(key, item, after, _try) {
-    _try = _try || 0;
-    if (!item._id) item._id = uid();
-    fetch(CANDLE_API + "/latest", { headers: { "X-Bin-Meta": "false" }, cache: "no-store" })
-      .then(function (r) { return r.json(); })
-      .then(function (rec) {
-        rec = rec || {};
-        if (!Array.isArray(rec.candles)) rec.candles = [];
-        if (!Array.isArray(rec.prayers)) rec.prayers = [];
-        if (!Array.isArray(rec.contacts)) rec.contacts = [];
-        if (!Array.isArray(rec.stories)) rec.stories = [];
-        if (!Array.isArray(rec.pidyon)) rec.pidyon = [];
-        var exists = rec[key].some(function (x) { return x && x._id === item._id; });
-        if (!exists) rec[key].push(item);
-        return fetch(CANDLE_API, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(rec) });
-      })
-      .then(function () {
-        /* אימות: לקרוא שוב ולוודא שהפריט באמת שם */
-        return fetch(CANDLE_API + "/latest", { headers: { "X-Bin-Meta": "false" }, cache: "no-store" }).then(function (r) { return r.json(); });
-      })
-      .then(function (rec) {
-        var ok = rec && Array.isArray(rec[key]) && rec[key].some(function (x) { return x && x._id === item._id; });
-        if (ok) { if (after) after(); return; }
-        if (_try < 5) { setTimeout(function () { appendToBin(key, item, after, _try + 1); }, 250 + Math.floor(Math.random() * 600)); }
-        else if (after) after();
-      })
-      .catch(function () {
-        if (_try < 5) { setTimeout(function () { appendToBin(key, item, after, _try + 1); }, 250 + Math.floor(Math.random() * 600)); }
+
+  function wallFetch(path, body, token) {
+    var h = { "Content-Type": "application/json" };
+    if (token) h["X-Cms-Token"] = token;
+    return fetch(WALL_API + path, { method: "POST", headers: h, body: JSON.stringify(body || {}) })
+      .then(function (r) {
+        return r.json().catch(function () { return {}; }).then(function (j) {
+          if (!r.ok) {
+            if (r.status === 401 && path !== "/login") { try { localStorage.removeItem(WALL_SESSION); } catch (e) {} }
+            throw new Error(j.error || ("שגיאה " + r.status));
+          }
+          return j;
+        });
       });
+  }
+  /* קריאת כל רשומות הקיר (ציבורי, בלי סיסמה) */
+  function wallRead() { return wallFetch("/wall/list", {}).then(function (j) { return j.rec || {}; }); }
+
+  /* כרטיס כניסה תקף לפעולות ניהול; מבקש את סיסמת הצוות פעם אחת ושומר אותו */
+  function wallSession() {
+    try {
+      var s = JSON.parse(localStorage.getItem(WALL_SESSION) || "null");
+      if (s && s.token && s.exp > Date.now() / 1000) return s;
+    } catch (e) {}
+    return null;
+  }
+  function wallToken() {
+    var s = wallSession();
+    if (s) return Promise.resolve(s.token);
+    var pw = window.prompt("סיסמת הצוות (לעריכה, הוספה ואישור)");
+    if (!pw) return Promise.reject(new Error("בוטל"));
+    return wallFetch("/login", { password: pw }).then(function (j) {
+      var exp = Math.floor(Date.now() / 1000) + (j.hours || 8) * 3600;
+      try { localStorage.setItem(WALL_SESSION, JSON.stringify({ token: j.token, exp: exp })); } catch (e) {}
+      return j.token;
+    });
+  }
+  /* שולח פעולות ניהול לשרת עם כרטיס כניסה, ומחזיר את הרשומה המעודכנת */
+  function wallAdmin(ops) {
+    return wallToken().then(function (t) { return wallFetch("/wall/admin", { ops: ops }, t); });
+  }
+
+  /* הוספת רשומה מהקהל - השרת מאמת קצב, מקצה מזהה וכופה status=pending לישועות.
+     נשאר "שקט" בכישלון: הפנייה ממילא הגיעה גם במייל דרך sendLead. */
+  function appendToBin(key, item, after) {
+    wallFetch("/wall/append", { kind: key, item: item })
+      .then(function () { if (after) after(); })
+      .catch(function () { if (after) after(); });
   }
   function appendCandle(c) {
     c = c || {};
@@ -391,8 +412,7 @@
   function loadCandleWall() {
     var wall = document.getElementById("candleWall");
     if (!wall) return;
-    fetch(CANDLE_API + "/latest", { headers: { "X-Bin-Meta": "false" } })
-      .then(function (r) { return r.json(); })
+    wallRead()
       .then(function (rec) {
         _candles = (rec && rec.candles) || [];
         var countEl = document.getElementById("candleCount");
@@ -624,46 +644,29 @@
       fields.date = fields.date || today;
       fields._id = uid();
       if (kind === "stories") fields.status = "approved";
-      admPersist(function (rec) { rec[kind].push(fields); }, function (ok) { if (!ok) alert("ההוספה נכשלה, נסו שוב 🙏"); });
+      admApply([{ type: "insert", kind: kind, item: fields }], function (ok) { if (!ok) alert("ההוספה נכשלה, נסו שוב 🙏"); });
     });
     li.appendChild(form);
     listEl.insertBefore(li, listEl.firstChild);
     var f0 = form.querySelector("input, textarea"); if (f0) f0.focus();
   }
-  /* קריאה טרייה → שינוי לפי _id → כתיבה → אימות → רענון התצוגה */
-  function admPersist(mutator, after) {
-    fetch(CANDLE_API + "/latest", { headers: { "X-Bin-Meta": "false" }, cache: "no-store" })
-      .then(function (r) { return r.json(); })
-      .then(function (rec) {
-        rec = rec || {};
-        if (!Array.isArray(rec.candles)) rec.candles = [];
-        if (!Array.isArray(rec.prayers)) rec.prayers = [];
-        if (!Array.isArray(rec.contacts)) rec.contacts = [];
-        if (!Array.isArray(rec.stories)) rec.stories = [];
-        if (!Array.isArray(rec.pidyon)) rec.pidyon = [];
-        mutator(rec);
-        return fetch(CANDLE_API, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(rec) })
-          .then(function () { return fetch(CANDLE_API + "/latest", { headers: { "X-Bin-Meta": "false" }, cache: "no-store" }); })
-          .then(function (r) { return r.json(); })
-          .then(function (rec2) { _admData = rec2 || {}; renderAdmin(); if (after) after(true); });
-      })
-      .catch(function () { if (after) after(false); });
+  /* שולח פעולת ניהול לשרת, ומרענן את התצוגה מהרשומה שהשרת החזיר.
+     השרת עצמו קורא טרי, משנה לפי _id, כותב ומאמת - כך שהלקוח לעולם לא
+     שולח את כל הרשומה, ופרטים מפוענחים בזיכרון לא חוזרים לקופסה גלויים. */
+  function admApply(ops, after) {
+    wallAdmin(ops)
+      .then(function (j) { _admData = j.rec || _admData; renderAdmin(); if (after) after(true); })
+      .catch(function (e) { if (String(e && e.message) === "בוטל") return; if (after) after(false); });
   }
   function admEdit(kind, id, fields) {
-    admPersist(function (rec) {
-      (rec[kind] || []).forEach(function (it) { if (it && it._id === id) { for (var k in fields) it[k] = fields[k]; } });
-    }, function (ok) { if (!ok) { alert("השמירה נכשלה, נסו שוב 🙏"); renderAdmin(); } });
+    admApply([{ type: "edit", kind: kind, id: id, fields: fields }], function (ok) { if (!ok) { alert("השמירה נכשלה, נסו שוב 🙏"); renderAdmin(); } });
   }
   function admDelete(kind, id) {
-    admPersist(function (rec) {
-      rec[kind] = (rec[kind] || []).filter(function (x) { return !(x && x._id === id); });
-    }, function (ok) { if (!ok) alert("המחיקה נכשלה, נסו שוב 🙏"); });
+    admApply([{ type: "delete", kind: kind, id: id }], function (ok) { if (!ok) alert("המחיקה נכשלה, נסו שוב 🙏"); });
   }
   /* סימון "תרם / לא תרם" לרשומה - נשמר ל-backend (להצלבה מול נדרים פלוס) */
   function admToggleDonated(kind, id, val) {
-    admPersist(function (rec) {
-      (rec[kind] || []).forEach(function (it) { if (it && it._id === id) it.donated = !!val; });
-    }, function (ok) { if (!ok) alert("עדכון הסימון נכשל, נסו שוב 🙏"); });
+    admApply([{ type: "edit", kind: kind, id: id, fields: { donated: !!val } }], function (ok) { if (!ok) alert("עדכון הסימון נכשל, נסו שוב 🙏"); });
   }
   /* שורת פניית "צור קשר" - מפוענחת רק כשהקוד מוזן */
   function admContactRow(item) {
@@ -702,10 +705,10 @@
             _phoneInit: o.phone || "", _emailInit: o.email || ""
           }, function (fields) {
             fields._id = uid();
-            admPersist(function (rec) {
-              rec.prayers.push(fields);
-              rec.contacts = (rec.contacts || []).filter(function (x) { return !(x && x._id === item._id); });
-            }, function (ok) { if (!ok) alert("ההעברה נכשלה, נסו שוב 🙏"); });
+            admApply([
+              { type: "insert", kind: "prayers", item: fields },
+              { type: "delete", kind: "contacts", id: item._id }
+            ], function (ok) { if (!ok) alert("ההעברה נכשלה, נסו שוב 🙏"); });
           });
           wrap.innerHTML = ""; wrap.appendChild(form);
           var f0 = form.querySelector("input"); if (f0) f0.focus();
@@ -784,7 +787,7 @@
     return li;
   }
   function admSetStoryStatus(id, status) {
-    admPersist(function (rec) { (rec.stories || []).forEach(function (it) { if (it && it._id === id) it.status = status; }); },
+    admApply([{ type: "edit", kind: "stories", id: id, fields: { status: status } }],
       function (ok) { if (!ok) alert("הפעולה נכשלה, נסו שוב 🙏"); });
   }
   /* חבילת השמות ההיסטוריים: rec.sens היא הצפנה אחת של כל השדות האישיים
@@ -812,8 +815,9 @@
   }
   function renderAdmin() {
     /* אזהרה לעתיד: אחרי הפענוח, _admData מחזיק שמות גלויים בזיכרון.
-       כל כתיבה לשרת חייבת לצאת מקריאה טרייה (כמו admPersist), לעולם לא
-       מ-JSON.stringify(_admData) - אחרת השמות יחזרו לקופסה גלויים. */
+       הכתיבה לשרת עוברת דרך admApply ששולח רק פעולות (edit/delete/insert)
+       ולעולם לא את כל הרשומה - כך שהשמות המפוענחים לא חוזרים לקופסה גלויים.
+       אין לשלוח לשרת JSON.stringify(_admData). */
     if (_admKey && _admData && _admData.sens && _admHydrated !== _admData) {
       admHydrateSens().then(function () { renderAdminNow(); });
       return;
@@ -877,17 +881,11 @@
   function loadAdminLists() {
     if (!document.getElementById("prayerList") && !document.getElementById("candleList")) return;
     function fetchAndRender() {
-      fetch(CANDLE_API + "/latest", { headers: { "X-Bin-Meta": "false" }, cache: "no-store" })
-        .then(function (r) { return r.json(); })
+      /* השרת מוודא מזהה לכל רשומה בכל כתיבה, ולכן כאן רק קוראים ומציגים */
+      wallRead()
         .then(function (rec) {
-          rec = rec || {};
-          var changed = false;
-          ["candles", "prayers", "contacts", "stories", "pidyon"].forEach(function (k) {
-            if (!Array.isArray(rec[k])) rec[k] = [];
-            rec[k].forEach(function (it) { if (it && !it._id) { it._id = uid(); changed = true; } });
-          });
+          ["candles", "prayers", "contacts", "stories", "pidyon"].forEach(function (k) { if (!Array.isArray(rec[k])) rec[k] = []; });
           _admData = rec; renderAdmin();
-          if (changed) { fetch(CANDLE_API, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(rec) }).catch(function () {}); }
         })
         .catch(function () { var p = document.getElementById("prayerList"); if (p) p.innerHTML = '<li class="adm-empty">לא ניתן לטעון כעת. נסו לרענן.</li>'; });
     }
@@ -1381,8 +1379,7 @@
         all.forEach(function (s) { storyGrid.appendChild(yshBall(s)); });
       }
       renderStoryGrid([]);
-      fetch(CANDLE_API + "/latest", { headers: { "X-Bin-Meta": "false" } })
-        .then(function (r) { return r.json(); })
+      wallRead()
         .then(function (rec) {
           var list = (((rec && rec.stories) || []).filter(function (x) { return x && x.status === "approved"; })).reverse()
             .map(function (us) {

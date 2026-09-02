@@ -22,6 +22,26 @@ const MAX_ATTEMPTS = 8;          // ניסיונות כניסה כושלים
 const ATTEMPT_WINDOW = 15 * 60;  // בתוך רבע שעה, לכל כתובת IP
 const MAX_MEDIA_BYTES = 25 * 1024 * 1024;
 
+/* קיר הנרות (JSONBin): הקופסה נעולה לפרטית והשירות הוא היחיד שמחזיק את המפתח.
+   כתיבות מהקהל מוגבלות בקצב, וכתיבות ניהוליות דורשות כרטיס כניסה.
+   משתנים נוספים ב-Cloudflare:
+     JSONBIN_KEY  - X-Master-Key של הקופסה (Secret)
+     JSONBIN_BIN  - מזהה הקופסה (Variable רגיל) */
+const WALL_KINDS = ["candles", "prayers", "stories", "contacts", "pidyon"];
+const WALL_APPEND_KINDS = new Set(["candles", "prayers", "stories", "contacts"]);
+const WALL_RATE_MAX = 12;              // כתיבות מהקהל
+const WALL_RATE_WINDOW = 10 * 60;      // בתוך 10 דקות, לכל כתובת IP
+const WALL_MAX_ITEM_BYTES = 16 * 1024; // תקרת גודל לרשומה בודדת מהקהל
+const WALL_MAX_BLOB = 8000;            // תקרת אורך למחרוזת מוצפנת (encb/enc)
+/* רק השדות הגלויים המותרים לכל סוג. שדות אישיים חיים מוצפנים ב-encb/enc בלבד. */
+const WALL_FIELDS = {
+  candles:  { name: 80, family: 60, deathdate: 40, dedication: 60 },
+  prayers:  {},
+  stories:  { type: 40, public_name: 60, story: 1500 },
+  contacts: { topic: 60 },
+  pidyon:   {},
+};
+
 /* רק סוגי קבצים שהאתר באמת מציג. בלי זה אפשר להעלות דף HTML או קוד
    לתוך הדומיין שלנו, וזו פרצה אמיתית גם למי שיש לו את סיסמת הצוות. */
 const ALLOWED_EXT = new Set([
@@ -144,6 +164,119 @@ async function writeFile(env, path, bytes, message, sha) {
   return r.json();
 }
 
+/* ---------- קיר הנרות ---------- */
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const wallUid = () => Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 9);
+const cap = (v, n) => String(v == null ? "" : v).slice(0, n);
+
+/* קריאה/כתיבה לקופסת JSONBin. User-Agent מוגדר במפורש כי JSONBin חוסם
+   בקשות בלי כותרת כזו. X-Bin-Meta:false מחזיר את הרשומה עצמה בלי עטיפה. */
+function jb(env, method, path, body) {
+  return fetch("https://api.jsonbin.io/v3" + path, {
+    method,
+    headers: {
+      "X-Master-Key": env.JSONBIN_KEY,
+      "X-Bin-Meta": "false",
+      "Content-Type": "application/json",
+      "User-Agent": "tzadik-cms-relay",
+    },
+    ...(body != null ? { body: JSON.stringify(body) } : {}),
+  });
+}
+
+function normalizeWall(rec) {
+  rec = rec && typeof rec === "object" && !Array.isArray(rec) ? rec : {};
+  for (const k of WALL_KINDS) if (!Array.isArray(rec[k])) rec[k] = [];
+  return rec;
+}
+
+/* מוודא שלכל רשומה יש מזהה, כדי שעריכה ומחיקה יעבדו לפי _id */
+function ensureWallIds(rec) {
+  for (const k of WALL_KINDS) for (const it of rec[k]) if (it && !it._id) it._id = wallUid();
+}
+
+async function readWall(env) {
+  const r = await jb(env, "GET", `/b/${env.JSONBIN_BIN}/latest`);
+  if (!r.ok) throw new Error(`קריאת קיר הנרות נכשלה (${r.status})`);
+  return normalizeWall(await r.json());
+}
+
+async function writeWall(env, rec) {
+  const r = await jb(env, "PUT", `/b/${env.JSONBIN_BIN}`, rec);
+  if (!r.ok) throw new Error(`כתיבה לקיר הנרות נכשלה (${r.status})`);
+  return true;
+}
+
+/* מנקה רשומה שמגיעה מהקהל: רק שדות מותרים, אורכים תחומים, מזהה ותאריך
+   נקבעים בשרת, וסטטוס ישועה נכפה ל-pending כדי שאי אפשר לפרסם באתר לבד. */
+function sanitizeWallItem(kind, raw) {
+  raw = raw && typeof raw === "object" ? raw : {};
+  const out = {};
+  const spec = WALL_FIELDS[kind] || {};
+  for (const f in spec) if (raw[f] != null) out[f] = cap(raw[f], spec[f]);
+  if (typeof raw.encb === "string") out.encb = raw.encb.slice(0, WALL_MAX_BLOB);
+  if (typeof raw.enc === "string") out.enc = raw.enc.slice(0, WALL_MAX_BLOB);
+  out._id = wallUid();
+  out.date = new Date().toISOString().slice(0, 10);
+  out.ts = new Date().toISOString();
+  if (kind === "stories") out.status = "pending";
+  return out;
+}
+
+/* הוספה מהקהל, עמידה לכתיבות מקבילות: קורא טרי, מוסיף לפי _id, כותב, מאמת */
+async function appendWall(env, kind, rawItem) {
+  const item = sanitizeWallItem(kind, rawItem);
+  for (let t = 0; t < 5; t++) {
+    const rec = await readWall(env);
+    ensureWallIds(rec);
+    if (!rec[kind].some((x) => x && x._id === item._id)) rec[kind].push(item);
+    await writeWall(env, rec);
+    const check = await readWall(env);
+    if ((check[kind] || []).some((x) => x && x._id === item._id)) return item;
+    await sleep(120 + Math.floor(Math.random() * 400));
+  }
+  throw new Error("שמירה נכשלה עקב עומס. נסו שוב.");
+}
+
+/* פעולת ניהול על הקיר (מאומתת בכרטיס כניסה): עריכה, מחיקה או הוספה ידנית */
+function applyWallOp(rec, op) {
+  if (!WALL_KINDS.includes(op.kind)) throw new Error("סוג לא מוכר");
+  const list = rec[op.kind];
+  if (op.type === "edit") {
+    const it = list.find((x) => x && x._id === op.id);
+    if (!it) throw new Error("הרשומה לא נמצאה");
+    Object.assign(it, op.fields || {});
+    return `עדכון ${op.kind}`;
+  }
+  if (op.type === "delete") {
+    const before = list.length;
+    rec[op.kind] = list.filter((x) => !(x && x._id === op.id));
+    if (rec[op.kind].length === before) throw new Error("הרשומה לא נמצאה");
+    return `מחיקת ${op.kind}`;
+  }
+  if (op.type === "insert") {
+    const it = op.item && typeof op.item === "object" ? { ...op.item } : {};
+    if (!it._id) it._id = wallUid();
+    if (!it.date) it.date = new Date().toISOString().slice(0, 10);
+    if (!it.ts) it.ts = new Date().toISOString();
+    list.push(it);
+    return `הוספת ${op.kind}`;
+  }
+  throw new Error("פעולה לא מוכרת");
+}
+
+async function wallRateLimited(env, ip) {
+  if (!env.RATE) return false;
+  return Number((await env.RATE.get(`wall:${ip}`)) || 0) >= WALL_RATE_MAX;
+}
+async function noteWallWrite(env, ip) {
+  if (!env.RATE) return;
+  const k = `wall:${ip}`;
+  const n = Number((await env.RATE.get(k)) || 0) + 1;
+  await env.RATE.put(k, String(n), { expirationTtl: WALL_RATE_WINDOW });
+}
+
 /* ---------- החלת פעולה על רשימת הכתבות ---------- */
 
 function applyOp(rows, op) {
@@ -210,6 +343,25 @@ export default {
       return json({ token: await makeToken(env), hours: TOKEN_HOURS });
     }
 
+    /* קיר הנרות: קריאה והוספה ציבוריות (בלי סיסמה). ההוספה מוגבלת בקצב,
+       השרת מקצה מזהה ותאריך, וכופה status=pending לישועות. */
+    if (url.pathname === "/wall/list") {
+      try { return json({ rec: await readWall(env) }); }
+      catch (e) { return json({ error: String(e.message || e) }, 502); }
+    }
+    if (url.pathname === "/wall/append") {
+      if (!WALL_APPEND_KINDS.has(body.kind)) return json({ error: "סוג לא מוכר" }, 400);
+      if (JSON.stringify(body.item || {}).length > WALL_MAX_ITEM_BYTES) {
+        return json({ error: "הרשומה גדולה מדי" }, 413);
+      }
+      if (await wallRateLimited(env, ip)) {
+        return json({ error: "יותר מדי בקשות. נסו שוב בעוד מספר דקות." }, 429);
+      }
+      await noteWallWrite(env, ip);
+      try { return json({ ok: true, item: await appendWall(env, body.kind, body.item) }); }
+      catch (e) { return json({ error: String(e.message || e) }, 502); }
+    }
+
     /* מכאן והלאה חובה כרטיס תקף */
     if (!(await validToken(env, request.headers.get("X-Cms-Token")))) {
       return json({ error: "הכניסה פגה. היכנסו שוב." }, 401);
@@ -243,6 +395,16 @@ export default {
         const out = enc.encode(JSON.stringify(rows, null, 2) + "\n");
         await writeFile(env, NEWS_PATH, out, `דשבורד: ${notes.join(" · ")}`, sha);
         return json({ ok: true, rows, message: notes.join(" · ") });
+      }
+
+      /* קיר הנרות: עריכה, מחיקה, הוספה ידנית ואישור ישועה - דורש כרטיס כניסה */
+      if (url.pathname === "/wall/admin") {
+        const ops = Array.isArray(body.ops) ? body.ops : [body.op];
+        const rec = await readWall(env);
+        ensureWallIds(rec);
+        ops.forEach((op) => applyWallOp(rec, op));
+        await writeWall(env, rec);
+        return json({ ok: true, rec });
       }
 
       /* קריאה: מהמאגר עצמו, כדי לראות שינויים מיד ולא לחכות לפריסה */

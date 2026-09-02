@@ -6,3 +6,6 @@ _full.html
 # גיבויים של כלי השחזור - לא אמורים להגיע לאתר
 data/news.json.גיבוי-*
 data/*.bak
+
+# wrangler local cache
+worker/.wrangler/

@@ -1,0 +1,16 @@
+name = "cms-relay"
+main = "cms-relay.js"
+compatibility_date = "2025-01-01"
+account_id = "1aebf018df02b8591ddd945c68d11de9"
+workers_dev = true
+
+# KV להגבלת ניסיונות כניסה והגבלת קצב של קיר הנרות
+[[kv_namespaces]]
+binding = "RATE"
+id = "e8f6c7ee681146fca5ed1c4e774ba2ec"
+
+# משתנים לא-סודיים בלבד. הסודות (CMS_PASSWORD, CMS_SIGNING, GITHUB_TOKEN,
+# JSONBIN_KEY) מוגדרים בנפרד דרך `wrangler secret put` או דשבורד Cloudflare.
+[vars]
+GITHUB_REPO = "calendboard/tzadik-magor-site"
+JSONBIN_BIN = "6a40f90fda38895dfe0b10e7"
