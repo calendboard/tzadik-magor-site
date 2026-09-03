@@ -1070,11 +1070,32 @@
     }
     return null;
   }
+  /* שם החודש העברי עבור תאריך לועזי */
+  function _hebMonthOf(d) {
+    return new Intl.DateTimeFormat("he-u-ca-hebrew", { month: "long" }).format(d);
+  }
+  /* ההילולא הבאה = כ״א (21) בתמוז, בערב. מתגלגל אוטומטית לשנה הבאה אחרי שעובר. */
+  function nextHilula() {
+    var now = new Date();
+    for (var i = 0; i < 400; i++) {
+      var probe = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i, 19, 30, 0);
+      try {
+        if (_hebDayOf(probe) === 21 && _hebMonthOf(probe).indexOf("תמוז") !== -1 && probe.getTime() > Date.now()) return probe.getTime();
+      } catch (e) { return null; }
+    }
+    return null;
+  }
+  /* מחזיר את היעד הבא לפי מצב הספירה המתגלגלת */
+  function nextTarget(mode) {
+    if (mode === "erevrc") return nextErevRoshChodesh();
+    if (mode === "hilula") return nextHilula();
+    return null;
+  }
   function setupCountdown(root) {
     if (!root) return;
-    var recurring = root.getAttribute("data-recurring") === "erevrc";
-    var target = recurring ? nextErevRoshChodesh()
-                           : new Date(root.getAttribute("data-date") || HILULA_TARGET).getTime();
+    var mode = root.getAttribute("data-recurring");
+    var target = mode ? nextTarget(mode)
+                      : new Date(root.getAttribute("data-date") || HILULA_TARGET).getTime();
     var elD = root.querySelector('[data-cd="days"]'),
         elH = root.querySelector('[data-cd="hours"]'),
         elM = root.querySelector('[data-cd="mins"]'),
@@ -1082,9 +1103,9 @@
     function tick() {
       var diff = (target || 0) - Date.now();
       if (diff <= 0) {
-        if (recurring) {
-          // ערב ר״ח עבר - מתגלגלים לחודש הבא
-          target = nextErevRoshChodesh();
+        if (mode) {
+          // היעד עבר - מתגלגלים ליעד הבא (ערב ר״ח הבא / ההילולא הבאה)
+          target = nextTarget(mode);
           diff = Math.max(0, (target || 0) - Date.now());
         } else {
           diff = 0;
