@@ -1443,12 +1443,10 @@
     document.addEventListener("keydown", function (e) { if (e.key === "Escape") yshClose(); });
   }
 
-  /* ---------- חדשות ועדכוני המרכז (כרטיסים + מודאל כתבה) - נטען מ-Supabase ---------- */
+  /* ---------- חדשות ועדכוני המרכז (כרטיסים + מודאל כתבה) - נטען מ-data/news.json ---------- */
   var newsGrid = document.getElementById("newsGrid");
   var newsTeaser = document.getElementById("newsTeaser");
   if (newsGrid || newsTeaser) {
-    var SB_URL = "https://wfhgenhmoofyegysysac.supabase.co";
-    var SB_KEY = "sb_publishable_XbSp3aL_Y_O3m8yzZ_qmOQ_vp5W3EYn";
 
     function ytId(url) {
       var m = String(url || "").match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/))([\w-]{11})/);
